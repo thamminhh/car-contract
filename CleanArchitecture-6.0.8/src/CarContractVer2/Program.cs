@@ -48,6 +48,7 @@ builder.Services.AddScoped<IRentContractRepository, RentContractRepository>();
 builder.Services.AddScoped<ITransferContractRepository, TransferContractRepository>();
 builder.Services.AddScoped<IReceiveContractRepository, ReceiveContractRepository>();
 builder.Services.AddScoped<ICarStatusRepository, CarStatusRepository>();
+builder.Services.AddScoped<IContractGroupStatusRepository, ContractGroupStatusRepository>();
 
 //connection string 
 builder.Services.AddDbContext<ContractContext>(otp => otp.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

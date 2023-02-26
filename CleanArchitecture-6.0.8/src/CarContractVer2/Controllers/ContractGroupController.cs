@@ -23,10 +23,11 @@ namespace CarContractVer2.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<ContractGroup>))]
         public IActionResult GetContractGroups([FromQuery] ContractFilter filter,int page = 1, int pageSize = 10)
         {
+            var count = _contractGroupRepository.GetNumberOfContracts(filter);
             var listContractGroup = _contractGroupRepository.GetContractGroups(page, pageSize, filter);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            return Ok(listContractGroup);
+            return Ok(new { contracts = listContractGroup, total = count });
         }
 
         [HttpGet]
@@ -75,7 +76,7 @@ namespace CarContractVer2.Controllers
         [Route(ContractGroupEndpoints.UpdateContractGroupStatus)]
         public IActionResult UpdateContractGroupStatus([FromRoute]int id, [FromBody] ContractGroupUpdateStatusModel request)
         {
-            if (request == null || id != request.id)
+            if (request == null || id != request.Id)
                 return BadRequest();
             if (!_contractGroupRepository.ContractGroupExit(id))
                 return NotFound();

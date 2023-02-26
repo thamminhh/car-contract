@@ -334,8 +334,7 @@ namespace CleanArchitecture.Application.Repository
                         IsDeleted = c.IsDeleted,
                         CarColor = c.CarColor,
                         CarFuel = c.CarFuel,
-                        FrontImg = cf.FrontImg,
-                        BackImg = cf.BackImg
+                        FrontImg = cf.FrontImg
                         
                     }).OrderBy(c => c.Id).Skip(skip).Take(pageSize).ToList();
         }
