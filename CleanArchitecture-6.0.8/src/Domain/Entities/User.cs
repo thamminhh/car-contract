@@ -26,6 +26,8 @@ namespace CleanArchitecture.Domain.Entities
         public DateTime? PassportInfoDateReceive { get; set; }
         public DateTime? CreatedDate { get; set; }
         public bool? IsDeleted { get; set; }
+        public byte[]? PasswordHash { get; set; }
+        public byte[]? PasswordSalt { get; set; }
 
         public virtual ExpertiseContract? ExpertiseContract { get; set; }
         public virtual ReceiveContract? ReceiveContract { get; set; }

@@ -7,6 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +53,33 @@ builder.Services.AddScoped<ITransferContractRepository, TransferContractReposito
 builder.Services.AddScoped<IReceiveContractRepository, ReceiveContractRepository>();
 builder.Services.AddScoped<ICarStatusRepository, CarStatusRepository>();
 builder.Services.AddScoped<IContractGroupStatusRepository, ContractGroupStatusRepository>();
+builder.Services.AddScoped<FileRepository>();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Description = "Standar Authorization header using Bearer sheme (\"beaser {token}\")",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+
+    });
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(option =>
+    {
+        option.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
+                .GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 
 //connection string 
 builder.Services.AddDbContext<ContractContext>(otp => otp.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -72,7 +103,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 
         app.UseRouting();
 
-        app.UseAuthorization();
+        app.UseAuthentication();
 
         app.UseHttpsRedirection();
 

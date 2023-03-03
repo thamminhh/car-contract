@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
 {
@@ -48,8 +49,6 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
         public double LimitedKmForMonthReceive { get; set; }
 
         public double OverLimitedMileageReceive { get; set; }
-
-        public string? FilePath { get; set; }
 
         public string FrontImg { get; set; }
 

@@ -11,7 +11,7 @@ namespace CleanArchitecture.Domain.Interface
 
         User GetUserById(int id);
 
-        User GetUserByName(string name);
+        User GetUserByEmail(string Email);
 
         bool CreateUser(CreateUserModel user, out string errorMessage);
         bool UpdateUser(User user);
@@ -20,6 +20,12 @@ namespace CleanArchitecture.Domain.Interface
         bool UpdateUserRoleAsync(int id, UpdateUserRoleModel model);
 
         public int GetNumberOfUsers();
+
+        public string CreateToken(string email);
+
+        bool Login(LoginModel request, out string errorMessage);
+
+        bool EmailExit(string email);
 
     }
 }

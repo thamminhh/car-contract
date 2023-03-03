@@ -3,6 +3,7 @@ using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.Entities_SubModel.Car.SubModel;
 using CleanArchitecture.Domain.Entities_SubModel.User.SubModel;
 using CleanArchitecture.Domain.Interface;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarContractVer2.Controllers
@@ -15,10 +16,13 @@ namespace CarContractVer2.Controllers
         private readonly ICarMakeRepository _carMakeController;
 
 
-        public CarController(ICarRepository carRepository, ICarMakeRepository carMakeController)
+        public CarController(ICarRepository carRepository, ICarMakeRepository carMakeController
+            , IWebHostEnvironment webHostEnvironment
+            )
         {
             _carRepository = carRepository;
             _carMakeController = carMakeController;
+
         }
 
         [HttpGet]
@@ -144,6 +148,14 @@ namespace CarContractVer2.Controllers
             }
             return NoContent();
         }
+
+        //[HttpGet("root")]
+        //public IActionResult Get()
+        //{
+        //    string rootPath = _webHostEnvironment.ContentRootPath;
+        //    var localhost = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+        //    return Ok(new { rootPath,localhost });
+        //}
     }
 
 }

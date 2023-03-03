@@ -2,7 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\CleanArchitecture-6.0.8",
-    "\\CleanArchitecture-6.0.8\\src"
+    "\\CleanArchitecture-6.0.8\\src",
+    "\\CleanArchitecture-6.0.8\\src\\Infrastructure"
   ],
   "SelectedNode": "\\CleanArchitecture-6.0.8\\CleanArchitecture.sln",
   "PreviewInSolutionExplorer": false

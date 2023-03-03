@@ -2,6 +2,7 @@
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.Entities_SubModel.Car.SubModel;
 using CleanArchitecture.Domain.Interface;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -15,13 +16,17 @@ namespace CleanArchitecture.Application.Repository
         private readonly ContractContext _contractContext;
         private readonly ICarMakeRepository _carMakeController;
         private readonly ICarStatusRepository _carStatusController;
+        private readonly FileRepository _fileRepository;
+        
 
 
-        public CarRepository(ContractContext contractContext, ICarMakeRepository carMakeController, ICarStatusRepository carStatusController)
+        public CarRepository(ContractContext contractContext, FileRepository fileRepository,
+            ICarMakeRepository carMakeController, ICarStatusRepository carStatusController)
         {
             _contractContext = contractContext;
             _carMakeController = carMakeController;
-            _carStatusController = carStatusController; 
+            _carStatusController = carStatusController;
+            _fileRepository = fileRepository;
         }
 
         public int GetNumberOfCars(CarFilter filter)
@@ -247,12 +252,12 @@ namespace CleanArchitecture.Application.Repository
                 Maintenance = car.CarLoanInfo.Maintenance,
                 LimitedKmForMonthReceive = car.CarLoanInfo.LimitedKmForMonthReceive,
                 OverLimitedMileageReceive = car.CarLoanInfo.OverLimitedMileageReceive,
-                FilePath = car.CarFile.FilePath,
+                FilePath = car.CarFile != null ? car.CarFile.FilePath : null,
                 FrontImg = car.CarFile.FrontImg,
                 BackImg = car.CarFile.BackImg,
                 LeftImg = car.CarFile.LeftImg,
-                RightImg = car.CarFile.BackImg,
-                OrtherImg = car.CarFile.OrtherImg,
+                RightImg = car.CarFile.BackImg, 
+                OrtherImg = car.CarFile != null ? car.CarFile.OrtherImg : null,
                 CarFileCreatedDate = car.CarFile.CreatedDate,
                 LinkTracking = car.CarTracking.LinkTracking,
                 TrackingUsername = car.CarTracking.TrackingUsername,
@@ -265,6 +270,7 @@ namespace CleanArchitecture.Application.Repository
                 DayOfPayment = car.ForControl != null ? car.ForControl.DayOfPayment : null
             };
         }
+        
         public ICollection<CarDataModel> GetCars(int page, int pageSize, CarFilter filter)
         {
             if (page < 1)
@@ -379,7 +385,6 @@ namespace CleanArchitecture.Application.Repository
                     cars = cars.Where(c => c.CarColor.Equals(filter.CarColor));
                 }
             }
-
             return (from c in cars
                         join cstatus in _contractContext.CarStatuses on c.CarStatusId equals cstatus.Id
                         join cf in _contractContext.CarFiles on c.Id equals cf.CarId
@@ -523,20 +528,22 @@ namespace CleanArchitecture.Application.Repository
             _contractContext.CarLoanInfos.Add(carLoadnInfo);
             _contractContext.SaveChanges();
 
-            var carFile = new CarFile
+            if (request.OrtherImg != null)
             {
-                CarId = car.Id,
-                FilePath = request.FilePath,
-                FrontImg = request.FrontImg,
-                BackImg = request.BackImg,
-                LeftImg = request.LeftImg,
-                RightImg = request.RightImg,
-                OrtherImg = request.OrtherImg,
-                CreatedDate = request.CarFileCreatedDate,
-            };
-            // Save the new CarFile object to the database
-            _contractContext.CarFiles.Add(carFile);
-            _contractContext.SaveChanges();
+                var carFile = new CarFile
+                {
+                    CarId = car.Id,
+                    FrontImg = request.FrontImg,
+                    BackImg = request.BackImg,
+                    LeftImg = request.LeftImg,
+                    RightImg = request.RightImg,
+                    OrtherImg = request.OrtherImg,
+                    CreatedDate = request.CarFileCreatedDate,
+                };
+                // Save the new CarFile object to the database
+                _contractContext.CarFiles.Add(carFile);
+                _contractContext.SaveChanges();
+            }
 
             var carTracking = new CarTracking
             {

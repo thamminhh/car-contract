@@ -1,4 +1,4 @@
-using CleanArchitecture.Application.Repository;
+﻿using CleanArchitecture.Application.Repository;
 using CleanArchitecture.Domain.Endpoints;
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.Entities_SubModel.Car.SubModel;
@@ -13,11 +13,13 @@ namespace CarContractVer2.Controllers
     public class ExpertiseContractController : ControllerBase
     {
         private readonly IExpertiseContractRepository _expertiseContractRepository;
+        private readonly FileRepository _fileRepository;
 
 
-        public ExpertiseContractController(IExpertiseContractRepository expertiseContractRepository)
+        public ExpertiseContractController(IExpertiseContractRepository expertiseContractRepository, FileRepository fileRepository)
         {
             _expertiseContractRepository = expertiseContractRepository;
+            _fileRepository = fileRepository;
         }
 
         [HttpGet]
@@ -85,6 +87,19 @@ namespace CarContractVer2.Controllers
                 return StatusCode(500, ModelState);
             }
             return NoContent();
+        }
+
+        [HttpGet("generatePDF")]
+        public async Task<IActionResult> GeneratePDF(string contractNo)
+        {
+            string htmlContent = "<h1> Hợp đồng thuê </h1>";
+            string fileName = "Contract_" + contractNo + ".pdf";
+
+            var file = await _fileRepository.GeneratePdfAsync(htmlContent, fileName);
+
+            var filePath = _fileRepository.SaveFileToFolder(file, "1");
+
+            return Ok(filePath);
         }
 
     }
