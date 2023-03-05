@@ -53,6 +53,7 @@ builder.Services.AddScoped<ITransferContractRepository, TransferContractReposito
 builder.Services.AddScoped<IReceiveContractRepository, ReceiveContractRepository>();
 builder.Services.AddScoped<ICarStatusRepository, CarStatusRepository>();
 builder.Services.AddScoped<IContractGroupStatusRepository, ContractGroupStatusRepository>();
+builder.Services.AddScoped<ICarScheduleRepository, CarScheduleRepository>();
 builder.Services.AddScoped<FileRepository>();
 builder.Services.AddHttpContextAccessor();
 

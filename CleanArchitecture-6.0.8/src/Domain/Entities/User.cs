@@ -8,6 +8,10 @@ namespace CleanArchitecture.Domain.Entities
         public User()
         {
             ContractGroups = new HashSet<ContractGroup>();
+            ExpertiseContracts = new HashSet<ExpertiseContract>();
+            ReceiveContracts = new HashSet<ReceiveContract>();
+            RentContracts = new HashSet<RentContract>();
+            TransferContracts = new HashSet<TransferContract>();
         }
 
         public int Id { get; set; }
@@ -29,10 +33,10 @@ namespace CleanArchitecture.Domain.Entities
         public byte[]? PasswordHash { get; set; }
         public byte[]? PasswordSalt { get; set; }
 
-        public virtual ExpertiseContract? ExpertiseContract { get; set; }
-        public virtual ReceiveContract? ReceiveContract { get; set; }
-        public virtual RentContract? RentContract { get; set; }
-        public virtual TransferContract? TransferContract { get; set; }
         public virtual ICollection<ContractGroup> ContractGroups { get; set; }
+        public virtual ICollection<ExpertiseContract> ExpertiseContracts { get; set; }
+        public virtual ICollection<ReceiveContract> ReceiveContracts { get; set; }
+        public virtual ICollection<RentContract> RentContracts { get; set; }
+        public virtual ICollection<TransferContract> TransferContracts { get; set; }
     }
 }

@@ -89,18 +89,18 @@ namespace CarContractVer2.Controllers
             return NoContent();
         }
 
-        [HttpGet("generatePDF")]
-        public async Task<IActionResult> GeneratePDF(string contractNo)
-        {
-            string htmlContent = "<h1> Hợp đồng thuê </h1>";
-            string fileName = "Contract_" + contractNo + ".pdf";
+        //[HttpGet("generatePDF")]
+        //public async Task<IActionResult> GeneratePDF()
+        //{
+        //    string htmlContent = "<h1> Hợp đồng thuê </h1>";
+        //    string fileName = "ExpertiseContract"+".pdf";
 
-            var file = await _fileRepository.GeneratePdfAsync(htmlContent, fileName);
+        //    var file = await _fileRepository.GeneratePdfAsync(htmlContent, fileName);
 
-            var filePath = _fileRepository.SaveFileToFolder(file, "1");
+        //    var filePath = _fileRepository.SaveFileToFolder(file, "1");
 
-            return Ok(filePath);
-        }
+        //    return Ok(filePath);
+        //}
 
     }
 }

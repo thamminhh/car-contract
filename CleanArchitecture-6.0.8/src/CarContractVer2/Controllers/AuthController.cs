@@ -33,8 +33,7 @@ namespace CarContractVer2.Controllers
                 return StatusCode(422, ModelState);
             }
             var token = _userRepository.CreateToken(request.UserName);
-            return Ok(token);
+            return Ok (new { email = request.UserName, accessToken = token });
         }
-
     }
 }

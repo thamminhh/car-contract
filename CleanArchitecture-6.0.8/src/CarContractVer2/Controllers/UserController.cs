@@ -53,6 +53,19 @@ namespace CarContractVer2.Controllers
             return Ok(user);
         }
 
+        [HttpGet]
+        [Route(UserEndpoints.GetUserIdByEmail)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
+        public IActionResult GetUserIdByEmail(string email)
+        {
+            if (!_userRepository.EmailExit(email))
+                return NotFound();
+            var userId = _userRepository.GetUserIdByEmail(email);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(userId);
+        }
+
         [HttpPost]
         [Route(UserEndpoints.Create)]
         [ProducesResponseType(204)]

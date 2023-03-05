@@ -2,26 +2,74 @@
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.Entities_SubModel.RentContract;
 using CleanArchitecture.Domain.Interface;
+using MediatR;
 
 namespace CleanArchitecture.Application.Repository
 {
     public class RentContractRepository : IRentContractRepository
     {
         private readonly ContractContext _contractContext;
-
-        public RentContractRepository(ContractContext contractContext)
+        private readonly FileRepository _fileRepository;
+        public RentContractRepository(ContractContext contractContext, FileRepository fileRepository)
         {
             _contractContext = contractContext;
+            _fileRepository = fileRepository;
         }
 
         public RentContract GetRentContractById(int id)
         {
-            return _contractContext.RentContracts.Where(c => c.Id == id).FirstOrDefault();
+            var rentContract = _contractContext.RentContracts.Where(c => c.Id == id).FirstOrDefault();
+            var host = _fileRepository.GetCurrentHost();
+            return new RentContract
+            {
+                Id = id,
+                ContractGroupId = rentContract.ContractGroupId,
+                RepresentativeId = rentContract.RepresentativeId,
+                DeliveryAddress = rentContract.DeliveryAddress,
+                CarGeneralInfoAtRentPriceForNormalDay = rentContract.CarGeneralInfoAtRentPriceForNormalDay,
+                CarGeneralInfoAtRentPriceForWeekendDay = rentContract.CarGeneralInfoAtRentPriceForWeekendDay,
+                CarGeneralInfoAtRentPriceForHoliday = rentContract.CarGeneralInfoAtRentPriceForHoliday,
+                CarGeneralInfoAtRentPricePerKmExceed = rentContract.CarGeneralInfoAtRentPricePerKmExceed,
+                CarGeneralInfoAtRentPricePerHourExceed = rentContract.CarGeneralInfoAtRentPricePerHourExceed,
+                CarGeneralInfoAtRentLimitedKmForMonth = rentContract.CarGeneralInfoAtRentLimitedKmForMonth,
+                CarGeneralInfoAtRentPriceForMonth = rentContract.CarGeneralInfoAtRentPriceForMonth,
+                DownPayment = rentContract.DownPayment,
+                CreatedDate = rentContract.CreatedDate,
+                PaymentAmount = rentContract.PaymentAmount,
+                DepositItemAsset = rentContract.DepositItemAsset,
+                DepositItemDescription = rentContract.DepositItemDescription,
+                DepositItemDownPayment = rentContract.DepositItemDownPayment,
+                FilePath = host + rentContract.FilePath,
+                ContractStatusId = rentContract.ContractStatusId
+            };
         }
 
         public RentContract GetRentContractByContractGroupId(int contractGroupId)
         {
-            return _contractContext.RentContracts.Where(c => c.ContractGroupId == contractGroupId).FirstOrDefault();
+            var rentContract = _contractContext.RentContracts.Where(c => c.ContractGroupId == contractGroupId).FirstOrDefault();
+            var host = _fileRepository.GetCurrentHost();
+            return new RentContract
+            {
+                Id = rentContract.Id,
+                ContractGroupId = rentContract.ContractGroupId,
+                RepresentativeId = rentContract.RepresentativeId,
+                DeliveryAddress = rentContract.DeliveryAddress,
+                CarGeneralInfoAtRentPriceForNormalDay = rentContract.CarGeneralInfoAtRentPriceForNormalDay,
+                CarGeneralInfoAtRentPriceForWeekendDay = rentContract.CarGeneralInfoAtRentPriceForWeekendDay,
+                CarGeneralInfoAtRentPriceForHoliday = rentContract.CarGeneralInfoAtRentPriceForHoliday,
+                CarGeneralInfoAtRentPricePerKmExceed = rentContract.CarGeneralInfoAtRentPricePerKmExceed,
+                CarGeneralInfoAtRentPricePerHourExceed = rentContract.CarGeneralInfoAtRentPricePerHourExceed,
+                CarGeneralInfoAtRentLimitedKmForMonth = rentContract.CarGeneralInfoAtRentLimitedKmForMonth,
+                CarGeneralInfoAtRentPriceForMonth = rentContract.CarGeneralInfoAtRentPriceForMonth,
+                DownPayment = rentContract.DownPayment,
+                CreatedDate = rentContract.CreatedDate,
+                PaymentAmount = rentContract.PaymentAmount,
+                DepositItemAsset = rentContract.DepositItemAsset,
+                DepositItemDescription = rentContract.DepositItemDescription,
+                DepositItemDownPayment = rentContract.DepositItemDownPayment,
+                FilePath = host + rentContract.FilePath,
+                ContractStatusId = rentContract.ContractStatusId
+            };
         }
 
 
@@ -33,6 +81,20 @@ namespace CleanArchitecture.Application.Repository
         public void CreateRentContract(RentContractCreateModel request)
         {
             var defaultContractId = ContractStatusConstant.ContractExported;
+
+            string htmlContent = "<h1> Hợp đồng thuê </h1>";
+            string fileName = "RentContract" + ".pdf";
+
+
+
+            htmlContent += "<h2> RepresentativeId: " + request.RepresentativeId + "</h2>";
+            htmlContent += "<h2> ContractGroupId: " + request.ContractGroupId + "</h2>";
+            htmlContent += "<h2> DeliveryAddress: " + request.DeliveryAddress + "</h2>";
+            htmlContent += "<h2> CreatedDate: " + request.CreatedDate + "</h2>";
+
+            var file = _fileRepository.GeneratePdfAsync(htmlContent, fileName);
+
+            var filePath = _fileRepository.SaveFileToFolder(file, "1");
 
 
             var rentContract = new RentContract
@@ -53,6 +115,7 @@ namespace CleanArchitecture.Application.Repository
                 DepositItemAsset = request.DepositItemAsset ,
                 DepositItemDescription = request.DepositItemDescription ,
                 DepositItemDownPayment = request.DepositItemDownPayment ,
+                FilePath = filePath,
                 ContractStatusId = defaultContractId
             };
             _contractContext.RentContracts.Add(rentContract);

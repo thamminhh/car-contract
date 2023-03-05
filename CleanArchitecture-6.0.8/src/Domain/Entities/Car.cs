@@ -33,7 +33,7 @@ namespace CleanArchitecture.Domain.Entities
         public virtual CarFile? CarFile { get; set; }
         public virtual CarGenerallInfo? CarGenerallInfo { get; set; }
         public virtual CarLoanInfo? CarLoanInfo { get; set; }
-        public virtual CarShedule? CarShedule { get; set; }
+        public virtual CarSchedule? CarSchedule { get; set; }
         public virtual CarState? CarState { get; set; }
         public virtual CarTracking? CarTracking { get; set; }
         public virtual ForControl? ForControl { get; set; }

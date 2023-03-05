@@ -67,7 +67,7 @@ public class FileRepository
                 return "/" + folderName + "/" + subFolderName + "/" + uniqueFilename;
             }
 
-            public async Task<IFormFile> GeneratePdfAsync(string htmlContent, string fileName)
+            public IFormFile GeneratePdfAsync(string htmlContent, string fileName)
             {
                 var document = new PdfDocument();
                 PdfGenerator.AddPdfPages(document, htmlContent, PageSize.A4);

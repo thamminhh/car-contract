@@ -223,6 +223,12 @@ namespace CleanArchitecture.Application.Repository
             return _contractContext.Users.Where(u => u.Email == email).FirstOrDefault();
         }
 
+        public int GetUserIdByEmail(string email)
+        {
+            var user = _contractContext.Users.Where(u => u.Email == email).FirstOrDefault();
+            return user.Id;
+        }
+
         //public bool UpdateUserRole(int id, string role)
         //{
         //    throw new NotImplementedException();

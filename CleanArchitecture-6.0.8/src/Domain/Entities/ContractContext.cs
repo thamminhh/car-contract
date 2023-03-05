@@ -23,8 +23,8 @@ namespace CleanArchitecture.Domain.Entities
         public virtual DbSet<CarLoanInfo> CarLoanInfos { get; set; } = null!;
         public virtual DbSet<CarMake> CarMakes { get; set; } = null!;
         public virtual DbSet<CarModel> CarModels { get; set; } = null!;
+        public virtual DbSet<CarSchedule> CarSchedules { get; set; } = null!;
         public virtual DbSet<CarSeries> CarSeries { get; set; } = null!;
-        public virtual DbSet<CarShedule> CarShedules { get; set; } = null!;
         public virtual DbSet<CarState> CarStates { get; set; } = null!;
         public virtual DbSet<CarStatus> CarStatuses { get; set; } = null!;
         public virtual DbSet<CarTracking> CarTrackings { get; set; } = null!;
@@ -180,6 +180,28 @@ namespace CleanArchitecture.Domain.Entities
                     .HasConstraintName("FK__CarModel__CarMak__1BC821DD");
             });
 
+            modelBuilder.Entity<CarSchedule>(entity =>
+            {
+                entity.HasIndex(e => e.CarId, "UQ__CarSched__68A0342F8A137E52")
+                    .IsUnique();
+
+                entity.Property(e => e.DateEnd).HasColumnType("datetime");
+
+                entity.Property(e => e.DateStart).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).HasMaxLength(255);
+
+                entity.HasOne(d => d.Car)
+                    .WithOne(p => p.CarSchedule)
+                    .HasForeignKey<CarSchedule>(d => d.CarId)
+                    .HasConstraintName("FK__CarSchedu__CarId__17C286CF");
+
+                entity.HasOne(d => d.CarStatus)
+                    .WithMany(p => p.CarSchedules)
+                    .HasForeignKey(d => d.CarStatusId)
+                    .HasConstraintName("FK__CarSchedu__CarSt__18B6AB08");
+            });
+
             modelBuilder.Entity<CarSeries>(entity =>
             {
                 entity.HasNoKey();
@@ -187,26 +209,6 @@ namespace CleanArchitecture.Domain.Entities
                 entity.Property(e => e.CarGenerationId).HasColumnName("CarGenerationID");
 
                 entity.Property(e => e.Name).HasMaxLength(255);
-            });
-
-            modelBuilder.Entity<CarShedule>(entity =>
-            {
-                entity.HasIndex(e => e.CarId, "UQ__CarShedu__68A0342F83A92ABB")
-                    .IsUnique();
-
-                entity.Property(e => e.DateEnd).HasColumnType("datetime");
-
-                entity.Property(e => e.DateStart).HasColumnType("datetime");
-
-                entity.HasOne(d => d.Car)
-                    .WithOne(p => p.CarShedule)
-                    .HasForeignKey<CarShedule>(d => d.CarId)
-                    .HasConstraintName("FK__CarShedul__CarId__76619304");
-
-                entity.HasOne(d => d.CarStatus)
-                    .WithMany(p => p.CarShedules)
-                    .HasForeignKey(d => d.CarStatusId)
-                    .HasConstraintName("FK__CarShedul__CarSt__7755B73D");
             });
 
             modelBuilder.Entity<CarState>(entity =>
@@ -394,10 +396,7 @@ namespace CleanArchitecture.Domain.Entities
             {
                 entity.ToTable("ExpertiseContract");
 
-                entity.HasIndex(e => e.ContractGroupId, "UQ__Expertis__BD73678F7FBB688F")
-                    .IsUnique();
-
-                entity.HasIndex(e => e.ExpertiserId, "UQ__Expertis__E4B697DB1E6C6DF0")
+                entity.HasIndex(e => e.ContractGroupId, "UQ__Expertis__BD73678F32F8652E")
                     .IsUnique();
 
                 entity.Property(e => e.DepositInfoAsset).HasColumnName("DepositInfo_Asset");
@@ -412,6 +411,8 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.Property(e => e.ExpertiseDate).HasColumnType("datetime");
 
+                entity.Property(e => e.FilePath).HasMaxLength(255);
+
                 entity.Property(e => e.Result).HasMaxLength(255);
 
                 entity.Property(e => e.ResultOther).HasMaxLength(255);
@@ -421,12 +422,17 @@ namespace CleanArchitecture.Domain.Entities
                 entity.HasOne(d => d.ContractGroup)
                     .WithOne(p => p.ExpertiseContract)
                     .HasForeignKey<ExpertiseContract>(d => d.ContractGroupId)
-                    .HasConstraintName("FK__Expertise__Contr__503BEA1C");
+                    .HasConstraintName("FK__Expertise__Contr__7FEAFD3E");
+
+                entity.HasOne(d => d.ContractStatus)
+                    .WithMany(p => p.ExpertiseContracts)
+                    .HasForeignKey(d => d.ContractStatusId)
+                    .HasConstraintName("FK__Expertise__Contr__01D345B0");
 
                 entity.HasOne(d => d.Expertiser)
-                    .WithOne(p => p.ExpertiseContract)
-                    .HasForeignKey<ExpertiseContract>(d => d.ExpertiserId)
-                    .HasConstraintName("FK__Expertise__Exper__51300E55");
+                    .WithMany(p => p.ExpertiseContracts)
+                    .HasForeignKey(d => d.ExpertiserId)
+                    .HasConstraintName("FK__Expertise__Exper__00DF2177");
             });
 
             modelBuilder.Entity<ForControl>(entity =>
@@ -471,10 +477,7 @@ namespace CleanArchitecture.Domain.Entities
             {
                 entity.ToTable("ReceiveContract");
 
-                entity.HasIndex(e => e.ContractGroupId, "UQ__ReceiveC__BD73678FE2BD3737")
-                    .IsUnique();
-
-                entity.HasIndex(e => e.ReceiverId, "UQ__ReceiveC__FEBB5F265109C7B5")
+                entity.HasIndex(e => e.ContractGroupId, "UQ__ReceiveC__BD73678FB760A5DC")
                     .IsUnique();
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -536,27 +539,24 @@ namespace CleanArchitecture.Domain.Entities
                 entity.HasOne(d => d.ContractGroup)
                     .WithOne(p => p.ReceiveContract)
                     .HasForeignKey<ReceiveContract>(d => d.ContractGroupId)
-                    .HasConstraintName("FK__ReceiveCo__Contr__6442E2C9");
+                    .HasConstraintName("FK__ReceiveCo__Contr__2334397B");
 
                 entity.HasOne(d => d.ContractStatus)
                     .WithMany(p => p.ReceiveContracts)
                     .HasForeignKey(d => d.ContractStatusId)
-                    .HasConstraintName("FK__ReceiveCo__Contr__65370702");
+                    .HasConstraintName("FK__ReceiveCo__Contr__24285DB4");
 
                 entity.HasOne(d => d.Receiver)
-                    .WithOne(p => p.ReceiveContract)
-                    .HasForeignKey<ReceiveContract>(d => d.ReceiverId)
-                    .HasConstraintName("FK__ReceiveCo__Recei__634EBE90");
+                    .WithMany(p => p.ReceiveContracts)
+                    .HasForeignKey(d => d.ReceiverId)
+                    .HasConstraintName("FK__ReceiveCo__Recei__22401542");
             });
 
             modelBuilder.Entity<RentContract>(entity =>
             {
                 entity.ToTable("RentContract");
 
-                entity.HasIndex(e => e.ContractGroupId, "UQ__RentCont__BD73678F43302792")
-                    .IsUnique();
-
-                entity.HasIndex(e => e.RepresentativeId, "UQ__RentCont__E25A229896328E37")
+                entity.HasIndex(e => e.ContractGroupId, "UQ__RentCont__BD73678F89230323")
                     .IsUnique();
 
                 entity.Property(e => e.CarGeneralInfoAtRentLimitedKmForMonth).HasColumnName("CarGeneralInfoAtRent_LimitedKmForMonth");
@@ -596,27 +596,24 @@ namespace CleanArchitecture.Domain.Entities
                 entity.HasOne(d => d.ContractGroup)
                     .WithOne(p => p.RentContract)
                     .HasForeignKey<RentContract>(d => d.ContractGroupId)
-                    .HasConstraintName("FK__RentContr__Contr__55F4C372");
+                    .HasConstraintName("FK__RentContr__Contr__05A3D694");
 
                 entity.HasOne(d => d.ContractStatus)
                     .WithMany(p => p.RentContracts)
                     .HasForeignKey(d => d.ContractStatusId)
-                    .HasConstraintName("FK__RentContr__Contr__57DD0BE4");
+                    .HasConstraintName("FK__RentContr__Contr__078C1F06");
 
                 entity.HasOne(d => d.Representative)
-                    .WithOne(p => p.RentContract)
-                    .HasForeignKey<RentContract>(d => d.RepresentativeId)
-                    .HasConstraintName("FK__RentContr__Repre__56E8E7AB");
+                    .WithMany(p => p.RentContracts)
+                    .HasForeignKey(d => d.RepresentativeId)
+                    .HasConstraintName("FK__RentContr__Repre__0697FACD");
             });
 
             modelBuilder.Entity<TransferContract>(entity =>
             {
                 entity.ToTable("TransferContract");
 
-                entity.HasIndex(e => e.TransfererId, "UQ__Transfer__2981FF71E9FB5346")
-                    .IsUnique();
-
-                entity.HasIndex(e => e.ContractGroupId, "UQ__Transfer__BD73678F52807E58")
+                entity.HasIndex(e => e.ContractGroupId, "UQ__Transfer__BD73678FCBABE35D")
                     .IsUnique();
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -680,17 +677,17 @@ namespace CleanArchitecture.Domain.Entities
                 entity.HasOne(d => d.ContractGroup)
                     .WithOne(p => p.TransferContract)
                     .HasForeignKey<TransferContract>(d => d.ContractGroupId)
-                    .HasConstraintName("FK__TransferC__Contr__5D95E53A");
+                    .HasConstraintName("FK__TransferC__Contr__1D7B6025");
 
                 entity.HasOne(d => d.ContractStatus)
                     .WithMany(p => p.TransferContracts)
                     .HasForeignKey(d => d.ContractStatusId)
-                    .HasConstraintName("FK__TransferC__Contr__5E8A0973");
+                    .HasConstraintName("FK__TransferC__Contr__1E6F845E");
 
                 entity.HasOne(d => d.Transferer)
-                    .WithOne(p => p.TransferContract)
-                    .HasForeignKey<TransferContract>(d => d.TransfererId)
-                    .HasConstraintName("FK__TransferC__Trans__5CA1C101");
+                    .WithMany(p => p.TransferContracts)
+                    .HasForeignKey(d => d.TransfererId)
+                    .HasConstraintName("FK__TransferC__Trans__1C873BEC");
             });
 
             modelBuilder.Entity<User>(entity =>

@@ -12,6 +12,9 @@ namespace CleanArchitecture.Domain.Interface
         User GetUserById(int id);
 
         User GetUserByEmail(string Email);
+        int GetUserIdByEmail(string Email);
+
+
 
         bool CreateUser(CreateUserModel user, out string errorMessage);
         bool UpdateUser(User user);

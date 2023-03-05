@@ -7,14 +7,14 @@ namespace CleanArchitecture.Domain.Entities
     {
         public CarStatus()
         {
-            CarShedules = new HashSet<CarShedule>();
+            CarSchedules = new HashSet<CarSchedule>();
             Cars = new HashSet<Car>();
         }
 
         public int Id { get; set; }
         public string? Name { get; set; }
 
-        public virtual ICollection<CarShedule> CarShedules { get; set; }
+        public virtual ICollection<CarSchedule> CarSchedules { get; set; }
         public virtual ICollection<Car> Cars { get; set; }
     }
 }

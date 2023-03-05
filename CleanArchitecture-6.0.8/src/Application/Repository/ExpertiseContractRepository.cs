@@ -2,6 +2,7 @@
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.Entities_SubModel.ExpertiseContract;
 using CleanArchitecture.Domain.Interface;
+using MediatR;
 
 namespace CleanArchitecture.Application.Repository
 {
@@ -9,21 +10,59 @@ namespace CleanArchitecture.Application.Repository
     {
         private readonly ContractContext _contractContext;
         private readonly IContractGroupRepository _contractGroupController;
+        private readonly FileRepository _fileRepository;
 
-        public ExpertiseContractRepository(ContractContext contractContext, IContractGroupRepository contractGroupController)
+        public ExpertiseContractRepository(ContractContext contractContext, IContractGroupRepository contractGroupController, FileRepository fileRepository)
         {
             _contractContext = contractContext;
             _contractGroupController = contractGroupController;
+            _fileRepository = fileRepository;
         }
 
         public ExpertiseContract GetExpertiseContractById(int id)
         {
-            return _contractContext.ExpertiseContracts.Where(c => c.Id == id).FirstOrDefault();
+            var expertisecontracts = _contractContext.ExpertiseContracts.Where(c => c.Id == id).FirstOrDefault();
+            var host = _fileRepository.GetCurrentHost();
+            return new ExpertiseContract
+            {
+                Id= id,
+                ContractGroupId = expertisecontracts.ContractGroupId,
+                ExpertiserId = expertisecontracts.ExpertiserId,
+                ExpertiseDate = expertisecontracts.ExpertiseDate,
+                Description = expertisecontracts.Description,
+                Result = expertisecontracts.Result,
+                ResultOther = expertisecontracts.ResultOther,
+                TrustLevel = expertisecontracts.TrustLevel,
+                DepositInfoDescription = expertisecontracts.DepositInfoDescription,
+                DepositInfoAsset = expertisecontracts.DepositInfoAsset,
+                FilePath = host + expertisecontracts.FilePath,
+                DepositInfoDownPayment = expertisecontracts.DepositInfoDownPayment,
+                PaymentAmount = expertisecontracts.PaymentAmount,
+                ContractStatusId = expertisecontracts.ContractStatusId
+            };
         }
 
         public ExpertiseContract GetExpertiseContractByContractGroupId(int contractGroupId)
         {
-            return _contractContext.ExpertiseContracts.Where(c => c.ContractGroupId == contractGroupId).FirstOrDefault();
+            var expertisecontracts = _contractContext.ExpertiseContracts.Where(c => c.ContractGroupId == contractGroupId).FirstOrDefault();
+            var host = _fileRepository.GetCurrentHost();
+            return new ExpertiseContract
+            {
+                Id = expertisecontracts.Id,
+                ContractGroupId = expertisecontracts.ContractGroupId,
+                ExpertiserId = expertisecontracts.ExpertiserId,
+                ExpertiseDate = expertisecontracts.ExpertiseDate,
+                Description = expertisecontracts.Description,
+                Result = expertisecontracts.Result,
+                ResultOther = expertisecontracts.ResultOther,
+                TrustLevel = expertisecontracts.TrustLevel,
+                DepositInfoDescription = expertisecontracts.DepositInfoDescription,
+                DepositInfoAsset = expertisecontracts.DepositInfoAsset,
+                FilePath = host + expertisecontracts.FilePath,
+                DepositInfoDownPayment = expertisecontracts.DepositInfoDownPayment,
+                PaymentAmount = expertisecontracts.PaymentAmount,
+                ContractStatusId = expertisecontracts.ContractStatusId
+            };
         }
 
 
@@ -38,6 +77,23 @@ namespace CleanArchitecture.Application.Repository
 
             _contractGroupController.UpdateContractCarId(request.ContractGroupId, request.CarId);
 
+            string htmlContent = "<h1> Hợp đồng thẩm định </h1>";
+            string fileName = "ExpertiseContract" + ".pdf";
+
+            htmlContent += "<h2> ExpertiserId: " + request.ExpertiserId + "</h2>";
+            htmlContent += "<h2> ContractGroupId: " + request.ContractGroupId + "</h2>";
+            htmlContent += "<h2> ExpertiseDate: " + request.ExpertiseDate + "</h2>";
+            htmlContent += "<h2> Description: " + request.Description + "</h2>";
+            htmlContent += "<h2> Result: " + request.Result + "<h2>";
+            htmlContent += "<h2> DepositInfoDescription: " + request.DepositInfoDescription + "</h2>";
+            htmlContent += "<h2> DepositInfoAsset: " + request.DepositInfoAsset + "</h2>";
+            htmlContent += "<h2> DepositInfoDownPayment: " + request.DepositInfoDownPayment + "</h2>";
+            htmlContent += "<h2> PaymentAmount: " + request.PaymentAmount + "</h2>";
+
+            var file =  _fileRepository.GeneratePdfAsync(htmlContent, fileName);
+
+            var filePath = _fileRepository.SaveFileToFolder(file, "1");
+
             var expertiseContract = new ExpertiseContract
             {
                 ContractGroupId = request.ContractGroupId,
@@ -49,6 +105,7 @@ namespace CleanArchitecture.Application.Repository
                 TrustLevel = request.TrustLevel,
                 DepositInfoDescription = request.DepositInfoDescription,
                 DepositInfoAsset = request.DepositInfoAsset,
+                FilePath = filePath,
                 DepositInfoDownPayment = request.DepositInfoDownPayment,
                 PaymentAmount = request.PaymentAmount,
                 ContractStatusId = defaultContractId

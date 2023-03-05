@@ -17,11 +17,13 @@ namespace CleanArchitecture.Domain.Entities
         public double? DepositInfoAsset { get; set; }
         public double? DepositInfoDownPayment { get; set; }
         public double? PaymentAmount { get; set; }
+        public string? FilePath { get; set; }
         public bool? IsDeposited { get; set; }
         public bool? IsExported { get; set; }
         public int? ContractStatusId { get; set; }
 
         public virtual ContractGroup? ContractGroup { get; set; }
+        public virtual ContractStatus? ContractStatus { get; set; }
         public virtual User? Expertiser { get; set; }
     }
 }

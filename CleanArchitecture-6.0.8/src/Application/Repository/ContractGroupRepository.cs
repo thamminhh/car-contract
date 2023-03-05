@@ -291,7 +291,6 @@ namespace CleanArchitecture.Application.Repository
         }
 
 
-
         public bool ContractGroupExit(int id)
             {
                 return _contractContext.ContractGroups.Any(c => c.Id == id);

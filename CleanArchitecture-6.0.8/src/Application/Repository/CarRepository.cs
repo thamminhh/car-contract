@@ -217,7 +217,7 @@ namespace CleanArchitecture.Application.Repository
                 CarMakeId = car.CarMakeId,
                 MakeName = make.Name,
                 CarModelId = car.CarModelId,
-                ModelName = make.Name,
+                ModelName = model.Name,
                 CarGenerationId = car.CarGenerationId,
                 GenerationName = generation.Name,
                 GenerationYearBegin = generation.YearBegin,

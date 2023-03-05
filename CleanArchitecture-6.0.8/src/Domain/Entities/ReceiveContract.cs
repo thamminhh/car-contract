@@ -9,6 +9,7 @@ namespace CleanArchitecture.Domain.Entities
         public int? ReceiverId { get; set; }
         public int? ContractGroupId { get; set; }
         public DateTime? DateReceive { get; set; }
+        public string? ReceiveAddress { get; set; }
         public int? CurrentCarStateSpeedometerNumber { get; set; }
         public int? CurrentCarStateFuelPercent { get; set; }
         public double? CurrentCarStateCurrentEtcAmount { get; set; }
@@ -29,7 +30,6 @@ namespace CleanArchitecture.Domain.Entities
         public string? FilePath { get; set; }
         public string? FileWithSignsPath { get; set; }
         public int? ContractStatusId { get; set; }
-        public string? ReceiveAddress { get; set; }
 
         public virtual ContractGroup? ContractGroup { get; set; }
         public virtual ContractStatus? ContractStatus { get; set; }
