@@ -75,6 +75,7 @@ public class FileRepository
                 using (MemoryStream ms = new MemoryStream())
                 {
                     document.Save(ms);
+            
                     response = ms.ToArray();
                 }
 

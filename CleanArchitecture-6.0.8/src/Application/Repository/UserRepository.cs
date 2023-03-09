@@ -213,6 +213,32 @@ namespace CleanArchitecture.Application.Repository
             return true;
         }
 
+        public bool ChangePassword(UpdateUserPasswordModel request, out string errorMessage)
+        {
+            errorMessage = string.Empty;
+            if (!EmailExit(request.UserName))
+            {
+                errorMessage = "User not found";
+                return false;
+            }
+            var user = GetUserByEmail(request.UserName);
+            if (!VerifyPasswordHash(request.OldPassword, user.PasswordHash, user.PasswordSalt))
+            {
+                errorMessage = "Password incorect";
+                return false;
+            }
+            if(request.NewPassword != request.ConfirmPassword)
+            {
+                errorMessage = "Confirm password and new password don't match";
+                return false;
+            }
+            CreatePasswordHash(request.NewPassword, out byte[] newPasswordHash, out byte[] newPasswordSalt);
+            user.PasswordHash = newPasswordHash;
+            user.PasswordSalt = newPasswordSalt;
+            _contractContext.Update(user);
+            return Save();
+        }
+
         public bool EmailExit(string email)
         {
             return _contractContext.Users.Any(u => u.Email == email);

@@ -6,9 +6,9 @@ namespace CleanArchitecture.Domain.Interface
     public interface IExpertiseContractRepository
     {
 
-        ExpertiseContract GetExpertiseContractById(int id);
+        ExpertiseContractDataModel GetExpertiseContractById(int id);
 
-        ExpertiseContract GetExpertiseContractByContractGroupId(int contractGroupId);
+        ExpertiseContractDataModel GetExpertiseContractByContractGroupId(int contractGroupId);
 
         void CreateExpertiesContract(ExpertiseContractCreateModel request);
 

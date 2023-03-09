@@ -19,15 +19,17 @@ namespace CleanArchitecture.Application.Repository
             _fileRepository = fileRepository;
         }
 
-        public ExpertiseContract GetExpertiseContractById(int id)
+        public ExpertiseContractDataModel GetExpertiseContractById(int id)
         {
             var expertisecontracts = _contractContext.ExpertiseContracts.Where(c => c.Id == id).FirstOrDefault();
+            var contractGroup = _contractContext.ContractGroups.Find(expertisecontracts.ContractGroupId);
             var host = _fileRepository.GetCurrentHost();
-            return new ExpertiseContract
+            return new ExpertiseContractDataModel
             {
                 Id= id,
                 ContractGroupId = expertisecontracts.ContractGroupId,
                 ExpertiserId = expertisecontracts.ExpertiserId,
+                CarId = contractGroup.CarId,
                 ExpertiseDate = expertisecontracts.ExpertiseDate,
                 Description = expertisecontracts.Description,
                 Result = expertisecontracts.Result,
@@ -42,15 +44,18 @@ namespace CleanArchitecture.Application.Repository
             };
         }
 
-        public ExpertiseContract GetExpertiseContractByContractGroupId(int contractGroupId)
+        public ExpertiseContractDataModel GetExpertiseContractByContractGroupId(int contractGroupId)
         {
             var expertisecontracts = _contractContext.ExpertiseContracts.Where(c => c.ContractGroupId == contractGroupId).FirstOrDefault();
+
+            var contractGroup = _contractContext.ContractGroups.Find(expertisecontracts.ContractGroupId);
             var host = _fileRepository.GetCurrentHost();
-            return new ExpertiseContract
+            return new ExpertiseContractDataModel
             {
                 Id = expertisecontracts.Id,
                 ContractGroupId = expertisecontracts.ContractGroupId,
                 ExpertiserId = expertisecontracts.ExpertiserId,
+                CarId = contractGroup.CarId,
                 ExpertiseDate = expertisecontracts.ExpertiseDate,
                 Description = expertisecontracts.Description,
                 Result = expertisecontracts.Result,

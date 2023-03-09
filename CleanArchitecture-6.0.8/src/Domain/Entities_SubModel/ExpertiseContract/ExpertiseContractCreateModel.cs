@@ -16,7 +16,7 @@ public class ExpertiseContractCreateModel
     public string? ResultOther { get; set; }
     public string? TrustLevel { get; set; }
     public string? DepositInfoDescription { get; set; }
-    public double? DepositInfoAsset { get; set; }
+    public string? DepositInfoAsset { get; set; }
     public double? DepositInfoDownPayment { get; set; }
     public double? PaymentAmount { get; set; }
 }

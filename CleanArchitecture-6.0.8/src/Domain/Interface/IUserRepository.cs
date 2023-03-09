@@ -28,6 +28,8 @@ namespace CleanArchitecture.Domain.Interface
 
         bool Login(LoginModel request, out string errorMessage);
 
+        bool ChangePassword(UpdateUserPasswordModel request, out string errorMessage);
+
         bool EmailExit(string email);
 
     }

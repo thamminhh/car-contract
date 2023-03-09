@@ -528,10 +528,8 @@ namespace CleanArchitecture.Application.Repository
             _contractContext.CarLoanInfos.Add(carLoadnInfo);
             _contractContext.SaveChanges();
 
-            if (request.OrtherImg != null)
+            var carFile = new CarFile
             {
-                var carFile = new CarFile
-                {
                     CarId = car.Id,
                     FrontImg = request.FrontImg,
                     BackImg = request.BackImg,
@@ -539,11 +537,11 @@ namespace CleanArchitecture.Application.Repository
                     RightImg = request.RightImg,
                     OrtherImg = request.OrtherImg,
                     CreatedDate = request.CarFileCreatedDate,
-                };
+            };
                 // Save the new CarFile object to the database
-                _contractContext.CarFiles.Add(carFile);
-                _contractContext.SaveChanges();
-            }
+            _contractContext.CarFiles.Add(carFile);
+            _contractContext.SaveChanges();
+            
 
             var carTracking = new CarTracking
             {

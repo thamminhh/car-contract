@@ -4,14 +4,20 @@ using System.ComponentModel.DataAnnotations;
 
 public class UpdateUserPasswordModel
 {
+
+    public string UserName { get; init; }
     public string OldPassword { get; init; }
-    [StringLength(20, ErrorMessage = "Must be between 8 and 20 characters", MinimumLength = 8)]
-    [DataType(DataType.Password)]
     public string NewPassword { get; init; }
 
-    public UpdateUserPasswordModel(string oldPassword, string newPassword)
+    public string ConfirmPassword { get; init;}
+
+    public UpdateUserPasswordModel(string userName, string oldPassword, string newPassword, string confirmPassword)
     {
-        OldPassword = oldPassword ?? throw new ArgumentException(nameof(oldPassword));
-        NewPassword = newPassword ?? throw new ArgumentException(nameof(newPassword));
+        UserName = userName ?? throw new ArgumentNullException(nameof(userName));
+        OldPassword = oldPassword ?? throw new ArgumentNullException(nameof(oldPassword));
+        NewPassword = newPassword ?? throw new ArgumentNullException(nameof(newPassword));
+        ConfirmPassword = confirmPassword ?? throw new ArgumentNullException(nameof(confirmPassword));
     }
+
+
 }

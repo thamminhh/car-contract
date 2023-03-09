@@ -399,7 +399,9 @@ namespace CleanArchitecture.Domain.Entities
                 entity.HasIndex(e => e.ContractGroupId, "UQ__Expertis__BD73678F32F8652E")
                     .IsUnique();
 
-                entity.Property(e => e.DepositInfoAsset).HasColumnName("DepositInfo_Asset");
+                entity.Property(e => e.DepositInfoAsset)
+                    .HasMaxLength(255)
+                    .HasColumnName("DepositInfo_Asset");
 
                 entity.Property(e => e.DepositInfoDescription)
                     .HasMaxLength(255)

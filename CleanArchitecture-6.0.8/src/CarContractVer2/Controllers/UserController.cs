@@ -107,6 +107,25 @@ namespace CarContractVer2.Controllers
             }
             return NoContent();
         }
+
+        [HttpPut("password-change")]
+        public async Task<ActionResult<string>> ChangePassword(UpdateUserPasswordModel request)
+        {
+            if (request == null)
+                return BadRequest(ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_userRepository.ChangePassword(request, out string errorMessage))
+            {
+                ModelState.AddModelError("", errorMessage);
+                return StatusCode(422, ModelState);
+            }
+            return Ok();
+        }
     }
 }
 

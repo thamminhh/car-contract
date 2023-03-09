@@ -83,6 +83,7 @@ namespace CleanArchitecture.Application.Repository
                 ContractGroupStatusName = contractGroupStatus.Name,
 
                 CustomerInfoId = contractGroup.CustomerInfoId,
+                
                 PhoneNumber = customerInfo.PhoneNumber,
                 CustomerSocialInfoZalo = customerInfo.CustomerSocialInfoZalo,
                 CustomerSocialInfoFacebook = customerInfo.CustomerSocialInfoFacebook,
@@ -94,6 +95,7 @@ namespace CleanArchitecture.Application.Repository
                 ExpertiseInfoTrustLevel = customerInfo.ExpertiseInfoTrustLevel,
                 CustomerAddress = customerInfo.CustomerAddress,
                 CustomerName = customerInfo.CustomerName,
+                CompanyInfo = customerInfo.CompanyInfo,
 
                 Path = contractGroup.ContractFile.Path,
                 CitizenIdentifyImage1 = contractGroup.ContractFile.CitizenIdentifyImage1,
@@ -103,54 +105,12 @@ namespace CleanArchitecture.Application.Repository
                 HousePaperImages = contractGroup.ContractFile.HousePaperImages,
                 PassportImages = contractGroup.ContractFile.PassportImages,
                 OtherImages = contractGroup.ContractFile.OtherImages,
+                ExpertiseContracts = contractGroup.ContractFile.ExpertiseContracts,
                 RentContracts = contractGroup.ContractFile.RentContracts,
-                TransferContracts = contractGroup.ContractFile.TransferContracts
+                TransferContracts = contractGroup.ContractFile.TransferContracts,
+                ReceiveContracts = contractGroup.ContractFile.ReceiveContracts,
+
             };
-
-
-            //var ContractGroup = (from c in _contractContext.ContractGroups
-            //                     join ci in _contractContext.CustomerInfos on c.CustomerInfoId equals ci.Id
-            //                     join cf in _contractContext.ContractFiles on c.Id equals cf.Id
-            //                     where c.Id == ContractGroupId
-            //                     select new
-            //                     {
-            //                         c.Id,
-            //                         c.CustomerInfoId,
-            //                         c.UserId,
-            //                         c.CarId,
-            //                         c.RentPurpose,
-            //                         c.RentFrom,
-            //                         c.RentTo,
-            //                         c.RequireDescriptionInfoCarBrand,
-            //                         c.RequireDescriptionInfoSeatNumber,
-            //                         c.RequireDescriptionInfoYearCreate,
-            //                         c.RequireDescriptionInfoCarColor,
-            //                         c.ContractGroupStatus,
-
-            //                         ci.PhoneNumber,
-            //                         ci.CustomerSocialInfoZalo,
-            //                         ci.CustomerSocialInfoFacebook,
-            //                         ci.CustomerSocialInfoLinkedin,
-            //                         ci.CustomerSocialInfoOther,
-            //                         ci.AddtionalInfo,
-            //                         ci.RelativeTel,
-            //                         ci.ExpertiseInfoIsFirstTimeRent,
-            //                         ci.ExpertiseInfoTrustLevel,
-            //                         ci.CompanyInfo,
-
-            //                         cf.Path,
-            //                         cf.CitizenIdentifyImage1,
-            //                         cf.CitizenIdentifyImage2,
-            //                         cf.DrivingLisenceImage1,
-            //                         cf.DrivingLisenceImage2,
-            //                         cf.HousePaperImages,
-            //                         cf.PassportImages,
-            //                         cf.OtherImages,
-            //                         cf.RentContracts,
-            //                         cf.TransferContracts,
-            //                         cf.CreateDate
-            //                     }).FirstOrDefault();
-            //return ContractGroup;
 
         }
 
@@ -305,6 +265,7 @@ namespace CleanArchitecture.Application.Repository
                 var customerInfo = new CustomerInfo
                 {
                         PhoneNumber = request.PhoneNumber,
+                        CustomerName = request.CustomerName,
                         CustomerSocialInfoZalo = request.CustomerSocialInfoZalo,
                         CustomerSocialInfoFacebook = request.CustomerSocialInfoFacebook,
                         CustomerSocialInfoLinkedin = request.CustomerSocialInfoLinkedin,
@@ -322,7 +283,7 @@ namespace CleanArchitecture.Application.Repository
                     // Create new ContractGroup object and set its properties
 
 
-                    int contractGroupIdDefault = Constant.ContractGroupConstant.ContractGroupIsExpertising;
+                    int contractGroupIdDefault = Constant.ContractGroupConstant.ContractGroupNotExpertised;
                     var contractGroup = new ContractGroup
                     {
                         CustomerInfoId = customerInfo.Id,
@@ -360,83 +321,74 @@ namespace CleanArchitecture.Application.Repository
                     _contractContext.SaveChanges();
                 }
 
-                public void UpdateContractGroup(int id, ContractGroupUpdateModel request)
+            public void UpdateContractGroup(int id, ContractGroupUpdateModel request)
                 {
-                    // Retrieve the ContractGroup object from the database
-                    //var ContractGroup = _contractContext.ContractGroups.Find(id);
+            // Retrieve the ContractGroup object from the database
+                    var ContractGroup = _contractContext.ContractGroups.Find(id);
 
-                    //// Update the properties of the ContractGroup object
-                    //ContractGroup.ParkingLotId = request.ParkingLotId;
-                    //ContractGroup.ContractGroupStatus = request.ContractGroupStatus;
-                    //ContractGroup.ContractGroupId = request.ContractGroupId;
-                    //ContractGroup.ContractGroupLicensePlates = request.ContractGroupLicensePlates;
-                    //ContractGroup.ContractGroupMake = request.ContractGroupMake;
-                    //ContractGroup.SeatNumber = request.SeatNumber;
-                    //ContractGroup.ContractGroupModel = request.ContractGroupModel;
-                    //ContractGroup.ContractGroupGeneration = request.ContractGroupGeneration;
-                    //ContractGroup.ContractGroupSeries = request.ContractGroupSeries;
-                    //ContractGroup.ContractGroupTrim = request.ContractGroupTrim;
-                    //ContractGroup.CreatedDate = request.CreatedDate;
-                    //ContractGroup.IsDeleted = request.IsDeleted;
-                    //ContractGroup.ContractGroupColor = request.ContractGroupColor;
-                    //ContractGroup.ContractGroupFuel = request.ContractGroupFuel;
+                    // Update the properties of the ContractGroup object
+                    ContractGroup.CustomerInfoId = request.CustomerInfoId;
+                    ContractGroup.UserId = request.UserId;
+                    ContractGroup.CarId = request.CarId;
+                    ContractGroup.RentPurpose = request.RentPurpose;
+                    ContractGroup.RentFrom = request.RentFrom;
+                    ContractGroup.RentTo = request.RentTo;
+                    ContractGroup.RequireDescriptionInfoCarBrand = request.RequireDescriptionInfoCarBrand;
+                    ContractGroup.RequireDescriptionInfoSeatNumber = request.RequireDescriptionInfoSeatNumber;
+                    ContractGroup.RequireDescriptionInfoYearCreate = request.RequireDescriptionInfoYearCreate;
+                    ContractGroup.RequireDescriptionInfoCarColor = request.RequireDescriptionInfoCarColor;
+                    ContractGroup.ContractGroupStatusId = request.ContractGroupStatusId;
 
-                    //// Save the changes to the database
-                    //_contractContext.ContractGroups.Update(ContractGroup);
-                    //_contractContext.SaveChanges();
 
-                    //// Retrieve the ContractGroupGenerallInfos object from the database
-                    //var ContractGroupGenerallInfos = _contractContext.ContractGroupGenerallInfos.Find(id);
+                    // Save the changes to the database
+                    _contractContext.ContractGroups.Update(ContractGroup);
+                    _contractContext.SaveChanges();
 
-                    //// Update the properties of the ContractGroupGenerallInfos object
-                    //ContractGroupGenerallInfos.PriceForNormalDay = request.PriceForNormalDay;
-                    //ContractGroupGenerallInfos.PriceForWeekendDay = request.PriceForWeekendDay;
-                    //ContractGroupGenerallInfos.PriceForMonth = request.PriceForMonth;
-                    //ContractGroupGenerallInfos.LimitedKmForMonth = request.LimitedKmForMonth;
-                    //ContractGroupGenerallInfos.OverLimitedMileage = request.OverLimitedMileage;
+                    // Retrieve the ContractGroupGenerallInfos object from the database
+                    var customerInfo = _contractContext.CustomerInfos.Find(request.CustomerInfoId);
 
-                    //// Save the changes to the database
-                    //_contractContext.ContractGroupGenerallInfos.Update(ContractGroupGenerallInfos);
-                    //_contractContext.SaveChanges();
+            // Update the properties of the ContractGroupGenerallInfos object
+                    customerInfo.CustomerName = request.CustomerName;
+                    customerInfo.PhoneNumber = request.PhoneNumber;
+                    customerInfo.CustomerSocialInfoZalo = request.CustomerSocialInfoZalo;
+                    customerInfo.CustomerSocialInfoFacebook = request.CustomerSocialInfoFacebook;
+                    customerInfo.CustomerSocialInfoLinkedin = request.CustomerSocialInfoLinkedin;
+                    customerInfo.CustomerSocialInfoOther = request.CustomerSocialInfoOther;
+                    customerInfo.AddtionalInfo = request.AddtionalInfo;
+                    customerInfo.RelativeTel = request.RelativeTel;
+                    customerInfo.ExpertiseInfoIsFirstTimeRent = request.ExpertiseInfoIsFirstTimeRent;
+                    customerInfo.ExpertiseInfoTrustLevel = request.ExpertiseInfoTrustLevel;
+                    customerInfo.CompanyInfo = request.CompanyInfo;
+                    customerInfo.CustomerAddress = request.CustomerAddress;
 
-                    //// Retrieve the ContractGroupStates object from the database
-                    //var ContractGroupStates = _contractContext.ContractGroupStates.Find(id);
+                    // Save the changes to the database
+                    _contractContext.CustomerInfos.Update(customerInfo);
+                    _contractContext.SaveChanges();
 
-                    //// Update the properties of the ContractGroupStates object
-                    //ContractGroupStates.ContractGroupStatusDescription = request.ContractGroupStatusDescription;
-                    //ContractGroupStates.CurrentEtcAmount = request.CurrentEtcAmount;
-                    //ContractGroupStates.FuelPercent = request.FuelPercent;
-                    //ContractGroupStates.SpeedometerNumber = request.SpeedometerNumber;
+            // Retrieve the ContractGroupStates object from the database
+            var contractFile = _contractContext.ContractFiles.Where(c => c.ContractGroupId == id).FirstOrDefault();
 
-                    //// Save the changes to the database
-                    //_contractContext.ContractGroupStates.Update(ContractGroupStates);
-                    //_contractContext.SaveChanges();
+            // Update the properties of the ContractGroupStates object
+            contractFile.Path = request.Path;
+            contractFile.CitizenIdentifyImage1 = request.CitizenIdentifyImage1;
+            contractFile.CitizenIdentifyImage2 = request.CitizenIdentifyImage2;
+            contractFile.DrivingLisenceImage1 = request.DrivingLisenceImage1;
+            contractFile.DrivingLisenceImage2 = request.DrivingLisenceImage2;
+            contractFile.HousePaperImages = request.HousePaperImages;
+            contractFile.PassportImages = request.PassportImages;
+            contractFile.OtherImages = request.OtherImages;
+            contractFile.ExpertiseContracts = request.ExpertiseContracts;
+            contractFile.RentContracts = request.RentContracts;
+            contractFile.TransferContracts = request.TransferContracts;
+            contractFile.ReceiveContracts = request.ReceiveContracts;
 
-                    //// Retrieve the ContractGroupLoanInfo object from the database
-                    //var ContractGroupLoanInfo = _contractContext.ContractGroupLoanInfos.Find(id);
-                    //ContractGroupLoanInfo.ContractGroupOwnerName = request.ContractGroupOwnerName;
-                    //ContractGroupLoanInfo.RentalMethod = request.RentalMethod;
-                    //ContractGroupLoanInfo.RentalDate = request.RentalDate;
-                    //ContractGroupLoanInfo.SpeedometerNumberReceive = request.SpeedometerNumberReceive;
-                    //if (request.PriceForDayReceive != null)
-                    //{
-                    //    ContractGroupLoanInfo.PriceForDayReceive = request.PriceForDayReceive;
-                    //}
-                    //else
-                    //{
-                    //    ContractGroupLoanInfo.PriceForDayReceive = null;
-                    //}
-                    //ContractGroupLoanInfo.PriceForMonthReceive = request.PriceForMonthReceive;
-                    //ContractGroupLoanInfo.Insurance = request.Insurance;
-                    //ContractGroupLoanInfo.Maintenance = request.Maintenance;
-                    //ContractGroupLoanInfo.LimitedKmForMonthReceive = request.LimitedKmForMonthReceive;
-                    //ContractGroupLoanInfo.OverLimitedMileageReceive = request.OverLimitedMileageReceive;
-                    //_contractContext.ContractGroupLoanInfos.Update(ContractGroupLoanInfo);
-                    //_contractContext.SaveChanges();
+            // Save the changes to the database
+            _contractContext.ContractFiles.Update(contractFile);
+            _contractContext.SaveChanges();
 
-                }
+        }
 
-                public bool UpdateContractGroupStatus(int id, ContractGroupUpdateStatusModel request)
+        public bool UpdateContractGroupStatus(int id, ContractGroupUpdateStatusModel request)
                 {
                     var ContractGroup = _contractContext.ContractGroups.Where(c => c.Id == id).FirstOrDefault();
                     if (ContractGroup == null)

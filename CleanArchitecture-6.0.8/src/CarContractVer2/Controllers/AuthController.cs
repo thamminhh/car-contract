@@ -35,5 +35,6 @@ namespace CarContractVer2.Controllers
             var token = _userRepository.CreateToken(request.UserName);
             return Ok (new { email = request.UserName, accessToken = token });
         }
+
     }
 }

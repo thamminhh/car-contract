@@ -4,15 +4,11 @@
     {
 
         public int Id { get; set; }
-
         public int? UserId { get; set; }
-        public string? StaffEmail { get; set; }
-
         public int? CarId { get; set; }
         public string? RentPurpose { get; set; }
         public DateTime? RentFrom { get; set; }
         public DateTime? RentTo { get; set; }
-        public int? RequireDescriptionInfoCarClass { get; set; }
         public string? RequireDescriptionInfoCarBrand { get; set; }
         public int? RequireDescriptionInfoSeatNumber { get; set; }
         public int? RequireDescriptionInfoYearCreate { get; set; }
@@ -20,9 +16,10 @@
         public string? DeliveryAddress { get; set; }
 
         public int? ContractGroupStatusId { get; set; }
-        public string? ContractGroupStatusName { get; set; }    
+        public string? ContractGroupStatusName { get; set; }
 
         public int? CustomerInfoId { get; set; }
+        public string? StaffEmail { get; set; }
         public string? PhoneNumber { get; set; }
         public string? CustomerSocialInfoZalo { get; set; }
         public string? CustomerSocialInfoFacebook { get; set; }
@@ -36,6 +33,7 @@
         public string? CustomerName { get; set; }
         public string? CustomerAddress { get; set; }
 
+
         public string? Path { get; set; }
         public string? CitizenIdentifyImage1 { get; set; }
         public string? CitizenIdentifyImage2 { get; set; }
@@ -44,9 +42,10 @@
         public string? HousePaperImages { get; set; }
         public string? PassportImages { get; set; }
         public string? OtherImages { get; set; }
+        public string? ExpertiseContracts { get; set; }
         public string? RentContracts { get; set; }
         public string? TransferContracts { get; set; }
-
+        public string? ReceiveContracts { get; set; }
 
         public int? ExpertiseContractId { get; set; }
         public int? ExpertiseContractStatusId { get; set; }
