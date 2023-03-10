@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Application.Constant;
 using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.ContractGroup.SubModel;
 using CleanArchitecture.Domain.Entities_SubModel.TransferContract;
 using CleanArchitecture.Domain.Interface;
 
@@ -8,10 +9,12 @@ namespace CleanArchitecture.Application.Repository
     public class TransferContractRepository : ITransferContractRepository
     {
         private readonly ContractContext _contractContext;
+        private readonly IContractGroupRepository _contractGroupRepository;
 
-        public TransferContractRepository(ContractContext contractContext)
+        public TransferContractRepository(ContractContext contractContext, IContractGroupRepository contractGroupRepository)
         {
             _contractContext = contractContext;
+            _contractGroupRepository = contractGroupRepository;
         }
 
         public TransferContract GetTransferContractById(int id)
@@ -32,7 +35,7 @@ namespace CleanArchitecture.Application.Repository
 
         public void CreateExpertiesContract(TransferContractCreateModel request)
         {
-            var defaultContractId = ContractStatusConstant.ContractExported;
+            var defaultContractId = ContractStatusConstant.ContractExporting;
 
             var transferContract = new TransferContract
             {
@@ -58,6 +61,13 @@ namespace CleanArchitecture.Application.Repository
             };
             _contractContext.TransferContracts.Add(transferContract);
             _contractContext.SaveChanges();
+
+            var contractGroupStatusExpertised = Constant.ContractGroupConstant.TransferContractNotSign;
+            var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+            contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+            contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusExpertised;
+
+            _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
         }
 
         public void UpdateTransferContract(int id, TransferContractUpdateModel request)

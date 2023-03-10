@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace CleanArchitecture.Domain.Entities_SubModel.RentContract;
 public class RentContractCreateModel
 {
-    public int? ContractGroupId { get; set; }
+    public int ContractGroupId { get; set; }
     public int? RepresentativeId { get; set; }
     public string? DeliveryAddress { get; set; }
     public double? CarGeneralInfoAtRentPriceForNormalDay { get; set; }

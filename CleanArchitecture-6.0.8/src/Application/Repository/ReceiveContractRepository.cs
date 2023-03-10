@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Application.Constant;
 using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.ContractGroup.SubModel;
 using CleanArchitecture.Domain.Entities_SubModel.ReceiveContract;
 using CleanArchitecture.Domain.Interface;
 
@@ -8,10 +9,12 @@ namespace CleanArchitecture.Application.Repository
     public class ReceiveContractRepository : IReceiveContractRepository
     {
         private readonly ContractContext _contractContext;
+        private readonly IContractGroupRepository _contractGroupRepository;
 
-        public ReceiveContractRepository(ContractContext contractContext)
+        public ReceiveContractRepository(ContractContext contractContext, IContractGroupRepository contractGroupRepository)
         {
             _contractContext = contractContext;
+            _contractGroupRepository = contractGroupRepository;
         }
 
         public ReceiveContract GetReceiveContractById(int id)
@@ -32,7 +35,7 @@ namespace CleanArchitecture.Application.Repository
 
         public void CreateExpertiesContract(ReceiveContractCreateModel request)
         {
-            var defaultContractId = ContractStatusConstant.ContractExported;
+            var defaultContractId = ContractStatusConstant.ContractExporting;
 
             var receiveContract = new ReceiveContract
             {
@@ -58,6 +61,13 @@ namespace CleanArchitecture.Application.Repository
             };
             _contractContext.ReceiveContracts.Add(receiveContract);
             _contractContext.SaveChanges();
+
+            var contractGroupStatusExpertised = Constant.ContractGroupConstant.ReceiveContractNotSign;
+            var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+            contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+            contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusExpertised;
+
+            _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
         }
 
         public void UpdateReceiveContract(int id, ReceiveContractUpdateModel request)

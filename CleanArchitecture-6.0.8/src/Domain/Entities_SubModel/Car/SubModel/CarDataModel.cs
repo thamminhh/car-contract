@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.CarSchedules.SubModel;
 
 namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
 {
@@ -7,6 +8,8 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
 
         public int Id { get; set; }
         public int? ParkingLotId { get; set; }
+
+        public string? ParkingLotName { get; set; }
         public int? CarStatusId { get; set; }
         public string CarStatus { get; set; }
         public string CarId { get; set; }
@@ -99,6 +102,8 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
         public string? ForControlDay { get; set; }
 
         public string? DayOfPayment { get; set; }
+
+        public ICollection<CarScheduleDataModel>? CarSchedules { get; set; }
 
 
     }

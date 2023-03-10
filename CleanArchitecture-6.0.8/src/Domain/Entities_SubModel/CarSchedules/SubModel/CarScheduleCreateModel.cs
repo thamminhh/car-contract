@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CleanArchitecture.Domain.Entities_SubModel.CarSchedule;
+﻿namespace CleanArchitecture.Domain.Entities_SubModel.CarSchedules.SubModel;
 public class CarScheduleCreateModel
 {
     public int? CarId { get; set; }

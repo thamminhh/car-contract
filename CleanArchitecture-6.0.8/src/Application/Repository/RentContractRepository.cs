@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Application.Constant;
 using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.ContractGroup.SubModel;
 using CleanArchitecture.Domain.Entities_SubModel.RentContract;
 using CleanArchitecture.Domain.Interface;
 using MediatR;
@@ -10,10 +11,12 @@ namespace CleanArchitecture.Application.Repository
     {
         private readonly ContractContext _contractContext;
         private readonly FileRepository _fileRepository;
-        public RentContractRepository(ContractContext contractContext, FileRepository fileRepository)
+        private readonly IContractGroupRepository _contractGroupRepository;
+        public RentContractRepository(ContractContext contractContext, FileRepository fileRepository, IContractGroupRepository contractGroupRepository)
         {
             _contractContext = contractContext;
             _fileRepository = fileRepository;
+            _contractGroupRepository = contractGroupRepository;
         }
 
         public RentContract GetRentContractById(int id)
@@ -80,7 +83,7 @@ namespace CleanArchitecture.Application.Repository
 
         public void CreateRentContract(RentContractCreateModel request)
         {
-            var defaultContractId = ContractStatusConstant.ContractExported;
+            var defaultContractId = ContractStatusConstant.ContractExporting;
 
             string htmlContent = "<h1> Hợp đồng thuê </h1>";
             string fileName = "RentContract" + ".pdf";
@@ -120,6 +123,13 @@ namespace CleanArchitecture.Application.Repository
             };
             _contractContext.RentContracts.Add(rentContract);
             _contractContext.SaveChanges();
+
+            var contractGroupStatusExpertised = Constant.ContractGroupConstant.RentContractNotSign;
+            var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+            contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+            contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusExpertised;
+
+            _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
 
         }
 

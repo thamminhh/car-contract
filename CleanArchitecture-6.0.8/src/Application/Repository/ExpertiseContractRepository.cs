@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Application.Constant;
 using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.ContractGroup.SubModel;
 using CleanArchitecture.Domain.Entities_SubModel.ExpertiseContract;
 using CleanArchitecture.Domain.Interface;
 using MediatR;
@@ -117,6 +118,13 @@ namespace CleanArchitecture.Application.Repository
             };
             _contractContext.ExpertiseContracts.Add(expertiseContract);
             _contractContext.SaveChanges();
+
+            var contractGroupStatusExpertised = Constant.ContractGroupConstant.ContractGroupIsExpertising;
+            var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+            contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+            contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusExpertised;
+
+            _contractGroupController.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
             
         }
 

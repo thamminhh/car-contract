@@ -4,7 +4,7 @@ namespace CleanArchitecture.Domain.Entities_SubModel.ReceiveContract;
 public class ReceiveContractCreateModel
 {
     public int? ReceiverId { get; set; }
-    public int? ContractGroupId { get; set; }
+    public int ContractGroupId { get; set; }
     public DateTime? DateReceive { get; set; }
     public string? ReceiveAddress { get; set; }
     public int? CurrentCarStateSpeedometerNumber { get; set; }

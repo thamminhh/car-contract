@@ -2,7 +2,7 @@
 {
     public class ContractGroupUpdateStatusModel
     {
-        public int Id { get; set; }
-        public int ContractGroupStatusId { get; set; }    
+        public int? Id { get; set; }
+        public int? ContractGroupStatusId { get; set; }    
     }
 }

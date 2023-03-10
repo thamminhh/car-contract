@@ -2,7 +2,7 @@
 using CleanArchitecture.Application.Constant;
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.Entities_SubModel.Car.SubModel;
-using CleanArchitecture.Domain.Entities_SubModel.CarSchedule;
+using CleanArchitecture.Domain.Entities_SubModel.CarSchedules.SubModel;
 using CleanArchitecture.Domain.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;

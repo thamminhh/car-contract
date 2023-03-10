@@ -1,5 +1,5 @@
 ﻿using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Domain.Entities_SubModel.CarSchedule;
+using CleanArchitecture.Domain.Entities_SubModel.CarSchedules.SubModel;
 
 namespace CleanArchitecture.Domain.Interface
 {

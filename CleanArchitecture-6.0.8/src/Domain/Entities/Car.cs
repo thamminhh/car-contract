@@ -7,6 +7,7 @@ namespace CleanArchitecture.Domain.Entities
     {
         public Car()
         {
+            CarSchedules = new HashSet<CarSchedule>();
             ContractGroups = new HashSet<ContractGroup>();
         }
 
@@ -33,10 +34,10 @@ namespace CleanArchitecture.Domain.Entities
         public virtual CarFile? CarFile { get; set; }
         public virtual CarGenerallInfo? CarGenerallInfo { get; set; }
         public virtual CarLoanInfo? CarLoanInfo { get; set; }
-        public virtual CarSchedule? CarSchedule { get; set; }
         public virtual CarState? CarState { get; set; }
         public virtual CarTracking? CarTracking { get; set; }
         public virtual ForControl? ForControl { get; set; }
+        public virtual ICollection<CarSchedule> CarSchedules { get; set; }
         public virtual ICollection<ContractGroup> ContractGroups { get; set; }
     }
 }

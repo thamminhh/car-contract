@@ -5,6 +5,7 @@ using CleanArchitecture.Domain.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.Intrinsics.X86;
@@ -15,18 +16,16 @@ namespace CleanArchitecture.Application.Repository
     {
         private readonly ContractContext _contractContext;
         private readonly ICarMakeRepository _carMakeController;
-        private readonly ICarStatusRepository _carStatusController;
-        private readonly FileRepository _fileRepository;
+        private readonly ICarScheduleRepository _carScheduleRepository;
         
 
 
-        public CarRepository(ContractContext contractContext, FileRepository fileRepository,
-            ICarMakeRepository carMakeController, ICarStatusRepository carStatusController)
+        public CarRepository(ContractContext contractContext,
+            ICarMakeRepository carMakeController, ICarScheduleRepository carScheduleRepository)
         {
             _contractContext = contractContext;
             _carMakeController = carMakeController;
-            _carStatusController = carStatusController;
-            _fileRepository = fileRepository;
+            _carScheduleRepository = carScheduleRepository;
         }
 
         public int GetNumberOfCars(CarFilter filter)
@@ -42,7 +41,7 @@ namespace CleanArchitecture.Application.Repository
 
                 if (!string.IsNullOrWhiteSpace(filter.CarLicensePlates))
                 {
-                    cars = cars.Where(c => c.CarLicensePlates.Equals(filter.CarLicensePlates));
+                    cars = cars.Where(c => c.CarLicensePlates.Contains(filter.CarLicensePlates));
                 }
                 if (!string.IsNullOrWhiteSpace(filter.CarMakeName))
                 {
@@ -74,7 +73,7 @@ namespace CleanArchitecture.Application.Repository
 
                 if (!string.IsNullOrWhiteSpace(filter.CarLicensePlates))
                 {
-                    cars = cars.Where(c => c.CarLicensePlates.Equals(filter.CarLicensePlates));
+                    cars = cars.Where(c => c.CarLicensePlates.Contains(filter.CarLicensePlates));
                 }
                 if (!string.IsNullOrWhiteSpace(filter.CarMakeName))
                 {
@@ -198,16 +197,19 @@ namespace CleanArchitecture.Application.Repository
                 .Include(c => c.ForControl)
                 .FirstOrDefault(c => c.Id == carId);
 
+            var parkingLot = _contractContext.ParkingLots.Find(car.ParkingLotId);
             var make = _contractContext.CarMakes.Find(car.CarMakeId);
             var model = _contractContext.CarModels.Find(car.CarModelId);
             var generation = _contractContext.CarGenerations.Find(car.CarGenerationId);
             var series = _contractContext.CarSeries.Where(c => c.Id == car.CarSeriesId).FirstOrDefault();
-            var trim = _contractContext.CarTrims.Where(c => c.Id == car.CarSeriesId).FirstOrDefault();
+            var trim = _contractContext.CarTrims.Where(c => c.Id == car.CarTrimId).FirstOrDefault();
+            var carSchedule = _carScheduleRepository.GetCarSchedulesByCarId(car.Id);
 
             return new CarDataModel
             {
                 Id = car.Id,
                 ParkingLotId = car.ParkingLotId,
+                ParkingLotName = parkingLot.Name,
                 CarStatusId = car.CarStatusId,
                 CarStatus = car.CarStatus.Name,
                 CarId = car.CarId,
@@ -256,7 +258,7 @@ namespace CleanArchitecture.Application.Repository
                 FrontImg = car.CarFile.FrontImg,
                 BackImg = car.CarFile.BackImg,
                 LeftImg = car.CarFile.LeftImg,
-                RightImg = car.CarFile.BackImg, 
+                RightImg = car.CarFile.BackImg,
                 OrtherImg = car.CarFile != null ? car.CarFile.OrtherImg : null,
                 CarFileCreatedDate = car.CarFile.CreatedDate,
                 LinkTracking = car.CarTracking.LinkTracking,
@@ -264,6 +266,7 @@ namespace CleanArchitecture.Application.Repository
                 TrackingPassword = car.CarTracking.TrackingPassword,
                 Etcusername = car.CarTracking.Etcusername,
                 Etcpassword = car.CarTracking.Etcpassword,
+                CarSchedules = carSchedule,
                 LinkForControl = car.ForControl != null ? car.ForControl.LinkForControl : null,
                 PaymentMethod = car.ForControl != null ? car.ForControl.PaymentMethod : null,
                 ForControlDay = car.ForControl != null ? car.ForControl.ForControlDay : null,
@@ -295,7 +298,7 @@ namespace CleanArchitecture.Application.Repository
 
                 if (!string.IsNullOrWhiteSpace(filter.CarLicensePlates))
                 {
-                    cars = cars.Where(c => c.CarLicensePlates.Equals(filter.CarLicensePlates));
+                    cars = cars.Where(c => c.CarLicensePlates.Contains(filter.CarLicensePlates));
                 }
                 if (!string.IsNullOrWhiteSpace(filter.CarMakeName))
                 {
@@ -369,7 +372,7 @@ namespace CleanArchitecture.Application.Repository
 
                 if (!string.IsNullOrWhiteSpace(filter.CarLicensePlates))
                 {
-                    cars = cars.Where(c => c.CarLicensePlates.Equals(filter.CarLicensePlates));
+                    cars = cars.Where(c => c.CarLicensePlates.Contains(filter.CarLicensePlates));
                 }
                 if (!string.IsNullOrWhiteSpace(filter.CarMakeName))
                 {

@@ -1,6 +1,6 @@
 using CleanArchitecture.Domain.Endpoints;
 using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Domain.Entities_SubModel.CarSchedule;
+using CleanArchitecture.Domain.Entities_SubModel.CarSchedules.SubModel;
 using CleanArchitecture.Domain.Interface;
 using Microsoft.AspNetCore.Mvc;
 

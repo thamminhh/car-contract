@@ -8,7 +8,7 @@ namespace CleanArchitecture.Domain.Entities_SubModel.TransferContract;
 public class TransferContractCreateModel
 {
     public int? TransfererId { get; set; }
-    public int? ContractGroupId { get; set; }
+    public int ContractGroupId { get; set; }
     public DateTime? DateTransfer { get; set; }
     public string? DeliveryAddress { get; set; }
     public int? CurrentCarStateSpeedometerNumber { get; set; }

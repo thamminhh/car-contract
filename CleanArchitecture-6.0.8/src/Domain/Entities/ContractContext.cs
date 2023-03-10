@@ -182,8 +182,7 @@ namespace CleanArchitecture.Domain.Entities
 
             modelBuilder.Entity<CarSchedule>(entity =>
             {
-                entity.HasIndex(e => e.CarId, "UQ__CarSched__68A0342F8A137E52")
-                    .IsUnique();
+                entity.ToTable("CarSchedule");
 
                 entity.Property(e => e.DateEnd).HasColumnType("datetime");
 
@@ -192,14 +191,14 @@ namespace CleanArchitecture.Domain.Entities
                 entity.Property(e => e.Description).HasMaxLength(255);
 
                 entity.HasOne(d => d.Car)
-                    .WithOne(p => p.CarSchedule)
-                    .HasForeignKey<CarSchedule>(d => d.CarId)
-                    .HasConstraintName("FK__CarSchedu__CarId__17C286CF");
+                    .WithMany(p => p.CarSchedules)
+                    .HasForeignKey(d => d.CarId)
+                    .HasConstraintName("FK__CarSchedu__CarId__32767D0B");
 
                 entity.HasOne(d => d.CarStatus)
                     .WithMany(p => p.CarSchedules)
                     .HasForeignKey(d => d.CarStatusId)
-                    .HasConstraintName("FK__CarSchedu__CarSt__18B6AB08");
+                    .HasConstraintName("FK__CarSchedu__CarSt__336AA144");
             });
 
             modelBuilder.Entity<CarSeries>(entity =>
