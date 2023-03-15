@@ -11,7 +11,9 @@ namespace CleanArchitecture.Domain.Entities
         }
 
         public int Id { get; set; }
+        public string? CustomerName { get; set; }
         public string? PhoneNumber { get; set; }
+        public string? CustomerAddress { get; set; }
         public string? CustomerSocialInfoZalo { get; set; }
         public string? CustomerSocialInfoFacebook { get; set; }
         public string? CustomerSocialInfoLinkedin { get; set; }
@@ -21,8 +23,6 @@ namespace CleanArchitecture.Domain.Entities
         public bool? ExpertiseInfoIsFirstTimeRent { get; set; }
         public string? ExpertiseInfoTrustLevel { get; set; }
         public string? CompanyInfo { get; set; }
-        public string? CustomerName { get; set; }
-        public string? CustomerAddress { get; set; }
 
         public virtual ICollection<ContractGroup> ContractGroups { get; set; }
     }

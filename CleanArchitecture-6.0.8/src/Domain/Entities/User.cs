@@ -7,8 +7,8 @@ namespace CleanArchitecture.Domain.Entities
     {
         public User()
         {
+            AppraisalRecords = new HashSet<AppraisalRecord>();
             ContractGroups = new HashSet<ContractGroup>();
-            ExpertiseContracts = new HashSet<ExpertiseContract>();
             ReceiveContracts = new HashSet<ReceiveContract>();
             RentContracts = new HashSet<RentContract>();
             TransferContracts = new HashSet<TransferContract>();
@@ -32,9 +32,10 @@ namespace CleanArchitecture.Domain.Entities
         public bool? IsDeleted { get; set; }
         public byte[]? PasswordHash { get; set; }
         public byte[]? PasswordSalt { get; set; }
+        public string? CardImage { get; set; }
 
+        public virtual ICollection<AppraisalRecord> AppraisalRecords { get; set; }
         public virtual ICollection<ContractGroup> ContractGroups { get; set; }
-        public virtual ICollection<ExpertiseContract> ExpertiseContracts { get; set; }
         public virtual ICollection<ReceiveContract> ReceiveContracts { get; set; }
         public virtual ICollection<RentContract> RentContracts { get; set; }
         public virtual ICollection<TransferContract> TransferContracts { get; set; }

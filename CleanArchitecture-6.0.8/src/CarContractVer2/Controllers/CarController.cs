@@ -94,6 +94,9 @@ namespace CarContractVer2.Controllers
         [Route(CarEndpoints.Create)]
         public IActionResult CreateCar([FromBody] CarCreateModel request)
         {
+            if (request == null)
+                return BadRequest(ModelState);
+
             _carRepository.CreateCar(request);
             return Ok();
         }

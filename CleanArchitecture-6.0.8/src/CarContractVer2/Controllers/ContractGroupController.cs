@@ -1,9 +1,11 @@
+using CleanArchitecture.Application.Hubs;
 using CleanArchitecture.Domain.Endpoints;
 using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Domain.Entities_SubModel.Car.SubModel;
 using CleanArchitecture.Domain.Entities_SubModel.ContractGroup.SubModel;
 using CleanArchitecture.Domain.Interface;
+using Microsoft.AspNet.SignalR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CarContractVer2.Controllers
 {
@@ -12,10 +14,13 @@ namespace CarContractVer2.Controllers
     public class ContractGroupController : ControllerBase
     {
         private readonly IContractGroupRepository _contractGroupRepository;
+        private readonly Microsoft.AspNetCore.SignalR.IHubContext<ContractGroupHub> _hubContract;
 
-        public ContractGroupController(IContractGroupRepository contractGroupRepository)
+        public ContractGroupController(IContractGroupRepository contractGroupRepository, Microsoft.AspNetCore.SignalR.IHubContext<ContractGroupHub> hubContract)
         {
             _contractGroupRepository = contractGroupRepository;
+            _hubContract = hubContract;
+ 
         }
 
         [HttpGet]
@@ -29,20 +34,49 @@ namespace CarContractVer2.Controllers
                 return BadRequest(ModelState);
             return Ok(new { contracts = listContractGroup, total = count });
         }
+        //[HttpGet]
+        //[Route(ContractGroupEndpoints.GetSingle)]
+        //[ProducesResponseType(200, Type = typeof(IEnumerable<ContractGroup>))]
+        //public IActionResult GetContractGroupById(int contractGroupId)
+        //{
+        //    {
+        //        if (!_contractGroupRepository.ContractGroupExit(contractGroupId))
+        //            return NotFound();
+
+        //        var contractGroup = _contractGroupRepository.GetContractGroupById(contractGroupId);
+        //        //var connectionId = Request.Query["connectionId"]; // extract connection ID from query parameter
+
+        //        if (contractGroup == null)
+        //        {
+        //            return NotFound();
+        //        }
+        //        //var contractGroupData = contractGroup;
+
+        //        //var hubContext = GlobalHost.ConnectionManager.GetHubContext<ContractGroupHub>();
+        //        //hubContext.Clients.Client(connectionId).ContractGroupUpdated(contractGroup);
+
+        //        return Ok(contractGroup);
+
+        //    }
+        //}
 
         [HttpGet]
         [Route(ContractGroupEndpoints.GetSingle)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ContractGroup>))]
-        public IActionResult GetContractGroupById(int contractGroupId)
+        public async Task<IActionResult> GetContractGroupById(int contractGroupId)
         {
             if (!_contractGroupRepository.ContractGroupExit(contractGroupId))
                 return NotFound();
+
             var contractGroup = _contractGroupRepository.GetContractGroupById(contractGroupId);
 
             if (contractGroup == null)
             {
                 return NotFound();
             }
+            // Push update to clients
+            await _hubContract.Clients.All.SendAsync("ContractGroupUpdated", contractGroupId);
+
             return Ok(contractGroup);
         }
 
@@ -105,6 +139,8 @@ namespace CarContractVer2.Controllers
             }
             return NoContent();
         }
+
+
     }
 
 }

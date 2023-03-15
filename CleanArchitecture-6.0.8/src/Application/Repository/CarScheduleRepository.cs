@@ -40,6 +40,7 @@ namespace CleanArchitecture.Application.Repository
         public ICollection<CarScheduleDataModel> GetCarSchedules()
         {
             IQueryable<CarSchedule> CarSchedules = _contractContext.CarSchedules
+               .Include(c => c.Car)
                .Include(c => c.CarStatus)
                .AsQueryable();
 
@@ -49,6 +50,7 @@ namespace CleanArchitecture.Application.Repository
                 {
                     Id = c.Id,
                     CarId = c.CarId,
+                    CarLicensePlates = c.Car.CarLicensePlates,
                     DateStart = c.DateStart,
                     DateEnd = c.DateEnd,
                     CarStatusId = c.CarStatusId,

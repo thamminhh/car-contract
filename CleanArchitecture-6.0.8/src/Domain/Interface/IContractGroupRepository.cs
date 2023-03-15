@@ -22,7 +22,7 @@ namespace CleanArchitecture.Domain.Interface
 
         bool DeleteContractGroup(int id);
 
-        bool UpdateContractCarId(int id, int carId);
+        bool UpdateContractCarId(int id, int? carId);
 
         int GetNumberOfContracts(ContractFilter filter);
 

@@ -14,6 +14,8 @@ namespace CleanArchitecture.Application.Repository
     {
         private readonly ContractContext _contractContext;
 
+
+
         public ContractGroupRepository(ContractContext contractContext)
         {
             _contractContext = contractContext;
@@ -56,7 +58,7 @@ namespace CleanArchitecture.Application.Repository
                 return contracts.Count();
             }
         }
-            public ContractGroupDataModel GetContractGroupById(int contractGroupId)
+        public ContractGroupDataModel GetContractGroupById(int contractGroupId)
         {
             ContractGroup contractGroup = _contractContext.ContractGroups
                 .Include(c => c.ContractFile)
@@ -201,7 +203,6 @@ namespace CleanArchitecture.Application.Repository
                 .Include(c => c.CustomerInfo)
                 .Include(c => c.User)
                 .Include(c => c.ContractGroupStatus)
-                .Include(c => c.ExpertiseContract)
                 .Include(c => c.RentContract)
                 .Include(c => c.TransferContract)
                 .Include(c => c.ReceiveContract)
@@ -229,9 +230,9 @@ namespace CleanArchitecture.Application.Repository
                     ContractGroupStatusId = c.ContractGroupStatusId,
                     ContractGroupStatusName = c.ContractGroupStatus.Name,
 
-                    ExpertiseContractId = c.ExpertiseContract != null? c.ExpertiseContract.Id : null,
-                    ExpertiseContractStatusId = c.ExpertiseContract != null ? c.ExpertiseContract.ContractStatusId: null,
-                    ExpertiseContractStatusName = c.ExpertiseContract != null ? changeIdContractIntoString(c.ExpertiseContract.ContractStatusId) : null,
+                    //ExpertiseContractId = c.ExpertiseContract != null? c.ExpertiseContract.Id : null,
+                    //ExpertiseContractStatusId = c.ExpertiseContract != null ? c.ExpertiseContract.ContractStatusId: null,
+                    //ExpertiseContractStatusName = c.ExpertiseContract != null ? changeIdContractIntoString(c.ExpertiseContract.ContractStatusId) : null,
 
                     RentContractId = c.RentContract != null ? c.RentContract.Id : null,
                     RentContractStatusId = c.RentContract != null ? c.RentContract.ContractStatusId : null,
@@ -410,7 +411,7 @@ namespace CleanArchitecture.Application.Repository
 
                 }
 
-                public bool UpdateContractCarId(int id, int carId) 
+                public bool UpdateContractCarId(int id, int? carId) 
                 {
                     var ContractGroup = _contractContext.ContractGroups.Where(c => c.Id == id).FirstOrDefault();
                     if (ContractGroup == null)

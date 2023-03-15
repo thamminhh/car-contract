@@ -11,6 +11,7 @@ using CleanArchitecture.Domain.Entities_SubModel.User.SubModel;
 using CleanArchitecture.Application.Constant;
 using System.Data;
 using Microsoft.AspNetCore.Authorization;
+using CleanArchitecture.Domain.Entities_SubModel.Car.SubModel;
 
 namespace CarContractVer2.Controllers
 {
@@ -28,13 +29,13 @@ namespace CarContractVer2.Controllers
         }
 
 
-        [HttpGet, Authorize(Roles = UserRoleConstant.Admin + "," + UserRoleConstant.Expertise)]
+        [HttpGet/*, Authorize(Roles = UserRoleConstant.Admin + "," + UserRoleConstant.Expertise)*/]
         [Route(UserEndpoints.GetAll)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
         public IActionResult GetUsers([FromQuery] UserFilter filter, int page = 1, int pageSize = 10)
         {
             var listUser = _userRepository.GetUsers(page, pageSize, filter);
-            int toalCount = _userRepository.GetNumberOfUsers();
+            int toalCount = _userRepository.GetNumberOfUsers(filter);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(new { users = listUser, total = toalCount });
@@ -89,6 +90,23 @@ namespace CarContractVer2.Controllers
             return Ok("Successfully Added");
         }
         [HttpPut]
+        [Route(UserEndpoints.UpdateInfo)]
+        public IActionResult Update(int userId, [FromBody] UserUpdateModel request)
+        {
+            if (request == null || userId != request.Id)
+                return BadRequest();
+
+            // Check if the car with the specified id exists
+            if (!_userRepository.UserExit(userId))
+                return NotFound();
+
+            // Update the car and its related data
+            _userRepository.UpdateUser(userId, request);
+
+            return Ok();
+        }
+
+        [HttpPut]
         [Route(UserEndpoints.UpdateRole)]
         public async Task<IActionResult> UpdateUserRole([FromRoute] int id, [FromBody] UpdateUserRoleModel model)
         {
@@ -125,6 +143,22 @@ namespace CarContractVer2.Controllers
                 return StatusCode(422, ModelState);
             }
             return Ok();
+        }
+
+        [HttpPut]
+        [Route(UserEndpoints.Delete)]
+        public IActionResult DeleteUser([FromRoute] int id)
+        {
+            if (!_userRepository.UserExit(id))
+                return NotFound();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            if (!_userRepository.DeleteUser(id))
+            {
+                ModelState.AddModelError("", "Something went wrong");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent();
         }
     }
 }

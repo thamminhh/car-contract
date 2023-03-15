@@ -16,13 +16,16 @@ namespace CleanArchitecture.Domain.Entities
         {
         }
 
+        public virtual DbSet<AppraisalRecord> AppraisalRecords { get; set; } = null!;
         public virtual DbSet<Car> Cars { get; set; } = null!;
         public virtual DbSet<CarFile> CarFiles { get; set; } = null!;
         public virtual DbSet<CarGenerallInfo> CarGenerallInfos { get; set; } = null!;
         public virtual DbSet<CarGeneration> CarGenerations { get; set; } = null!;
         public virtual DbSet<CarLoanInfo> CarLoanInfos { get; set; } = null!;
+        public virtual DbSet<CarMaintenanceInfo> CarMaintenanceInfos { get; set; } = null!;
         public virtual DbSet<CarMake> CarMakes { get; set; } = null!;
         public virtual DbSet<CarModel> CarModels { get; set; } = null!;
+        public virtual DbSet<CarRegistryInfo> CarRegistryInfos { get; set; } = null!;
         public virtual DbSet<CarSchedule> CarSchedules { get; set; } = null!;
         public virtual DbSet<CarSeries> CarSeries { get; set; } = null!;
         public virtual DbSet<CarState> CarStates { get; set; } = null!;
@@ -34,7 +37,6 @@ namespace CleanArchitecture.Domain.Entities
         public virtual DbSet<ContractGroupStatus> ContractGroupStatuses { get; set; } = null!;
         public virtual DbSet<ContractStatus> ContractStatuses { get; set; } = null!;
         public virtual DbSet<CustomerInfo> CustomerInfos { get; set; } = null!;
-        public virtual DbSet<ExpertiseContract> ExpertiseContracts { get; set; } = null!;
         public virtual DbSet<ForControl> ForControls { get; set; } = null!;
         public virtual DbSet<ParkingLot> ParkingLots { get; set; } = null!;
         public virtual DbSet<ReceiveContract> ReceiveContracts { get; set; } = null!;
@@ -53,6 +55,37 @@ namespace CleanArchitecture.Domain.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<AppraisalRecord>(entity =>
+            {
+                entity.ToTable("AppraisalRecord");
+
+                entity.Property(e => e.DepositInfoAsset)
+                    .HasMaxLength(255)
+                    .HasColumnName("DepositInfo_Asset");
+
+                entity.Property(e => e.DepositInfoDescription)
+                    .HasMaxLength(255)
+                    .HasColumnName("DepositInfo_Description");
+
+                entity.Property(e => e.DepositInfoDownPayment).HasColumnName("DepositInfo_DownPayment");
+
+                entity.Property(e => e.ExpertiseDate).HasColumnType("datetime");
+
+                entity.Property(e => e.FilePath).HasMaxLength(255);
+
+                entity.Property(e => e.ResultDescription).HasMaxLength(255);
+
+                entity.HasOne(d => d.ContractGroup)
+                    .WithMany(p => p.AppraisalRecords)
+                    .HasForeignKey(d => d.ContractGroupId)
+                    .HasConstraintName("FK__Appraisal__Contr__66EA454A");
+
+                entity.HasOne(d => d.Expertiser)
+                    .WithMany(p => p.AppraisalRecords)
+                    .HasForeignKey(d => d.ExpertiserId)
+                    .HasConstraintName("FK__Appraisal__Exper__67DE6983");
+            });
+
             modelBuilder.Entity<Car>(entity =>
             {
                 entity.ToTable("Car");
@@ -61,18 +94,41 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.Property(e => e.CarFuel).HasMaxLength(255);
 
-                entity.Property(e => e.CarId).HasMaxLength(255);
-
                 entity.Property(e => e.CarLicensePlates).HasMaxLength(255);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("date");
 
                 entity.Property(e => e.IsDeleted).HasColumnName("isDeleted");
 
+                entity.HasOne(d => d.CarGeneration)
+                    .WithMany(p => p.CarCarGenerations)
+                    .HasForeignKey(d => d.CarGenerationId)
+                    .HasConstraintName("FK__Car__CarGenerati__3BFFE745");
+
+                entity.HasOne(d => d.CarMake)
+                    .WithMany(p => p.CarCarMakes)
+                    .HasForeignKey(d => d.CarMakeId)
+                    .HasConstraintName("FK__Car__CarMakeId__3A179ED3");
+
+                entity.HasOne(d => d.CarModel)
+                    .WithMany(p => p.CarCarModels)
+                    .HasForeignKey(d => d.CarModelId)
+                    .HasConstraintName("FK__Car__CarModelId__3B0BC30C");
+
+                entity.HasOne(d => d.CarSeries)
+                    .WithMany(p => p.CarCarSeries)
+                    .HasForeignKey(d => d.CarSeriesId)
+                    .HasConstraintName("FK__Car__CarSeriesId__3CF40B7E");
+
                 entity.HasOne(d => d.CarStatus)
                     .WithMany(p => p.Cars)
                     .HasForeignKey(d => d.CarStatusId)
                     .HasConstraintName("FK__Car__CarStatusId__68487DD7");
+
+                entity.HasOne(d => d.CarTrim)
+                    .WithMany(p => p.CarCarTrims)
+                    .HasForeignKey(d => d.CarTrimId)
+                    .HasConstraintName("FK__Car__CarTrimId__3DE82FB7");
 
                 entity.HasOne(d => d.ParkingLot)
                     .WithMany(p => p.Cars)
@@ -155,6 +211,22 @@ namespace CleanArchitecture.Domain.Entities
                     .HasConstraintName("FK__CarLoanIn__CarId__367C1819");
             });
 
+            modelBuilder.Entity<CarMaintenanceInfo>(entity =>
+            {
+                entity.ToTable("CarMaintenanceInfo");
+
+                entity.Property(e => e.CarKmlastMaintenance).HasColumnName("CarKMLastMaintenance");
+
+                entity.Property(e => e.MaintenanceDate).HasColumnType("datetime");
+
+                entity.Property(e => e.MaintenanceInvoice).HasMaxLength(255);
+
+                entity.HasOne(d => d.Car)
+                    .WithMany(p => p.CarMaintenanceInfos)
+                    .HasForeignKey(d => d.CarId)
+                    .HasConstraintName("FK__CarMainte__CarId__6ABAD62E");
+            });
+
             modelBuilder.Entity<CarMake>(entity =>
             {
                 entity.ToTable("CarMake");
@@ -180,6 +252,22 @@ namespace CleanArchitecture.Domain.Entities
                     .HasConstraintName("FK__CarModel__CarMak__1BC821DD");
             });
 
+            modelBuilder.Entity<CarRegistryInfo>(entity =>
+            {
+                entity.ToTable("CarRegistryInfo");
+
+                entity.Property(e => e.LastRegistryDate).HasColumnType("datetime");
+
+                entity.Property(e => e.RegistryDate).HasColumnType("datetime");
+
+                entity.Property(e => e.RegistryInvoice).HasMaxLength(255);
+
+                entity.HasOne(d => d.Car)
+                    .WithMany(p => p.CarRegistryInfos)
+                    .HasForeignKey(d => d.CarId)
+                    .HasConstraintName("FK__CarRegist__CarId__6D9742D9");
+            });
+
             modelBuilder.Entity<CarSchedule>(entity =>
             {
                 entity.ToTable("CarSchedule");
@@ -203,11 +291,21 @@ namespace CleanArchitecture.Domain.Entities
 
             modelBuilder.Entity<CarSeries>(entity =>
             {
-                entity.HasNoKey();
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.CarGenerationId).HasColumnName("CarGenerationID");
 
                 entity.Property(e => e.Name).HasMaxLength(255);
+
+                entity.HasOne(d => d.CarGeneration)
+                    .WithMany(p => p.CarSeries)
+                    .HasForeignKey(d => d.CarGenerationId)
+                    .HasConstraintName("FK__CarSeries__CarGe__3552E9B6");
+
+                entity.HasOne(d => d.CarModel)
+                    .WithMany(p => p.CarSeries)
+                    .HasForeignKey(d => d.CarModelId)
+                    .HasConstraintName("FK__CarSeries__CarMo__345EC57D");
             });
 
             modelBuilder.Entity<CarState>(entity =>
@@ -265,18 +363,23 @@ namespace CleanArchitecture.Domain.Entities
 
             modelBuilder.Entity<CarTrim>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("CarTrim");
 
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
                 entity.Property(e => e.Name).HasMaxLength(255);
+
+                entity.HasOne(d => d.CarModel)
+                    .WithMany(p => p.CarTrims)
+                    .HasForeignKey(d => d.CarModelId)
+                    .HasConstraintName("FK__CarTrim__CarMode__36470DEF");
             });
 
             modelBuilder.Entity<ContractFile>(entity =>
             {
                 entity.ToTable("ContractFile");
 
-                entity.HasIndex(e => e.ContractGroupId, "UQ__Contract__BD73678F89541C29")
+                entity.HasIndex(e => e.ContractGroupId, "UQ__Contract__BD73678FE48DAF14")
                     .IsUnique();
 
                 entity.Property(e => e.CreateDate).HasColumnType("datetime");
@@ -284,7 +387,7 @@ namespace CleanArchitecture.Domain.Entities
                 entity.HasOne(d => d.ContractGroup)
                     .WithOne(p => p.ContractFile)
                     .HasForeignKey<ContractFile>(d => d.ContractGroupId)
-                    .HasConstraintName("FK__ContractF__Contr__7C1A6C5A");
+                    .HasConstraintName("FK__ContractF__Contr__4B422AD5");
             });
 
             modelBuilder.Entity<ContractGroup>(entity =>
@@ -316,22 +419,22 @@ namespace CleanArchitecture.Domain.Entities
                 entity.HasOne(d => d.Car)
                     .WithMany(p => p.ContractGroups)
                     .HasForeignKey(d => d.CarId)
-                    .HasConstraintName("FK__ContractG__CarId__00200768");
+                    .HasConstraintName("FK__ContractG__CarId__467D75B8");
 
                 entity.HasOne(d => d.ContractGroupStatus)
                     .WithMany(p => p.ContractGroups)
                     .HasForeignKey(d => d.ContractGroupStatusId)
-                    .HasConstraintName("FK__ContractG__Contr__01142BA1");
+                    .HasConstraintName("FK__ContractG__Contr__477199F1");
 
                 entity.HasOne(d => d.CustomerInfo)
                     .WithMany(p => p.ContractGroups)
                     .HasForeignKey(d => d.CustomerInfoId)
-                    .HasConstraintName("FK__ContractG__Custo__7E37BEF6");
+                    .HasConstraintName("FK__ContractG__Custo__44952D46");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.ContractGroups)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__ContractG__UserI__7F2BE32F");
+                    .HasConstraintName("FK__ContractG__UserI__4589517F");
             });
 
             modelBuilder.Entity<ContractGroupStatus>(entity =>
@@ -391,51 +494,6 @@ namespace CleanArchitecture.Domain.Entities
                 entity.Property(e => e.RelativeTel).HasMaxLength(13);
             });
 
-            modelBuilder.Entity<ExpertiseContract>(entity =>
-            {
-                entity.ToTable("ExpertiseContract");
-
-                entity.HasIndex(e => e.ContractGroupId, "UQ__Expertis__BD73678F32F8652E")
-                    .IsUnique();
-
-                entity.Property(e => e.DepositInfoAsset)
-                    .HasMaxLength(255)
-                    .HasColumnName("DepositInfo_Asset");
-
-                entity.Property(e => e.DepositInfoDescription)
-                    .HasMaxLength(255)
-                    .HasColumnName("DepositInfo_Description");
-
-                entity.Property(e => e.DepositInfoDownPayment).HasColumnName("DepositInfo_DownPayment");
-
-                entity.Property(e => e.Description).HasMaxLength(255);
-
-                entity.Property(e => e.ExpertiseDate).HasColumnType("datetime");
-
-                entity.Property(e => e.FilePath).HasMaxLength(255);
-
-                entity.Property(e => e.Result).HasMaxLength(255);
-
-                entity.Property(e => e.ResultOther).HasMaxLength(255);
-
-                entity.Property(e => e.TrustLevel).HasMaxLength(255);
-
-                entity.HasOne(d => d.ContractGroup)
-                    .WithOne(p => p.ExpertiseContract)
-                    .HasForeignKey<ExpertiseContract>(d => d.ContractGroupId)
-                    .HasConstraintName("FK__Expertise__Contr__7FEAFD3E");
-
-                entity.HasOne(d => d.ContractStatus)
-                    .WithMany(p => p.ExpertiseContracts)
-                    .HasForeignKey(d => d.ContractStatusId)
-                    .HasConstraintName("FK__Expertise__Contr__01D345B0");
-
-                entity.HasOne(d => d.Expertiser)
-                    .WithMany(p => p.ExpertiseContracts)
-                    .HasForeignKey(d => d.ExpertiserId)
-                    .HasConstraintName("FK__Expertise__Exper__00DF2177");
-            });
-
             modelBuilder.Entity<ForControl>(entity =>
             {
                 entity.ToTable("ForControl");
@@ -478,7 +536,7 @@ namespace CleanArchitecture.Domain.Entities
             {
                 entity.ToTable("ReceiveContract");
 
-                entity.HasIndex(e => e.ContractGroupId, "UQ__ReceiveC__BD73678FB760A5DC")
+                entity.HasIndex(e => e.ContractGroupId, "UQ__ReceiveC__BD73678FF8E9433B")
                     .IsUnique();
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -540,29 +598,27 @@ namespace CleanArchitecture.Domain.Entities
                 entity.HasOne(d => d.ContractGroup)
                     .WithOne(p => p.ReceiveContract)
                     .HasForeignKey<ReceiveContract>(d => d.ContractGroupId)
-                    .HasConstraintName("FK__ReceiveCo__Contr__2334397B");
+                    .HasConstraintName("FK__ReceiveCo__Contr__603D47BB");
 
                 entity.HasOne(d => d.ContractStatus)
                     .WithMany(p => p.ReceiveContracts)
                     .HasForeignKey(d => d.ContractStatusId)
-                    .HasConstraintName("FK__ReceiveCo__Contr__24285DB4");
+                    .HasConstraintName("FK__ReceiveCo__Contr__61316BF4");
 
                 entity.HasOne(d => d.Receiver)
                     .WithMany(p => p.ReceiveContracts)
                     .HasForeignKey(d => d.ReceiverId)
-                    .HasConstraintName("FK__ReceiveCo__Recei__22401542");
+                    .HasConstraintName("FK__ReceiveCo__Recei__5F492382");
             });
 
             modelBuilder.Entity<RentContract>(entity =>
             {
                 entity.ToTable("RentContract");
 
-                entity.HasIndex(e => e.ContractGroupId, "UQ__RentCont__BD73678F89230323")
+                entity.HasIndex(e => e.ContractGroupId, "UQ__RentCont__BD73678FEA44C76E")
                     .IsUnique();
 
                 entity.Property(e => e.CarGeneralInfoAtRentLimitedKmForMonth).HasColumnName("CarGeneralInfoAtRent_LimitedKmForMonth");
-
-                entity.Property(e => e.CarGeneralInfoAtRentPriceForHoliday).HasColumnName("CarGeneralInfoAtRent_PriceForHoliday");
 
                 entity.Property(e => e.CarGeneralInfoAtRentPriceForMonth).HasColumnName("CarGeneralInfoAtRent_PriceForMonth");
 
@@ -580,7 +636,9 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.Property(e => e.DeliveryAddress).HasMaxLength(255);
 
-                entity.Property(e => e.DepositItemAsset).HasColumnName("DepositItem_Asset");
+                entity.Property(e => e.DepositItemAsset)
+                    .HasMaxLength(255)
+                    .HasColumnName("DepositItem_Asset");
 
                 entity.Property(e => e.DepositItemDescription)
                     .HasMaxLength(255)
@@ -597,24 +655,19 @@ namespace CleanArchitecture.Domain.Entities
                 entity.HasOne(d => d.ContractGroup)
                     .WithOne(p => p.RentContract)
                     .HasForeignKey<RentContract>(d => d.ContractGroupId)
-                    .HasConstraintName("FK__RentContr__Contr__05A3D694");
-
-                entity.HasOne(d => d.ContractStatus)
-                    .WithMany(p => p.RentContracts)
-                    .HasForeignKey(d => d.ContractStatusId)
-                    .HasConstraintName("FK__RentContr__Contr__078C1F06");
+                    .HasConstraintName("FK__RentContr__Contr__7167D3BD");
 
                 entity.HasOne(d => d.Representative)
                     .WithMany(p => p.RentContracts)
                     .HasForeignKey(d => d.RepresentativeId)
-                    .HasConstraintName("FK__RentContr__Repre__0697FACD");
+                    .HasConstraintName("FK__RentContr__Repre__725BF7F6");
             });
 
             modelBuilder.Entity<TransferContract>(entity =>
             {
                 entity.ToTable("TransferContract");
 
-                entity.HasIndex(e => e.ContractGroupId, "UQ__Transfer__BD73678FCBABE35D")
+                entity.HasIndex(e => e.ContractGroupId, "UQ__Transfer__BD73678FD8BEA333")
                     .IsUnique();
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -678,17 +731,17 @@ namespace CleanArchitecture.Domain.Entities
                 entity.HasOne(d => d.ContractGroup)
                     .WithOne(p => p.TransferContract)
                     .HasForeignKey<TransferContract>(d => d.ContractGroupId)
-                    .HasConstraintName("FK__TransferC__Contr__1D7B6025");
+                    .HasConstraintName("FK__TransferC__Contr__5A846E65");
 
                 entity.HasOne(d => d.ContractStatus)
                     .WithMany(p => p.TransferContracts)
                     .HasForeignKey(d => d.ContractStatusId)
-                    .HasConstraintName("FK__TransferC__Contr__1E6F845E");
+                    .HasConstraintName("FK__TransferC__Contr__5B78929E");
 
                 entity.HasOne(d => d.Transferer)
                     .WithMany(p => p.TransferContracts)
                     .HasForeignKey(d => d.TransfererId)
-                    .HasConstraintName("FK__TransferC__Trans__1C873BEC");
+                    .HasConstraintName("FK__TransferC__Trans__59904A2C");
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -705,6 +758,8 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.HasIndex(e => e.Email, "UQ__User__A9D10534CB9FF300")
                     .IsUnique();
+
+                entity.Property(e => e.CardImage).HasMaxLength(255);
 
                 entity.Property(e => e.CitizenIdentificationInfoAddress)
                     .HasMaxLength(255)

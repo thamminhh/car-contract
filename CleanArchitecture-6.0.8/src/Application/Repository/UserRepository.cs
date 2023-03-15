@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
+using PdfSharpCore.Pdf.Filters;
 
 namespace CleanArchitecture.Application.Repository
 {
@@ -67,9 +68,33 @@ namespace CleanArchitecture.Application.Repository
             }
         }
 
-        public int GetNumberOfUsers()
+        public int GetNumberOfUsers(UserFilter filter)
         {
-            return _contractContext.Users.Count();
+            IQueryable<User> users = _contractContext.Users.AsQueryable();
+
+            if (filter != null)
+            {
+                if (!string.IsNullOrWhiteSpace(filter.Name))
+                {
+                    users = users.Where(u => u.Name.Contains(filter.Name));
+                }
+
+                if (!string.IsNullOrWhiteSpace(filter.Email))
+                {
+                    users = users.Where(u => u.Email.Contains(filter.Email));
+                }
+
+                if (!string.IsNullOrWhiteSpace(filter.PhoneNumber))
+                {
+                    users = users.Where(u => u.PhoneNumber.Contains(filter.PhoneNumber));
+                }
+                if (filter.IsDeleted.HasValue)
+                {
+                    users = users.Where(u => u.IsDeleted == filter.IsDeleted.Value);
+                }
+                
+            }
+            return users.Count();
         }
 
         public User GetUserById(int id)
@@ -108,6 +133,10 @@ namespace CleanArchitecture.Application.Repository
                 if (!string.IsNullOrWhiteSpace(filter.PhoneNumber))
                 {
                     users = users.Where(u => u.PhoneNumber.Contains(filter.PhoneNumber));
+                }
+                if (filter.IsDeleted.HasValue)
+                {
+                    users = users.Where(u => u.IsDeleted == filter.IsDeleted.Value);
                 }
             }
 
@@ -166,7 +195,7 @@ namespace CleanArchitecture.Application.Repository
             CreatePasswordHash(userCreate.Password, out byte[] passwordHash, out byte[] passwordSalt);
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
-
+            user.CardImage = userCreate.CardImage;
             user.Role = userCreate.Role;
             user.CitizenIdentificationInfoNumber = userCreate.CitizenIdentificationInfoNumber;
             user.CitizenIdentificationInfoAddress = userCreate.CitizenIdentificationInfoAddress;
@@ -175,13 +204,28 @@ namespace CleanArchitecture.Application.Repository
             user.PassportInfoAddress = userCreate.PassportInfoAddress;
             user.PassportInfoDateReceive = userCreate.PassportInfoDateReceive;
             user.CreatedDate = userCreate.CreatedDate;
-            user.IsDeleted = userCreate.IsDeleted;
+            user.IsDeleted = false;
 
             _contractContext.Add(user);
             return Save();
         }
-        public bool UpdateUser(User user)
+        public bool UpdateUser(int id, UserUpdateModel request)
         {
+            var user = _contractContext.Users.Find(id);
+            user.Name = request.Name;
+            user.PhoneNumber = request.PhoneNumber;
+            user.Job = request.Job;
+            user.CurrentAddress = request.CurrentAddress;
+            user.Email = request.Email;
+            user.CardImage = request.CardImage;
+            user.Role = request.Role;
+            user.CitizenIdentificationInfoNumber = request.CitizenIdentificationInfoNumber;
+            user.CitizenIdentificationInfoAddress = request.CitizenIdentificationInfoAddress;
+            user.CitizenIdentificationInfoDateReceive = request.CitizenIdentificationInfoDateReceive;
+            user.PassportInfoNumber = request.PassportInfoNumber;
+            user.PassportInfoAddress = request.PassportInfoAddress;
+            user.PassportInfoDateReceive = request.PassportInfoDateReceive;
+            user.IsDeleted = request.isDeleted;
             _contractContext.Update(user);
             return Save();
         }
@@ -253,6 +297,15 @@ namespace CleanArchitecture.Application.Repository
         {
             var user = _contractContext.Users.Where(u => u.Email == email).FirstOrDefault();
             return user.Id;
+        }
+
+        public bool DeleteUser(int id)
+        {
+            var user = _contractContext.Users.Where(u => u.Id == id).FirstOrDefault();
+            user.IsDeleted = true;
+            _contractContext.Users.Update(user);
+            return Save();
+
         }
 
         //public bool UpdateUserRole(int id, string role)

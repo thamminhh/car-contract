@@ -14,15 +14,15 @@ namespace CleanArchitecture.Domain.Interface
         User GetUserByEmail(string Email);
         int GetUserIdByEmail(string Email);
 
-
+        public bool DeleteUser(int id);
 
         bool CreateUser(CreateUserModel user, out string errorMessage);
-        bool UpdateUser(User user);
+        bool UpdateUser(int id, UserUpdateModel user);
         bool Save();
         bool UserExit(int id);
         bool UpdateUserRoleAsync(int id, UpdateUserRoleModel model);
 
-        public int GetNumberOfUsers();
+        public int GetNumberOfUsers(UserFilter filter);
 
         public string CreateToken(string email);
 

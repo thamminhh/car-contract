@@ -4,20 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanArchitecture.Domain.Entities_SubModel.ExpertiseContract;
-public class ExpertiseContractUpdateModel
+namespace CleanArchitecture.Domain.Entities_SubModel.AppraisalRecord;
+public class AppraisalRecordCreateModel
 {
-    public int Id { get; set; }
+    public int? CarId { get; set; }
     public int ContractGroupId { get; set; }
-    public int ExpertiserId { get; set; }
+    public int? ExpertiserId { get; set; }
     public DateTime? ExpertiseDate { get; set; }
-    public string? Description { get; set; }
-    public string? Result { get; set; }
-    public string? ResultOther { get; set; }
-    public string? TrustLevel { get; set; }
+    public bool? ResultOfInfo { get; set; }
+    public bool? ResultOfCar { get; set; }
+    public string? ResultDescription { get; set; }
     public string? DepositInfoDescription { get; set; }
     public string? DepositInfoAsset { get; set; }
     public double? DepositInfoDownPayment { get; set; }
     public double? PaymentAmount { get; set; }
-    public int? ContractStatusId { get; set; }
 }

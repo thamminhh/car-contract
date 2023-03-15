@@ -21,8 +21,6 @@ namespace CleanArchitecture.Application.Repository
         {
             return _contractContext.CarFiles.Where(c => c.CarId == carId).FirstOrDefault();
         }
-
-
         public bool CarFileExit(int id)
         {
             return _contractContext.CarFiles.Any(c => c.Id == id);

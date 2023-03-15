@@ -12,7 +12,6 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
         public string? ParkingLotName { get; set; }
         public int? CarStatusId { get; set; }
         public string CarStatus { get; set; }
-        public string CarId { get; set; }
         public string CarLicensePlates { get; set; }
         public int? SeatNumber { get; set; }
         public int? CarMakeId { get; set; }
@@ -41,6 +40,7 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
         public bool? IsDeleted { get; set; }
         public string CarColor { get; set; }
         public string CarFuel { get; set; }
+        public double? PeriodicMaintenanceLimit { get; set; }
         public double? PriceForNormalDay { get; set; }
         public double? PriceForWeekendDay { get; set; }
         public double? PriceForMonth { get; set; }

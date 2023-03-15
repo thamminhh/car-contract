@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using CleanArchitecture.Application.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +31,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
@@ -47,14 +50,17 @@ builder.Services.AddScoped<IParkingLotRepository, ParkingLotRepository>();
 builder.Services.AddScoped<ICustomerInfoRepository, CustomerInfoRepository>();
 builder.Services.AddScoped<IContractGroupRepository, ContractGroupRepository>();
 builder.Services.AddScoped<IContractFileRepository, ContractFileRepository>();
-builder.Services.AddScoped<IExpertiseContractRepository, ExpertiseContractRepository>();
+builder.Services.AddScoped<IAppraisalRecordRepository, AppraisalRecordRepository>();
 builder.Services.AddScoped<IRentContractRepository, RentContractRepository>();
 builder.Services.AddScoped<ITransferContractRepository, TransferContractRepository>();
 builder.Services.AddScoped<IReceiveContractRepository, ReceiveContractRepository>();
 builder.Services.AddScoped<ICarStatusRepository, CarStatusRepository>();
 builder.Services.AddScoped<IContractGroupStatusRepository, ContractGroupStatusRepository>();
 builder.Services.AddScoped<ICarScheduleRepository, CarScheduleRepository>();
+builder.Services.AddScoped<ICarMaintenanceInfoRepository, CarMaintenanceInfoRepository>();
+builder.Services.AddScoped<ICarRegistryInfoRepository, CarRegistryInfoRepository>();
 builder.Services.AddScoped<FileRepository>();
+builder.Services.AddScoped<ContractGroupHub>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSwaggerGen(options =>
@@ -95,14 +101,13 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+        app.UseCors("AllowAllOrigins");
+
+        app.UseRouting();
 
         app.UseStaticFiles();
 
-        app.UseCors("AllowAllOrigins");
-
         app.UseAuthentication();
-
-        app.UseRouting();
 
         app.UseAuthentication();
 

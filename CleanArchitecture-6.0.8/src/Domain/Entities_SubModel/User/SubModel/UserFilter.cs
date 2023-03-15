@@ -12,5 +12,8 @@ namespace CleanArchitecture.Domain.Entities_SubModel.User.SubModel
 
         [AllowNull]
         public string? PhoneNumber { get; set; }
+
+        [AllowNull]
+        public bool? IsDeleted { get; set; }
     }
 }

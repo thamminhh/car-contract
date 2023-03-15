@@ -212,7 +212,6 @@ namespace CleanArchitecture.Application.Repository
                 ParkingLotName = parkingLot.Name,
                 CarStatusId = car.CarStatusId,
                 CarStatus = car.CarStatus.Name,
-                CarId = car.CarId,
                 CarLicensePlates = car.CarLicensePlates,
                 SeatNumber = car.SeatNumber,
                 ModelYear = car.ModelYear,
@@ -235,6 +234,7 @@ namespace CleanArchitecture.Application.Repository
                 IsDeleted = car.IsDeleted,
                 CarColor = car.CarColor,
                 CarFuel = car.CarFuel,
+                PeriodicMaintenanceLimit = car.PeriodicMaintenanceLimit,
                 PriceForNormalDay = car.CarGenerallInfo.PriceForNormalDay,
                 PriceForWeekendDay = car.CarGenerallInfo.PriceForWeekendDay,
                 PriceForMonth = car.CarGenerallInfo.PriceForMonth,
@@ -327,7 +327,6 @@ namespace CleanArchitecture.Application.Repository
                         ParkingLotId = c.ParkingLotId,
                         CarStatusId = c.CarStatusId,
                         CarStatus = cstatus.Name,
-                        CarId = c.CarId,
                         CarLicensePlates = c.CarLicensePlates,
                         SeatNumber = c.SeatNumber,
                         ModelYear = c.ModelYear,
@@ -400,7 +399,6 @@ namespace CleanArchitecture.Application.Repository
                             ParkingLotId = c.ParkingLotId,
                             CarStatusId = c.CarStatusId,
                             CarStatus = cstatus.Name,
-                            CarId = c.CarId,
                             CarLicensePlates = c.CarLicensePlates,
                             SeatNumber = c.SeatNumber,
                             ModelYear = c.ModelYear,
@@ -464,7 +462,6 @@ namespace CleanArchitecture.Application.Repository
             {
                 ParkingLotId = request.ParkingLotId,
                 CarStatusId = defaultCarSatusId,
-                CarId = request.CarId,
                 CarLicensePlates = request.CarLicensePlates,
                 ModelYear = request.ModelYear, 
                 SeatNumber = request.SeatNumber,
@@ -477,7 +474,9 @@ namespace CleanArchitecture.Application.Repository
                 CreatedDate = request.CreatedDate,
                 IsDeleted = request.IsDeleted,
                 CarColor = request.CarColor,
-                CarFuel = request.CarFuel
+                CarFuel = request.CarFuel,
+                PeriodicMaintenanceLimit = request.PeriodicMaintenanceLimit
+                
             };
 
             // Save the new car to the database
@@ -569,7 +568,6 @@ namespace CleanArchitecture.Application.Repository
             // Update the properties of the car object
             car.ParkingLotId = request.ParkingLotId;
             car.CarStatusId = request.CarStatusId;
-            car.CarId = request.CarId;
             car.CarLicensePlates = request.CarLicensePlates;
             car.SeatNumber = request.SeatNumber;
             car.CarMakeId = request.CarMakeId;
@@ -582,6 +580,7 @@ namespace CleanArchitecture.Application.Repository
             car.IsDeleted = request.IsDeleted;
             car.CarColor = request.CarColor;
             car.CarFuel = request.CarFuel;
+            car.PeriodicMaintenanceLimit = request.PeriodicMaintenanceLimit;
 
             // Save the changes to the database
             _contractContext.Cars.Update(car);

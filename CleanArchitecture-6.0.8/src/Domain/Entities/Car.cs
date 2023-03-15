@@ -7,6 +7,8 @@ namespace CleanArchitecture.Domain.Entities
     {
         public Car()
         {
+            CarMaintenanceInfos = new HashSet<CarMaintenanceInfo>();
+            CarRegistryInfos = new HashSet<CarRegistryInfo>();
             CarSchedules = new HashSet<CarSchedule>();
             ContractGroups = new HashSet<ContractGroup>();
         }
@@ -14,7 +16,6 @@ namespace CleanArchitecture.Domain.Entities
         public int Id { get; set; }
         public int? ParkingLotId { get; set; }
         public int? CarStatusId { get; set; }
-        public string? CarId { get; set; }
         public string? CarLicensePlates { get; set; }
         public int? SeatNumber { get; set; }
         public int? CarMakeId { get; set; }
@@ -28,8 +29,14 @@ namespace CleanArchitecture.Domain.Entities
         public DateTime? CreatedDate { get; set; }
         public bool? IsDeleted { get; set; }
         public int? ModelYear { get; set; }
+        public double? PeriodicMaintenanceLimit { get; set; }
 
+        public virtual CarModel? CarGeneration { get; set; }
+        public virtual CarModel? CarMake { get; set; }
+        public virtual CarModel? CarModel { get; set; }
+        public virtual CarModel? CarSeries { get; set; }
         public virtual CarStatus? CarStatus { get; set; }
+        public virtual CarModel? CarTrim { get; set; }
         public virtual ParkingLot? ParkingLot { get; set; }
         public virtual CarFile? CarFile { get; set; }
         public virtual CarGenerallInfo? CarGenerallInfo { get; set; }
@@ -37,6 +44,8 @@ namespace CleanArchitecture.Domain.Entities
         public virtual CarState? CarState { get; set; }
         public virtual CarTracking? CarTracking { get; set; }
         public virtual ForControl? ForControl { get; set; }
+        public virtual ICollection<CarMaintenanceInfo> CarMaintenanceInfos { get; set; }
+        public virtual ICollection<CarRegistryInfo> CarRegistryInfos { get; set; }
         public virtual ICollection<CarSchedule> CarSchedules { get; set; }
         public virtual ICollection<ContractGroup> ContractGroups { get; set; }
     }

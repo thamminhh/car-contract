@@ -1,20 +1,20 @@
 ﻿namespace CleanArchitecture.Application.Constant;
 public class ContractGroupConstant
 {
-    public const int ContractGroupNotExpertised  = 1; //"Nhóm hợp đồng chưa được thẩm định!"
-    public const int ContractGroupIsExpertising  = 2; //"Nhóm hợp đồng đang được thẩm định"
-    public const int ContractGroupNotExported    = 3; //"Nhóm hợp đồng không được duyệt"
-    public const int RentContractNotExit         = 4; //"Chưa tạo hợp đồng thuê"
-    public const int RentContractNotSign         = 5; //"Chưa kí HĐ thuê"
-    public const int RentContractSigned          = 6; //"Đã kí HĐ thuê"
-    public const int TransferContractNotCreate   = 7; //"Chưa tạo HĐ giao"
-    public const int TransferContractNotSign     = 8; //"Chưa kí HĐ giao"
-    public const int TransferContractSigned      = 9; //"Đã kí HĐ giao"
-    public const int ReceiveContractNotCreate    = 10; //"Chưa tạo HĐ nhận"
-    public const int ReceiveContractNotSign      = 11; //"Chưa kí HĐ nhận""
-    public const int ReceiveContractSigned       = 12; //"Đã kí HĐ nhận"
-    public const int ContractCancel              = 13; //"Đã Hủy"
-    public const int CheckedInfo                 = 14; //"Đã check thông tin"
+    public const int ContractGroupNotExpertised     = 1; //"Nhóm hợp đồng chưa được thẩm định!"
+    public const int FailInfo                       = 2; //"Fail thông tin"
+    public const int FailCar                        = 3; //"Fail xe"
+    public const int ContractGroupExpertised        = 4; //"Đã thẩm định"
+    public const int RentContractNotExit            = 5; //"Chưa tạo hợp đồng thuê"
+    public const int RentContractNotSign            = 6; //"Chưa kí HĐ thuê"
+    public const int RentContractSigned             = 7; //"Đã kí HĐ thuê"
+    public const int TransferContractNotCreate      = 8; //"Chưa tạo HĐ giao"
+    public const int TransferContractNotSign        = 9; //"Chưa kí HĐ giao"
+    public const int TransferContractSigned         = 10; //"Đã kí HĐ giao"
+    public const int ReceiveContractNotCreate       = 11; //"Chưa tạo HĐ nhận"
+    public const int ReceiveContractNotSign         = 12; //"Chưa kí HĐ nhận""
+    public const int ReceiveContractSigned          = 13; //"Đã kí HĐ nhận"
+    public const int ContractCancel                 = 14; //"Đã Hủy"
 
     //public const string RentContractNotExisted = "Hợp đồng thuê không tồn tại !";
     //public const string RentContractNotFinished = "Hợp đồng thuê chưa hoàn thành !";

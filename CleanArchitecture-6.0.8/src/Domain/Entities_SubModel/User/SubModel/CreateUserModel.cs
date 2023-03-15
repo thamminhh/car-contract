@@ -17,6 +17,8 @@ public class CreateUserModel
 
     public string? Password { get; set; }
 
+    public string? CardImage { get; set; }
+
     public string? CitizenIdentificationInfoNumber { get; set; }
 
     public string? CitizenIdentificationInfoAddress { get; set; }
@@ -30,8 +32,6 @@ public class CreateUserModel
     public DateTime? PassportInfoDateReceive { get; set; }
 
     public DateTime? CreatedDate { get; set; }
-
-    public bool? IsDeleted { get; set; }
 
     public string? Role { get; set; }
 
