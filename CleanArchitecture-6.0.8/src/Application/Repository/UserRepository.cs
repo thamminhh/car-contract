@@ -209,9 +209,38 @@ namespace CleanArchitecture.Application.Repository
             _contractContext.Add(user);
             return Save();
         }
-        public bool UpdateUser(int id, UserUpdateModel request)
+        public bool UpdateUser(int id, UserUpdateModel request, out string errorMessage)
         {
             var user = _contractContext.Users.Find(id);
+            errorMessage = string.Empty;
+            if (request.Email == null)
+            {
+                errorMessage = "Email don't allow null";
+                return false;
+            }
+
+            if (_contractContext.Users.Any(u => u.Email == request.Email) && request.Email != user.Email)
+            {
+                errorMessage = "User with this email already exists";
+                return false;
+            }
+            if (request.CitizenIdentificationInfoNumber != null && request.CitizenIdentificationInfoNumber != user.CitizenIdentificationInfoNumber)
+            {
+                if (_contractContext.Users.Any(u => u.CitizenIdentificationInfoNumber == request.CitizenIdentificationInfoNumber))
+                {
+                    errorMessage = "User with this citizen identification number already exists";
+                    return false;
+                }
+            }
+            if (request.PassportInfoNumber != null && request.PassportInfoNumber != user.PassportInfoNumber)
+            {
+                if (_contractContext.Users.Any(u => u.PassportInfoNumber == request.PassportInfoNumber))
+                {
+                    errorMessage = "User with this passport number already exists";
+                    return false;
+                }
+            }
+            
             user.Name = request.Name;
             user.PhoneNumber = request.PhoneNumber;
             user.Job = request.Job;
@@ -226,6 +255,8 @@ namespace CleanArchitecture.Application.Repository
             user.PassportInfoAddress = request.PassportInfoAddress;
             user.PassportInfoDateReceive = request.PassportInfoDateReceive;
             user.IsDeleted = request.isDeleted;
+            user.CardImage = request.CardImage;
+
             _contractContext.Update(user);
             return Save();
         }
@@ -293,19 +324,12 @@ namespace CleanArchitecture.Application.Repository
             return _contractContext.Users.Where(u => u.Email == email).FirstOrDefault();
         }
 
-        public int GetUserIdByEmail(string email)
-        {
-            var user = _contractContext.Users.Where(u => u.Email == email).FirstOrDefault();
-            return user.Id;
-        }
-
         public bool DeleteUser(int id)
         {
             var user = _contractContext.Users.Where(u => u.Id == id).FirstOrDefault();
             user.IsDeleted = true;
             _contractContext.Users.Update(user);
             return Save();
-
         }
 
         //public bool UpdateUserRole(int id, string role)

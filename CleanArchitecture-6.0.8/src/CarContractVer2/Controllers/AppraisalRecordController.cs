@@ -40,9 +40,7 @@ namespace CarContractVer2.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<AppraisalRecord>))]
         public IActionResult GetLastAppraisalByContractGroupId(int contractGroupId)
         {
-            if (!_appraisalRecordRepository.AppraisalRecordExit(contractGroupId))
-                return NotFound();
-            var appraisalRecord = _appraisalRecordRepository.GetMaxAppraisalRecordByContractGroupId(contractGroupId);
+            var appraisalRecord = _appraisalRecordRepository.GetLastAppraisalRecordByContractGroupId(contractGroupId);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(appraisalRecord);

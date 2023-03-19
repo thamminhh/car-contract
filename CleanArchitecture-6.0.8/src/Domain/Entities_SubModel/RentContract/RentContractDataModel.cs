@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CleanArchitecture.Domain.Entities_SubModel.RentContract;
-public class RentContractUpdateModel
+public class RentContractDataModel
 {
     public int Id { get; set; }
-    public int ContractGroupId { get; set; }
+    public int? ContractGroupId { get; set; }
     public int? RepresentativeId { get; set; }
     public string? RepresentativeName { get; set; }
 
@@ -39,6 +39,7 @@ public class RentContractUpdateModel
     public double? CarGeneralInfoAtRentPriceForMonth { get; set; }
     public string? CustomerSignature { get; set; }
     public string? StaffSignature { get; set; }
+    public string? FilePath { get; set; }
     public string? FileWithSignsPath { get; set; }
     public bool? IsExported { get; set; }
     public double? PaymentAmount { get; set; }

@@ -6,9 +6,9 @@ namespace CleanArchitecture.Domain.Interface
     public interface IRentContractRepository
     {
 
-        RentContract GetRentContractById(int id);
+        RentContractDataModel GetRentContractById(int id);
 
-        RentContract GetRentContractByContractGroupId(int contractGroupId);
+        RentContractDataModel GetRentContractByContractGroupId(int contractGroupId);
 
         void CreateRentContract(RentContractCreateModel request);
 

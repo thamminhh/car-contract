@@ -33,8 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\cars\" />
-    <Folder Include="wwwroot\contracts\" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>

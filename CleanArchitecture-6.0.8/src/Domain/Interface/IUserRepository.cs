@@ -12,12 +12,11 @@ namespace CleanArchitecture.Domain.Interface
         User GetUserById(int id);
 
         User GetUserByEmail(string Email);
-        int GetUserIdByEmail(string Email);
 
         public bool DeleteUser(int id);
 
         bool CreateUser(CreateUserModel user, out string errorMessage);
-        bool UpdateUser(int id, UserUpdateModel user);
+        bool UpdateUser(int id, UserUpdateModel user, out string errorMessage);
         bool Save();
         bool UserExit(int id);
         bool UpdateUserRoleAsync(int id, UpdateUserRoleModel model);

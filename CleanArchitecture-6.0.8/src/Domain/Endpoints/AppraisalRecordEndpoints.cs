@@ -12,7 +12,7 @@ public class AppraisalRecordEndpoints
     public const string Base = Area + "/appraisalrecord";
     public const string GetAll = Base;
     public const string GetSingle = Base + "/{id}";
-    public const string GetLastByContractGroupId = Base + "/contractGroupId/{contractGroupId}";
+    public const string GetLastByContractGroupId = Base + "/last/contractGroupId/{contractGroupId}";
     public const string GetByContractGroupId = Base + "/get-by-contractGroupId/{contractGroupId}";
     public const string Create = Base + "/create";
     public const string Update = Base + "/update/{id}";

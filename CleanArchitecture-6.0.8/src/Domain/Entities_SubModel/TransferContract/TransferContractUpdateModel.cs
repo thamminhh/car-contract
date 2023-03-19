@@ -9,7 +9,21 @@ public class TransferContractUpdateModel
 {
     public int Id { get; set; }
     public int? TransfererId { get; set; }
-    public int? ContractGroupId { get; set; }
+    public string? TransfererName { get; set; }
+    public string? TransfererPhoneNumber { get; set; }
+
+    public int ContractGroupId { get; set; }
+
+    public string CustomerName { get; set; }
+    public string CustomerPhoneNumber { get; set; }
+    public string? CustomerAddress { get; set; }
+    public string? CustomerCitizenIdentificationInfoNumber { get; set; }
+
+    public string? CarModel { get; set; }
+
+    public string? CarLicensePlates { get; set; }
+    public int? SeatNumber { get; set; }
+
     public DateTime? DateTransfer { get; set; }
     public string? DeliveryAddress { get; set; }
     public int? CurrentCarStateSpeedometerNumber { get; set; }
@@ -23,7 +37,7 @@ public class TransferContractUpdateModel
     public string? CurrentCarStateCarInteriorImg { get; set; }
     public string? CurrentCarStateCarBackSeatImg { get; set; }
     public string? DepositItemPaper { get; set; }
-    public double? DepositItemAsset { get; set; }
+    public string? DepositItemAsset { get; set; }
     public string? DepositItemAssetInfo { get; set; }
     public bool? IsExported { get; set; }
     public string? CustomerSignature { get; set; }

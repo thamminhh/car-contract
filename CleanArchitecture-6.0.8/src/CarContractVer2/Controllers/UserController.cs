@@ -41,7 +41,7 @@ namespace CarContractVer2.Controllers
             return Ok(new { users = listUser, total = toalCount });
         }
 
-        [HttpGet, Authorize(Roles = UserRoleConstant.Admin)]
+        [HttpGet]
         [Route(UserEndpoints.GetSingle)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
         public IActionResult GetUserById(int id)
@@ -55,16 +55,16 @@ namespace CarContractVer2.Controllers
         }
 
         [HttpGet]
-        [Route(UserEndpoints.GetUserIdByEmail)]
+        [Route(UserEndpoints.GetUserByEmail)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<User>))]
         public IActionResult GetUserIdByEmail(string email)
         {
             if (!_userRepository.EmailExit(email))
                 return NotFound();
-            var userId = _userRepository.GetUserIdByEmail(email);
+            var user = _userRepository.GetUserByEmail(email);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            return Ok(userId);
+            return Ok(user);
         }
 
         [HttpPost]
@@ -101,7 +101,11 @@ namespace CarContractVer2.Controllers
                 return NotFound();
 
             // Update the car and its related data
-            _userRepository.UpdateUser(userId, request);
+            if(!_userRepository.UpdateUser(userId, request, out string errorMessage))
+            {
+                ModelState.AddModelError("", errorMessage);
+                return StatusCode(422, ModelState);
+            }
 
             return Ok();
         }

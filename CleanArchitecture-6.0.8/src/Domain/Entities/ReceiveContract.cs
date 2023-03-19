@@ -21,7 +21,7 @@ namespace CleanArchitecture.Domain.Entities
         public string? CurrentCarStateCarInteriorImg { get; set; }
         public string? CurrentCarStateCarBackSeatImg { get; set; }
         public string? CurrentCarStateCarPhysicalDamage { get; set; }
-        public double? DepositItemAsset { get; set; }
+        public string? DepositItemAsset { get; set; }
         public double? CarInsuranceMoney { get; set; }
         public DateTime? CreatedDate { get; set; }
         public bool? IsExported { get; set; }

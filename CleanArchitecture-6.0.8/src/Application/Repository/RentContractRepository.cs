@@ -1,9 +1,11 @@
-﻿using CleanArchitecture.Application.Constant;
+﻿using System.Net.NetworkInformation;
+using CleanArchitecture.Application.Constant;
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.Entities_SubModel.ContractGroup.SubModel;
 using CleanArchitecture.Domain.Entities_SubModel.RentContract;
 using CleanArchitecture.Domain.Interface;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace CleanArchitecture.Application.Repository
@@ -20,15 +22,36 @@ namespace CleanArchitecture.Application.Repository
             _contractGroupRepository = contractGroupRepository;
         }
 
-        public RentContract GetRentContractById(int id)
+        public RentContractDataModel GetRentContractById(int id)
         {
-            var rentContract = _contractContext.RentContracts.Where(c => c.Id == id).FirstOrDefault();
+            RentContract rentContract = _contractContext.RentContracts
+                .Include(c => c.Representative)
+                .FirstOrDefault(c => c.Id == id);
             var host = _fileRepository.GetCurrentHost();
-            return new RentContract
+            var contractGroup = _contractContext.ContractGroups
+                .Include(c => c.CustomerInfo)
+                .FirstOrDefault(c => c.Id == rentContract.ContractGroupId);
+            var car = _contractContext.Cars
+                .Include(c => c.CarModel)
+                .FirstOrDefault(c => c.Id == contractGroup.CarId);
+
+            return new RentContractDataModel
             {
                 Id = id,
                 ContractGroupId = rentContract.ContractGroupId,
                 RepresentativeId = rentContract.RepresentativeId,
+                RepresentativeName = rentContract.Representative.Name,
+                RepresentativePhoneNumber = rentContract.Representative.PhoneNumber,
+                RepresentativeAddress = rentContract.Representative.CurrentAddress,
+                CustomerPhoneNumber = contractGroup.CustomerInfo.PhoneNumber,
+                CustomerAddress = contractGroup.CustomerInfo.CustomerAddress,
+                CustomerCitizenIdentificationInfoNumber = contractGroup.CustomerInfo.CitizenIdentificationInfoNumber,
+                CustomerCitizenIdentificationInfoDateReceive = contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive,
+                CarModel = car.CarModel.Name,
+                CarLicensePlates = car.CarLicensePlates,
+                SeatNumber = car.SeatNumber,
+                RentFrom = contractGroup.RentFrom,
+                RentTo = contractGroup.RentTo,
                 DeliveryAddress = rentContract.DeliveryAddress,
                 CarGeneralInfoAtRentPriceForNormalDay = rentContract.CarGeneralInfoAtRentPriceForNormalDay,
                 CarGeneralInfoAtRentPriceForWeekendDay = rentContract.CarGeneralInfoAtRentPriceForWeekendDay,
@@ -36,26 +59,51 @@ namespace CleanArchitecture.Application.Repository
                 CarGeneralInfoAtRentPricePerHourExceed = rentContract.CarGeneralInfoAtRentPricePerHourExceed,
                 CarGeneralInfoAtRentLimitedKmForMonth = rentContract.CarGeneralInfoAtRentLimitedKmForMonth,
                 CarGeneralInfoAtRentPriceForMonth = rentContract.CarGeneralInfoAtRentPriceForMonth,
-                DownPayment = rentContract.DownPayment,
                 CreatedDate = rentContract.CreatedDate,
                 PaymentAmount = rentContract.PaymentAmount,
                 DepositItemAsset = rentContract.DepositItemAsset,
                 DepositItemDescription = rentContract.DepositItemDescription,
                 DepositItemDownPayment = rentContract.DepositItemDownPayment,
                 FilePath = host + rentContract.FilePath,
-                ContractStatusId = rentContract.ContractStatusId
+                ContractStatusId = rentContract.ContractStatusId,
+                StaffSignature= rentContract.StaffSignature,
+                CustomerSignature = rentContract.CustomerSignature,
+                FileWithSignsPath = host + rentContract.FileWithSignsPath,
+                
             };
         }
 
-        public RentContract GetRentContractByContractGroupId(int contractGroupId)
+        public RentContractDataModel GetRentContractByContractGroupId(int contractGroupId)
         {
-            var rentContract = _contractContext.RentContracts.Where(c => c.ContractGroupId == contractGroupId).FirstOrDefault();
+            RentContract rentContract = _contractContext.RentContracts
+                .Include(c => c.Representative)
+                .FirstOrDefault(c => c.ContractGroupId == contractGroupId);
             var host = _fileRepository.GetCurrentHost();
-            return new RentContract
+            var contractGroup = _contractContext.ContractGroups
+                .Include(c => c.CustomerInfo)
+                .FirstOrDefault(c => c.Id == rentContract.ContractGroupId);
+            var car = _contractContext.Cars
+                .Include(c => c.CarModel)
+                .FirstOrDefault(c => c.Id == contractGroup.CarId);
+
+            return new RentContractDataModel
             {
                 Id = rentContract.Id,
                 ContractGroupId = rentContract.ContractGroupId,
                 RepresentativeId = rentContract.RepresentativeId,
+                RepresentativeName = rentContract.Representative.Name,
+                RepresentativePhoneNumber = rentContract.Representative.PhoneNumber,
+                RepresentativeAddress = rentContract.Representative.CurrentAddress,
+                CustomerPhoneNumber = contractGroup.CustomerInfo.PhoneNumber,
+                CustomerAddress = contractGroup.CustomerInfo.CustomerAddress,
+                CustomerCitizenIdentificationInfoNumber = contractGroup.CustomerInfo.CitizenIdentificationInfoNumber,
+                CustomerCitizenIdentificationInfoDateReceive = contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive,
+                CarModel = car.CarModel.Name,
+                CarLicensePlates = car.CarLicensePlates,
+                SeatNumber = car.SeatNumber,
+                RentFrom = contractGroup.RentFrom,
+                RentTo = contractGroup.RentTo,
+
                 DeliveryAddress = rentContract.DeliveryAddress,
                 CarGeneralInfoAtRentPriceForNormalDay = rentContract.CarGeneralInfoAtRentPriceForNormalDay,
                 CarGeneralInfoAtRentPriceForWeekendDay = rentContract.CarGeneralInfoAtRentPriceForWeekendDay,
@@ -63,14 +111,16 @@ namespace CleanArchitecture.Application.Repository
                 CarGeneralInfoAtRentPricePerHourExceed = rentContract.CarGeneralInfoAtRentPricePerHourExceed,
                 CarGeneralInfoAtRentLimitedKmForMonth = rentContract.CarGeneralInfoAtRentLimitedKmForMonth,
                 CarGeneralInfoAtRentPriceForMonth = rentContract.CarGeneralInfoAtRentPriceForMonth,
-                DownPayment = rentContract.DownPayment,
                 CreatedDate = rentContract.CreatedDate,
                 PaymentAmount = rentContract.PaymentAmount,
                 DepositItemAsset = rentContract.DepositItemAsset,
                 DepositItemDescription = rentContract.DepositItemDescription,
                 DepositItemDownPayment = rentContract.DepositItemDownPayment,
                 FilePath = host + rentContract.FilePath,
-                ContractStatusId = rentContract.ContractStatusId
+                ContractStatusId = rentContract.ContractStatusId,
+                StaffSignature = rentContract.StaffSignature,
+                CustomerSignature = rentContract.CustomerSignature,
+                FileWithSignsPath = host + rentContract.FileWithSignsPath,
             };
         }
 
@@ -80,46 +130,46 @@ namespace CleanArchitecture.Application.Repository
             return _contractContext.RentContracts.Any(c => c.Id == id);
         }
 
-            public void CreateRentContract(RentContractCreateModel request)
+        public void CreateRentContract(RentContractCreateModel request)
+        {
+            var defaultContractId = ContractStatusConstant.ContractExporting;
+            string fileName = "RentContract" + ".pdf";
+
+            string htmlContent = CreateRentContractContent(request);
+
+            var file = _fileRepository.GeneratePdfAsync(htmlContent, fileName);
+            var filePath = _fileRepository.SaveFileToFolder(file, request.ContractGroupId.ToString());
+
+            var rentContract = new RentContract
             {
-                var defaultContractId = ContractStatusConstant.ContractExporting;
-                string fileName = "RentContract" + ".pdf";
+                ContractGroupId = request.ContractGroupId,
+                RepresentativeId = request.RepresentativeId,
+                DeliveryAddress = request.DeliveryAddress,
+                CarGeneralInfoAtRentPriceForNormalDay = request.CarGeneralInfoAtRentPriceForNormalDay,
+                CarGeneralInfoAtRentPriceForWeekendDay = request.CarGeneralInfoAtRentPriceForWeekendDay,
+                CarGeneralInfoAtRentPricePerKmExceed = request.CarGeneralInfoAtRentPricePerKmExceed,
+                CarGeneralInfoAtRentPricePerHourExceed = request.CarGeneralInfoAtRentPricePerHourExceed,
+                CarGeneralInfoAtRentLimitedKmForMonth = request.CarGeneralInfoAtRentLimitedKmForMonth,
+                CarGeneralInfoAtRentPriceForMonth = request.CarGeneralInfoAtRentPriceForMonth,
+                CreatedDate = request.CreatedDate,
+                PaymentAmount = request.PaymentAmount,
+                DepositItemAsset = request.DepositItemAsset,
+                DepositItemDescription = request.DepositItemDescription,
+                DepositItemDownPayment = request.DepositItemDownPayment,
+                FilePath = filePath,
+                ContractStatusId = defaultContractId
+            };
+            _contractContext.RentContracts.Add(rentContract);
+            _contractContext.SaveChanges();
 
-                string htmlContent = CreateRentContractContent(request);
+            var contractGroupStatusExpertised = Constant.ContractGroupConstant.RentContractNotSign;
+            var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+            contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+            contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusExpertised;
 
-                var file = _fileRepository.GeneratePdfAsync(htmlContent, fileName);
-                var filePath = _fileRepository.SaveFileToFolder(file, request.ContractGroupId.ToString());
+            _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
 
-                var rentContract = new RentContract
-                {
-                    ContractGroupId = request.ContractGroupId,
-                    RepresentativeId = request.RepresentativeId,
-                    DeliveryAddress = request.DeliveryAddress,
-                    CarGeneralInfoAtRentPriceForNormalDay = request.CarGeneralInfoAtRentPriceForNormalDay,
-                    CarGeneralInfoAtRentPriceForWeekendDay = request.CarGeneralInfoAtRentPriceForWeekendDay,
-                    CarGeneralInfoAtRentPricePerKmExceed = request.CarGeneralInfoAtRentPricePerKmExceed,
-                    CarGeneralInfoAtRentPricePerHourExceed = request.CarGeneralInfoAtRentPricePerHourExceed,
-                    CarGeneralInfoAtRentLimitedKmForMonth = request.CarGeneralInfoAtRentLimitedKmForMonth,
-                    CarGeneralInfoAtRentPriceForMonth = request.CarGeneralInfoAtRentPriceForMonth,
-                    CreatedDate = request.CreatedDate,
-                    PaymentAmount = request.PaymentAmount,
-                    DepositItemAsset = request.DepositItemAsset ,
-                    DepositItemDescription = request.DepositItemDescription ,
-                    DepositItemDownPayment = request.DepositItemDownPayment ,
-                    FilePath = filePath,
-                    ContractStatusId = defaultContractId
-                };
-                _contractContext.RentContracts.Add(rentContract);
-                _contractContext.SaveChanges();
-
-                var contractGroupStatusExpertised = Constant.ContractGroupConstant.RentContractNotSign;
-                var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
-                contractGroupUpdateStatusModel.Id = request.ContractGroupId;
-                contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusExpertised;
-
-                _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
-
-            }
+        }
 
         public void UpdateRentContract(int id, RentContractUpdateModel request)
         {
@@ -151,10 +201,28 @@ namespace CleanArchitecture.Application.Repository
             rentContract.DepositItemAsset = request.DepositItemAsset;
             rentContract.DepositItemDescription = request.DepositItemDescription;
             rentContract.DepositItemDownPayment = request.DepositItemDownPayment;
-            rentContract.ContractStatusId = request.ContractStatusId;
+            rentContract.CustomerSignature = request.CustomerSignature;
+            rentContract.StaffSignature = request.StaffSignature;
+            if (request.CustomerSignature != null && request.StaffSignature != null)
+            {
+                rentContract.ContractStatusId = Constant.ContractStatusConstant.ContractExported;
+            }else
+            {
+                rentContract.ContractStatusId = request.ContractStatusId;
+            }
 
             _contractContext.RentContracts.Update(rentContract);
             _contractContext.SaveChanges();
+
+            if(request.CustomerSignature != null && request.StaffSignature != null)
+            {
+                var contractGroupStatusRentSigned = Constant.ContractGroupConstant.RentContractSigned;
+                var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+                contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+                contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusRentSigned;
+
+                _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+            }
         }
 
         public bool UpdateRentContractStatus(int id, RentContractUpdateStatusModel request)
@@ -170,8 +238,10 @@ namespace CleanArchitecture.Application.Repository
 
         public string CreateRentContractContent(RentContractCreateModel request)
         {
+
             string htmlContent = "<h1 style= " + "color: blue; text - align:center;" + "> CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
             htmlContent += "<h1 style= " + "color: blue; text - align:center;" + "> Độc lập – Tự do – Hạnh phúc</h1>";
+            htmlContent += "<h2>HỢP ĐỒNG CHO THUÊ XE </h2>";
             htmlContent += "<ul><li>Căn cứ Bộ Luật dân sự số 91/2015/QH13 nước CHXHCN Việt Nam ngày 01/01/2017</li>";
             htmlContent += "<li>Căn cứ Luật thương mại số 36/2005/QH11 nước CHXHCN Việt Nam ngày 26/06/2005</li>";
             htmlContent += "<li>Căn cứ vào khả năng cung cấp và nhu cầu của hai bên.</li></ul>";
@@ -186,8 +256,8 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<ul>";
             htmlContent += "<li>Địa chỉ hiện tại: " + request.CustomerAddress + "</li>";
             htmlContent += "<li>Số điện thoại: " + request.CustomerPhoneNumber + "</li>";
-            htmlContent += "<li>CCCD/ CMND số: " + request.CustomerCitizenIdentificationInfoNumber + " </li>";
-            htmlContent += "<li>Cấp ngày: " + request.CustomerCitizenIdentificationInfoDateReceive + " </li>";
+            htmlContent += "<li>CCCD/ CMND số: " + request.CustomerCitizenIdentificationInfoNumber + "</li>";
+            htmlContent += "<li>Cấp ngày: " + request.CustomerCitizenIdentificationInfoDateReceive + "</li>";
             htmlContent += "</ul>";
             htmlContent += "<p>Sau khi bàn bạc, thỏa thuận, hai bên cùng nhất trí ký hợp đồng thuê xe với các điều khoản sau:</p>";
             htmlContent += "<h2>Điều I: Nội dung hợp đồng</h2>";
@@ -254,15 +324,24 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<li>2. Hợp đồng này được lập thành 02 bản có giá trị pháp lý như nhau và có hiệu lực kể từ ngày ký.</li>";
             htmlContent += "</ul>";
 
-            htmlContent += "<h3>BÊN A                                                             BÊN B</h3>";
+            htmlContent += "<h3>&nbsp;&nbsp;&nbsp;&nbsp;BÊN A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
+                ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "BÊN B</h3>";
+
 
             return htmlContent;
         }
 
         public string UpdateRentContractContent(RentContractUpdateModel request)
         {
-            string htmlContent = "<h1 style= " + "color: blue; text - align:center;" + "> CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
-            htmlContent += "<h1 style= " + "color: blue; text - align:center;" + "> Độc lập – Tự do – Hạnh phúc</h1>";
+
+            string htmlContent = "<h1 style='text-align:center;'>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
+            htmlContent += "<h1 style='text-align:center;'>Độc lập – Tự do – Hạnh phúc</h1>";
+
+            htmlContent += "<h2>HỢP ĐỒNG CHO THUÊ XE </h2>";
             htmlContent += "<ul><li>Căn cứ Bộ Luật dân sự số 91/2015/QH13 nước CHXHCN Việt Nam ngày 01/01/2017</li>";
             htmlContent += "<li>Căn cứ Luật thương mại số 36/2005/QH11 nước CHXHCN Việt Nam ngày 26/06/2005</li>";
             htmlContent += "<li>Căn cứ vào khả năng cung cấp và nhu cầu của hai bên.</li></ul>";
@@ -345,7 +424,21 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<li>2. Hợp đồng này được lập thành 02 bản có giá trị pháp lý như nhau và có hiệu lực kể từ ngày ký.</li>";
             htmlContent += "</ul>";
 
-            htmlContent += "<h3>BÊN A                                                             BÊN B</h3>";
+            htmlContent += "<h3>&nbsp;&nbsp;&nbsp;&nbsp;BÊN A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
+                ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "BÊN B</h3>";
+
+            if (request.StaffSignature != null)
+            {
+                htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;<img style= 'width:100px; height:100%' src='" + request.StaffSignature + "' />";
+            }
+            if (request.CustomerSignature != null)
+            {
+                htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;<img style= 'width:100px; height:100%' src='" + request.CustomerSignature + "' />";
+            }
 
             return htmlContent;
         }

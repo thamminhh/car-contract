@@ -3,5 +3,7 @@
     public class ContractFilter
     {
         public int? ContractGroupStatusId { get; set; }
+
+        public int ? UserId { get; set; }
     }
 }

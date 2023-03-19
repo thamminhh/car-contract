@@ -23,6 +23,9 @@ namespace CleanArchitecture.Domain.Entities
         public bool? ExpertiseInfoIsFirstTimeRent { get; set; }
         public string? ExpertiseInfoTrustLevel { get; set; }
         public string? CompanyInfo { get; set; }
+        public string? CitizenIdentificationInfoNumber { get; set; }
+        public string? CitizenIdentificationInfoAddress { get; set; }
+        public DateTime? CitizenIdentificationInfoDateReceive { get; set; }
 
         public virtual ICollection<ContractGroup> ContractGroups { get; set; }
     }

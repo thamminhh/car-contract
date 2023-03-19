@@ -8,7 +8,7 @@ namespace CleanArchitecture.Domain.Interface
 
         AppraisalRecordDataModel GetAppraisalRecordById(int id);
 
-        AppraisalRecordDataModel GetMaxAppraisalRecordByContractGroupId(int carId);
+        AppraisalRecordDataModel GetLastAppraisalRecordByContractGroupId(int carId);
 
         ICollection <AppraisalRecordDataModel> GetAppraisalRecordByContractGroupId(int contractGroupId);
 

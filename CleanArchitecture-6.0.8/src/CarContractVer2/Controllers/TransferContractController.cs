@@ -47,7 +47,7 @@ namespace CarContractVer2.Controllers
         [Route(TransferContractEndpoints.Create)]
         public IActionResult CreateTransferContract([FromBody] TransferContractCreateModel request)
         {
-            _transferContractRepository.CreateExpertiesContract(request);
+            _transferContractRepository.CreateTransferContract(request);
             return Ok();
         }
 

@@ -47,7 +47,7 @@ namespace CarContractVer2.Controllers
         [Route(ReceiveContractEndpoints.Create)]
         public IActionResult CreateReceiveContract([FromBody] ReceiveContractCreateModel request)
         {
-            _receiveContractRepository.CreateExpertiesContract(request);
+            _receiveContractRepository.CreateReceiveContract(request);
             return Ok();
         }
 

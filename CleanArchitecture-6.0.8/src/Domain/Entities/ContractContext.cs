@@ -143,19 +143,7 @@ namespace CleanArchitecture.Domain.Entities
                 entity.HasIndex(e => e.CarId, "UQ__CarFile__68A0342FB7405E59")
                     .IsUnique();
 
-                entity.Property(e => e.BackImg).HasMaxLength(255);
-
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.FilePath).HasMaxLength(255);
-
-                entity.Property(e => e.FrontImg).HasMaxLength(255);
-
-                entity.Property(e => e.LeftImg).HasMaxLength(255);
-
-                entity.Property(e => e.OrtherImg).HasMaxLength(255);
-
-                entity.Property(e => e.RightImg).HasMaxLength(255);
 
                 entity.HasOne(d => d.Car)
                     .WithOne(p => p.CarFile)
@@ -219,8 +207,6 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.Property(e => e.MaintenanceDate).HasColumnType("datetime");
 
-                entity.Property(e => e.MaintenanceInvoice).HasMaxLength(255);
-
                 entity.HasOne(d => d.Car)
                     .WithMany(p => p.CarMaintenanceInfos)
                     .HasForeignKey(d => d.CarId)
@@ -259,8 +245,6 @@ namespace CleanArchitecture.Domain.Entities
                 entity.Property(e => e.LastRegistryDate).HasColumnType("datetime");
 
                 entity.Property(e => e.RegistryDate).HasColumnType("datetime");
-
-                entity.Property(e => e.RegistryInvoice).HasMaxLength(255);
 
                 entity.HasOne(d => d.Car)
                     .WithMany(p => p.CarRegistryInfos)
@@ -461,6 +445,18 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.Property(e => e.AddtionalInfo).HasMaxLength(255);
 
+                entity.Property(e => e.CitizenIdentificationInfoAddress)
+                    .HasMaxLength(255)
+                    .HasColumnName("CitizenIdentificationInfo_Address");
+
+                entity.Property(e => e.CitizenIdentificationInfoDateReceive)
+                    .HasColumnType("datetime")
+                    .HasColumnName("CitizenIdentificationInfo_DateReceive");
+
+                entity.Property(e => e.CitizenIdentificationInfoNumber)
+                    .HasMaxLength(255)
+                    .HasColumnName("CitizenIdentificationInfo_Number");
+
                 entity.Property(e => e.CompanyInfo).HasMaxLength(255);
 
                 entity.Property(e => e.CustomerAddress).HasMaxLength(255);
@@ -527,8 +523,6 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.Property(e => e.Name).HasMaxLength(255);
 
-                entity.Property(e => e.ParkingLotImg).HasMaxLength(255);
-
                 entity.Property(e => e.PhoneNumber).HasMaxLength(15);
             });
 
@@ -541,33 +535,19 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.CurrentCarStateCarBackImg)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarBackImg");
+                entity.Property(e => e.CurrentCarStateCarBackImg).HasColumnName("CurrentCarState_CarBackImg");
 
-                entity.Property(e => e.CurrentCarStateCarBackSeatImg)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarBackSeatImg");
+                entity.Property(e => e.CurrentCarStateCarBackSeatImg).HasColumnName("CurrentCarState_CarBackSeatImg");
 
-                entity.Property(e => e.CurrentCarStateCarFrontImg)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarFrontImg");
+                entity.Property(e => e.CurrentCarStateCarFrontImg).HasColumnName("CurrentCarState_CarFrontImg");
 
-                entity.Property(e => e.CurrentCarStateCarInteriorImg)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarInteriorImg");
+                entity.Property(e => e.CurrentCarStateCarInteriorImg).HasColumnName("CurrentCarState_CarInteriorImg");
 
-                entity.Property(e => e.CurrentCarStateCarLeftImg)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarLeftImg");
+                entity.Property(e => e.CurrentCarStateCarLeftImg).HasColumnName("CurrentCarState_CarLeftImg");
 
-                entity.Property(e => e.CurrentCarStateCarPhysicalDamage)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarPhysicalDamage");
+                entity.Property(e => e.CurrentCarStateCarPhysicalDamage).HasColumnName("CurrentCarState_CarPhysicalDamage");
 
-                entity.Property(e => e.CurrentCarStateCarRightImg)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarRightImg");
+                entity.Property(e => e.CurrentCarStateCarRightImg).HasColumnName("CurrentCarState_CarRightImg");
 
                 entity.Property(e => e.CurrentCarStateCarStatusDescription)
                     .HasMaxLength(255)
@@ -583,7 +563,9 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.Property(e => e.DateReceive).HasColumnType("datetime");
 
-                entity.Property(e => e.DepositItemAsset).HasColumnName("DepositItem_Asset");
+                entity.Property(e => e.DepositItemAsset)
+                    .HasMaxLength(255)
+                    .HasColumnName("DepositItem_Asset");
 
                 entity.Property(e => e.FilePath).HasMaxLength(255);
 
@@ -672,29 +654,17 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                entity.Property(e => e.CurrentCarStateCarBackImg)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarBackImg");
+                entity.Property(e => e.CurrentCarStateCarBackImg).HasColumnName("CurrentCarState_CarBackImg");
 
-                entity.Property(e => e.CurrentCarStateCarBackSeatImg)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarBackSeatImg");
+                entity.Property(e => e.CurrentCarStateCarBackSeatImg).HasColumnName("CurrentCarState_CarBackSeatImg");
 
-                entity.Property(e => e.CurrentCarStateCarFrontImg)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarFrontImg");
+                entity.Property(e => e.CurrentCarStateCarFrontImg).HasColumnName("CurrentCarState_CarFrontImg");
 
-                entity.Property(e => e.CurrentCarStateCarInteriorImg)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarInteriorImg");
+                entity.Property(e => e.CurrentCarStateCarInteriorImg).HasColumnName("CurrentCarState_CarInteriorImg");
 
-                entity.Property(e => e.CurrentCarStateCarLeftImg)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarLeftImg");
+                entity.Property(e => e.CurrentCarStateCarLeftImg).HasColumnName("CurrentCarState_CarLeftImg");
 
-                entity.Property(e => e.CurrentCarStateCarRightImg)
-                    .HasMaxLength(255)
-                    .HasColumnName("CurrentCarState_CarRightImg");
+                entity.Property(e => e.CurrentCarStateCarRightImg).HasColumnName("CurrentCarState_CarRightImg");
 
                 entity.Property(e => e.CurrentCarStateCarStatusDescription)
                     .HasMaxLength(255)
@@ -712,7 +682,9 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.Property(e => e.DeliveryAddress).HasMaxLength(255);
 
-                entity.Property(e => e.DepositItemAsset).HasColumnName("DepositItem_Asset");
+                entity.Property(e => e.DepositItemAsset)
+                    .HasMaxLength(255)
+                    .HasColumnName("DepositItem_Asset");
 
                 entity.Property(e => e.DepositItemAssetInfo)
                     .HasMaxLength(255)
@@ -758,8 +730,6 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.HasIndex(e => e.Email, "UQ__User__A9D10534CB9FF300")
                     .IsUnique();
-
-                entity.Property(e => e.CardImage).HasMaxLength(255);
 
                 entity.Property(e => e.CitizenIdentificationInfoAddress)
                     .HasMaxLength(255)

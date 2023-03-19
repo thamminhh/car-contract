@@ -25,67 +25,163 @@ namespace CleanArchitecture.Application.Repository
 
         public AppraisalRecordDataModel GetAppraisalRecordById(int id)
         {
-            var appraisalRecords = _contractContext.AppraisalRecords.Where(c => c.Id == id).FirstOrDefault();
-            var contractGroup = _contractContext.ContractGroups.Find(appraisalRecords.ContractGroupId);
             var host = _fileRepository.GetCurrentHost();
+
+            AppraisalRecord appraisalRecord = _contractContext.AppraisalRecords
+                .Include(c => c.ContractGroup)
+                .FirstOrDefault(c => c.Id == id);
+
+            ContractGroup contractGroup = _contractContext.ContractGroups
+                .Include(c => c.Car)
+                .FirstOrDefault(c => c.Id == appraisalRecord.ContractGroupId);
+
             return new AppraisalRecordDataModel
             {
                 Id = id,
-                ContractGroupId = appraisalRecords.ContractGroupId,
-                ExpertiserId = appraisalRecords.ExpertiserId,
-                CarId = contractGroup.CarId,
-                ExpertiseDate = appraisalRecords.ExpertiseDate,
-                ResultOfInfo = appraisalRecords.ResultOfInfo,
-                ResultOfCar = appraisalRecords.ResultOfCar,
-                ResultDescription = appraisalRecords.ResultDescription,
-                DepositInfoDescription = appraisalRecords.DepositInfoDescription,
-                DepositInfoAsset = appraisalRecords.DepositInfoAsset,
-                FilePath = host + appraisalRecords.FilePath,
-                DepositInfoDownPayment = appraisalRecords.DepositInfoDownPayment,
-                PaymentAmount = appraisalRecords.PaymentAmount,
+                ContractGroupId = appraisalRecord.ContractGroupId,
+                ExpertiserId = appraisalRecord.ExpertiserId,
+                CarId = contractGroup.Car != null ? contractGroup.CarId : null,
+                ExpertiseDate = appraisalRecord.ExpertiseDate,
+                ResultOfInfo = appraisalRecord.ResultOfInfo,
+                ResultOfCar = appraisalRecord.ResultOfCar,
+                ResultDescription = appraisalRecord.ResultDescription,
+                DepositInfoDescription = appraisalRecord.DepositInfoDescription,
+                DepositInfoAsset = appraisalRecord.DepositInfoAsset,
+                FilePath = host + appraisalRecord.FilePath,
+                DepositInfoDownPayment = appraisalRecord.DepositInfoDownPayment,
+                PaymentAmount = appraisalRecord.PaymentAmount,
             };
+
+            //var appraisalRecords = _contractContext.AppraisalRecords.Where(c => c.Id == id).FirstOrDefault();
+            //var contractGroup = _contractContext.ContractGroups.Find(appraisalRecords.ContractGroupId);
+            //var host = _fileRepository.GetCurrentHost();
+            //return new AppraisalRecordDataModel
+            //{
+            //    Id = id,
+            //    ContractGroupId = appraisalRecords.ContractGroupId,
+            //    ExpertiserId = appraisalRecords.ExpertiserId,
+            //    CarId = contractGroup.CarId,
+            //    ExpertiseDate = appraisalRecords.ExpertiseDate,
+            //    ResultOfInfo = appraisalRecords.ResultOfInfo,
+            //    ResultOfCar = appraisalRecords.ResultOfCar,
+            //    ResultDescription = appraisalRecords.ResultDescription,
+            //    DepositInfoDescription = appraisalRecords.DepositInfoDescription,
+            //    DepositInfoAsset = appraisalRecords.DepositInfoAsset,
+            //    FilePath = host + appraisalRecords.FilePath,
+            //    DepositInfoDownPayment = appraisalRecords.DepositInfoDownPayment,
+            //    PaymentAmount = appraisalRecords.PaymentAmount,
+            //};
         }
 
-        public AppraisalRecordDataModel GetMaxAppraisalRecordByContractGroupId(int carId)
+        public AppraisalRecordDataModel GetLastAppraisalRecordByContractGroupId(int contractGroupId)
         {
-            IQueryable<AppraisalRecord> appraisalRecords = _contractContext.AppraisalRecords
-                .Include(c => c.ContractGroup)
-                .Where(c => c.ContractGroup.CarId == carId)
-                .AsQueryable();
-
             var host = _fileRepository.GetCurrentHost();
 
-            var maxAppraisalRecord = appraisalRecords
-                .OrderByDescending(c => c.Id)
-                .Select(c => new AppraisalRecordDataModel
-                {
-                    Id = c.Id,
-                    ContractGroupId = c.ContractGroupId,
-                    ExpertiserId = c.ExpertiserId,
-                    CarId = c.ContractGroup != null ? c.ContractGroup.CarId : null,
-                    ExpertiseDate = c.ExpertiseDate,
-                    ResultOfInfo = c.ResultOfInfo,
-                    ResultOfCar = c.ResultOfCar,
-                    ResultDescription = c.ResultDescription,
-                    DepositInfoDescription = c.DepositInfoDescription,
-                    DepositInfoAsset = c.DepositInfoAsset,
-                    FilePath = host + c.FilePath,
-                    DepositInfoDownPayment = c.DepositInfoDownPayment,
-                    PaymentAmount = c.PaymentAmount,
-                })
+            var lastRecord = _contractContext.AppraisalRecords
+                .Where(ar => ar.ContractGroupId == contractGroupId)
+                .OrderByDescending(ar => ar.Id)
                 .FirstOrDefault();
 
-            return maxAppraisalRecord;
+            if (lastRecord == null)
+            {
+                return null;
+            }
+
+            var car = _contractContext.ContractGroups
+                .Where(cg => cg.Id == contractGroupId)
+                .Select(cg => cg.Car)
+                .FirstOrDefault();
+
+            var appraisalRecordModel = new AppraisalRecordDataModel
+            {
+                Id = lastRecord.Id,
+                ContractGroupId = lastRecord.ContractGroupId,
+                ExpertiserId = lastRecord.ExpertiserId,
+                CarId = car != null ? car.Id : null,
+                ExpertiseDate = lastRecord.ExpertiseDate,
+                ResultOfInfo = lastRecord.ResultOfInfo,
+                ResultOfCar = lastRecord.ResultOfCar,
+                ResultDescription = lastRecord.ResultDescription,
+                DepositInfoDescription = lastRecord.DepositInfoDescription,
+                DepositInfoAsset = lastRecord.DepositInfoAsset,
+                FilePath = host + lastRecord.FilePath,
+                DepositInfoDownPayment = lastRecord.DepositInfoDownPayment,
+                PaymentAmount = lastRecord.PaymentAmount,
+            };
+
+            return appraisalRecordModel;
         }
+
+        //public AppraisalRecordDataModel GetLastAppraisalRecordByContractGroupId(int contractGroupId)
+        //{
+        //    var host = _fileRepository.GetCurrentHost();
+
+        //    var appraisalRecord = _contractContext.AppraisalRecords.Where(c => c.ContractGroupId == contractGroupId);
+
+        //    ContractGroup contractGroup = _contractContext.ContractGroups
+        //        .Include(c => c.Car)
+        //        .FirstOrDefault(c => c.Id == contractGroupId);
+
+        //    var appraisalRecordModel = appraisalRecord
+        //        .OrderBy(c => c.Id)
+        //        .Select(c => new AppraisalRecordDataModel
+        //        {
+        //            Id = c.Id,
+        //            ContractGroupId = c.ContractGroupId,
+        //            ExpertiserId = c.ExpertiserId,
+        //            CarId = contractGroup.Car != null ? contractGroup.CarId : null,
+        //            ExpertiseDate = c.ExpertiseDate,
+        //            ResultOfInfo = c.ResultOfInfo,
+        //            ResultOfCar = c.ResultOfCar,
+        //            ResultDescription = c.ResultDescription,
+        //            DepositInfoDescription = c.DepositInfoDescription,
+        //            DepositInfoAsset = c.DepositInfoAsset,
+        //            FilePath = host + c.FilePath,
+        //            DepositInfoDownPayment = c.DepositInfoDownPayment,
+        //            PaymentAmount = c.PaymentAmount,
+        //        })
+        //        .LastOrDefault();
+
+        //    return appraisalRecordModel;
+
+        //    //var host = _fileRepository.GetCurrentHost();
+
+        //    //AppraisalRecord appraisalRecord = _contractContext.AppraisalRecords
+        //    //    .Include(c => c.ContractGroup)
+        //    //    .LastOrDefault(c => c.ContractGroupId == contractGroupId);
+
+        //    //ContractGroup contractGroup = _contractContext.ContractGroups
+        //    //    .Include(c => c.Car)
+        //    //    .FirstOrDefault(c => c.Id == appraisalRecord.ContractGroupId);
+
+        //    //return new AppraisalRecordDataModel
+        //    //{
+        //    //    Id = appraisalRecord.Id,
+        //    //    ContractGroupId = appraisalRecord.ContractGroupId,
+        //    //    ExpertiserId = appraisalRecord.ExpertiserId,
+        //    //    CarId = contractGroup.Car != null ? contractGroup.CarId : null,
+        //    //    ExpertiseDate = appraisalRecord.ExpertiseDate,
+        //    //    ResultOfInfo = appraisalRecord.ResultOfInfo,
+        //    //    ResultOfCar = appraisalRecord.ResultOfCar,
+        //    //    ResultDescription = appraisalRecord.ResultDescription,
+        //    //    DepositInfoDescription = appraisalRecord.DepositInfoDescription,
+        //    //    DepositInfoAsset = appraisalRecord.DepositInfoAsset,
+        //    //    FilePath = host + appraisalRecord.FilePath,
+        //    //    DepositInfoDownPayment = appraisalRecord.DepositInfoDownPayment,
+        //    //    PaymentAmount = appraisalRecord.PaymentAmount,
+        //    //};
+        //}
 
         public ICollection <AppraisalRecordDataModel> GetAppraisalRecordByContractGroupId(int contractGroupId)
         {
 
-            IQueryable<AppraisalRecord> appraisalRecords = _contractContext.AppraisalRecords
-                .Include(c => c.ContractGroup)
-                .AsQueryable();
+            var  appraisalRecords = _contractContext.AppraisalRecords.Where(c => c.ContractGroupId == contractGroupId).ToList();
 
             var host = _fileRepository.GetCurrentHost();
+
+            ContractGroup contractGroup = _contractContext.ContractGroups
+               .Include(c => c.Car)
+               .FirstOrDefault(c => c.Id == contractGroupId);
 
             var appraisalRecordModels = appraisalRecords
                 .OrderBy(c => c.Id)
@@ -94,7 +190,7 @@ namespace CleanArchitecture.Application.Repository
                     Id = c.Id,
                     ContractGroupId = c.ContractGroupId,
                     ExpertiserId = c.ExpertiserId,
-                    CarId = c.ContractGroup != null ? c.ContractGroup.CarId : null,
+                    CarId = contractGroup.Car != null ? contractGroup.CarId : null,
                     ExpertiseDate = c.ExpertiseDate,
                     ResultOfInfo = c.ResultOfInfo,
                     ResultOfCar = c.ResultOfCar,

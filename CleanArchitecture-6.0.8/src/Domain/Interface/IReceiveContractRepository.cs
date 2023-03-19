@@ -6,11 +6,11 @@ namespace CleanArchitecture.Domain.Interface
     public interface IReceiveContractRepository
     {
 
-        ReceiveContract GetReceiveContractById(int id);
+        ReceiveContractDataModel GetReceiveContractById(int id);
 
-        ReceiveContract GetReceiveContractByContractGroupId(int contractGroupId);
+        ReceiveContractDataModel GetReceiveContractByContractGroupId(int contractGroupId);
 
-        void CreateExpertiesContract(ReceiveContractCreateModel request);
+        void CreateReceiveContract(ReceiveContractCreateModel request);
 
         void UpdateReceiveContract(int id, ReceiveContractUpdateModel request);
         bool UpdateReceiveContractStatus(int id, ReceiveContractUpdateStatusModel request);

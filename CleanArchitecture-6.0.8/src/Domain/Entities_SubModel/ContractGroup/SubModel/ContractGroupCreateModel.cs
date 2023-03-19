@@ -2,7 +2,6 @@
 {
     public class ContractGroupCreateModel
     {
-        public int? CustomerInfoId { get; set; }
         public int? UserId { get; set; }
         public int? CarId { get; set; }
         public string? RentPurpose { get; set; }
@@ -27,6 +26,10 @@
         public string? CompanyInfo { get; set; }
         public string? CustomerName { get; set; }
         public string? CustomerAddress { get; set; }
+
+        public string? CitizenIdentificationInfoNumber { get; set; }
+        public string? CitizenIdentificationInfoAddress { get; set; }
+        public DateTime? CitizenIdentificationInfoDateReceive { get; set; }
 
         public string? CitizenIdentifyImage1 { get; set; }
         public string? CitizenIdentifyImage2 { get; set; }

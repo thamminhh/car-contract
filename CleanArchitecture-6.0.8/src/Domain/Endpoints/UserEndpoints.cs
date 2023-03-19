@@ -5,7 +5,7 @@ public class UserEndpoints
     public const string Base = Area + "/user";
     public const string GetAll = Base;
     public const string GetSingle = Base + "/{id}";
-    public const string GetUserIdByEmail = Base + "/userId/{email}";
+    public const string GetUserByEmail = Base + "/email/{email}";
     public const string Create = Base + "/create";
     public const string UpdateRole = Base + "/update-role/{id}";
     public const string Delete = Base + "/delete/{id}";
