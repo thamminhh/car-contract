@@ -9,7 +9,7 @@ public class AppraisalRecordUpdateModel
 {
     public int Id { get; set; }
     public int? CarId { get; set; }
-    public int? ContractGroupId { get; set; }
+    public int ContractGroupId { get; set; }
     public int? ExpertiserId { get; set; }
     public DateTime? ExpertiseDate { get; set; }
     public bool? ResultOfInfo { get; set; }

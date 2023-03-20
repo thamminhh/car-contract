@@ -7,6 +7,8 @@ using MediatR;
 using PdfSharpCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Microsoft.AspNet.SignalR;
 
 namespace CleanArchitecture.Application.Repository
 {
@@ -218,15 +220,8 @@ namespace CleanArchitecture.Application.Repository
                 _contractGroupController.UpdateContractCarId(request.ContractGroupId, request.CarId);
             }
 
-            string htmlContent = "<h1> Biên bản thẩm định </h1>";
+            string htmlContent = CreateAppraisalRecordContent(request);
             string fileName = "AppraisalRecord" + ".pdf";
-
-            htmlContent += "<h2> ExpertiserId: " + request.ExpertiserId + "</h2>";
-            htmlContent += "<h2> ContractGroupId: " + request.ContractGroupId + "</h2>";
-            htmlContent += "<h2> DepositInfoDescription: " + request.DepositInfoDescription + "</h2>";
-            htmlContent += "<h2> DepositInfoAsset: " + request.DepositInfoAsset + "</h2>";
-            htmlContent += "<h2> DepositInfoDownPayment: " + request.DepositInfoDownPayment + "</h2>";
-            htmlContent += "<h2> PaymentAmount: " + request.PaymentAmount + "</h2>";
 
             var file = _fileRepository.GeneratePdfAsync(htmlContent, fileName);
 
@@ -248,6 +243,7 @@ namespace CleanArchitecture.Application.Repository
             };
             _contractContext.AppraisalRecords.Add(appraisalRecord);
             _contractContext.SaveChanges();
+
             var contractGroupStatus = 1;
             if (request.ResultOfInfo == false && request.ResultOfCar == false) 
             {
@@ -270,17 +266,53 @@ namespace CleanArchitecture.Application.Repository
 
         public void UpdateAppraisalRecord(int id, AppraisalRecordUpdateModel request)
         {
-            var appraisalRecord = _contractContext.AppraisalRecords.Find(id);
-            appraisalRecord.ContractGroupId = request.ContractGroupId;
-            appraisalRecord.ExpertiserId = request.ExpertiserId;
-            appraisalRecord.ExpertiseDate = request.ExpertiseDate;
+            if (request.CarId != null)
+            {
+                _contractGroupController.UpdateContractCarId(request.ContractGroupId, request.CarId);
+            }
 
-            appraisalRecord.DepositInfoDescription = request.DepositInfoDescription;
-            appraisalRecord.DepositInfoAsset = request.DepositInfoAsset;
-            appraisalRecord.DepositInfoDownPayment = request.DepositInfoDownPayment;
+            string htmlContent = UpdateAppraisalRecordContent(request);
+            string fileName = "AppraisalRecord" + ".pdf";
 
-            _contractContext.AppraisalRecords.Update(appraisalRecord);
+            var file = _fileRepository.GeneratePdfAsync(htmlContent, fileName);
+
+            var filePath = _fileRepository.SaveFileToFolder(file, "1");
+
+            var appraisalRecord = new AppraisalRecord
+            {
+                ContractGroupId = request.ContractGroupId,
+                ExpertiserId = request.ExpertiserId,
+                ExpertiseDate = request.ExpertiseDate,
+                ResultOfInfo = request.ResultOfInfo,
+                ResultOfCar = request.ResultOfCar,
+                ResultDescription = request.ResultDescription,
+                DepositInfoDescription = request.DepositInfoDescription,
+                DepositInfoAsset = request.DepositInfoAsset,
+                FilePath = filePath,
+                DepositInfoDownPayment = request.DepositInfoDownPayment,
+                PaymentAmount = request.PaymentAmount
+            };
+            _contractContext.AppraisalRecords.Add(appraisalRecord);
             _contractContext.SaveChanges();
+
+            var contractGroupStatus = 1;
+            if (request.ResultOfInfo == false && request.ResultOfCar == false)
+            {
+                contractGroupStatus = Constant.ContractGroupConstant.FailInfo;
+            }
+            if (request.ResultOfInfo == true && request.ResultOfCar == false)
+            {
+                contractGroupStatus = Constant.ContractGroupConstant.FailCar;
+            }
+            if (request.ResultOfInfo == true && request.ResultOfCar == true)
+            {
+                contractGroupStatus = Constant.ContractGroupConstant.ContractGroupExpertised;
+            }
+            var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+            contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+            contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatus;
+
+            _contractGroupController.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
 
         }
 
@@ -289,5 +321,103 @@ namespace CleanArchitecture.Application.Repository
             var saved = _contractContext.SaveChanges();
             return saved > 0 ? true : false;
         }
+
+        public string CreateAppraisalRecordContent(AppraisalRecordCreateModel request)
+        {
+            var expertiser = _contractContext.Users.FirstOrDefault(c => c.Id == request.ExpertiserId);
+
+            string htmlContent = "<h1 style='text-align:center;'>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
+            htmlContent += "<h1 style='text-align:center;'>Độc lập – Tự do – Hạnh phúc</h1>";
+            htmlContent += "<h1>Biên bản thẩm định </h1>";
+            htmlContent += "<h2>Nhân viên thẩm định: </h2>";
+            htmlContent += "<p>Hôm nay, ngày " + request.ExpertiseDate +"</p>";
+
+            htmlContent += "<ul>";
+            htmlContent += "<li>Địa chỉ: " + expertiser.CurrentAddress + "</li>";
+            htmlContent += "<li>Đại diện: " + expertiser.Name + "</li>";
+            htmlContent += "<li>Điện thoại: " + expertiser.PhoneNumber + " </li>";
+            htmlContent += "</ul>";
+
+            htmlContent += "<p>Sau khi kiểm tra thông tin khách hàng và yêu cầu của khách hàng: </p>";
+            htmlContent += "<ul>";
+            if (request.ResultOfInfo == false)
+            {
+                htmlContent += "<li>Kết quả thẩm định thông tin: Chưa đạt</li>";
+            }
+            if (request.ResultOfInfo == true)
+            {
+                htmlContent += "<li>Kết quả thẩm định thông tin: Đạt</li>";
+            }
+            if (request.ResultOfCar == false)
+            {
+                htmlContent += "<li>Kết quả chọn xe: Chưa đạt</li>";
+            }
+            if (request.ResultOfCar == true)
+            {
+                htmlContent += "<li>Kết quả chọn xe: Đạt</li>";
+            }
+            htmlContent += "<li>Mô tả kết quả: " + request.ResultDescription + " </li>"; 
+            htmlContent += "</ul>";
+
+
+            htmlContent += "<p>Thông tin đặt cọc : </p>";
+            htmlContent += "<ul>";
+            htmlContent += "<li>Số tiền đặt cọc: " + request.DepositInfoDownPayment+ " VNĐ</li>";
+            htmlContent += "<li>Tài sản đặt cọc: " + request.DepositInfoAsset+ "</li>";
+            htmlContent += "<li>Mô tả đặt cọc: " + request.DepositInfoDescription+ "</li>";
+            htmlContent += "</ul>";    
+
+            return htmlContent;
+
+        }
+        public string UpdateAppraisalRecordContent(AppraisalRecordUpdateModel request)
+        {
+            var expertiser = _contractContext.Users.FirstOrDefault(c => c.Id == request.ExpertiserId);
+
+            string htmlContent = "<h1 style='text-align:center;'>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
+            htmlContent += "<h1 style='text-align:center;'>Độc lập – Tự do – Hạnh phúc</h1>";
+            htmlContent += "<h1>Biên bản thẩm định </h1>";
+            htmlContent += "<h2>Nhân viên thẩm định: </h2>";
+            htmlContent += "<p>Hôm nay, ngày " + request.ExpertiseDate + "</p>";
+
+            htmlContent += "<ul>";
+            htmlContent += "<li>Địa chỉ: " + expertiser.CurrentAddress + "</li>";
+            htmlContent += "<li>Đại diện: " + expertiser.Name + "</li>";
+            htmlContent += "<li>Điện thoại: " + expertiser.PhoneNumber + " </li>";
+            htmlContent += "</ul>";
+
+            htmlContent += "<p>Sau khi kiểm tra thông tin khách hàng và yêu cầu của khách hàng: </p>";
+            htmlContent += "<ul>";
+            if (request.ResultOfInfo == false)
+            {
+                htmlContent += "<li>Kết quả thẩm định thông tin: Chưa đạt</li>";
+            }
+            if (request.ResultOfInfo == true)
+            {
+                htmlContent += "<li>Kết quả thẩm định thông tin: Đạt</li>";
+            }
+            if (request.ResultOfCar == false)
+            {
+                htmlContent += "<li>Kết quả chọn xe: Chưa đạt</li>";
+            }
+            if (request.ResultOfCar == true)
+            {
+                htmlContent += "<li>Kết quả chọn xe: Đạt</li>";
+            }
+            htmlContent += "<li>Mô tả kết quả: " + request.ResultDescription + " </li>";
+            htmlContent += "</ul>";
+
+
+            htmlContent += "<p>Thông tin đặt cọc : </p>";
+            htmlContent += "<ul>";
+            htmlContent += "<li>Số tiền đặt cọc: " + request.DepositInfoDownPayment + " VNĐ</li>";
+            htmlContent += "<li>Tài sản đặt cọc: " + request.DepositInfoAsset + "</li>";
+            htmlContent += "<li>Mô tả đặt cọc: " + request.DepositInfoDescription + "</li>";
+            htmlContent += "</ul>";
+
+            return htmlContent;
+
+        }
+
     }
 }

@@ -70,6 +70,7 @@ namespace CleanArchitecture.Application.Repository
                 FilePath = host + receiveContract.FilePath,
                 FileWithSignsPath = host + receiveContract.FileWithSignsPath,
                 ContractStatusId = receiveContract.ContractStatusId,
+                CarInsuranceMoney = receiveContract.CarInsuranceMoney,
             };
         }
 
@@ -120,6 +121,7 @@ namespace CleanArchitecture.Application.Repository
                 CustomerSignature = receiveContract.CustomerSignature,
                 StaffSignature = receiveContract.StaffSignature,
                 FilePath = host + receiveContract.FilePath,
+                CarInsuranceMoney = receiveContract.CarInsuranceMoney,
                 FileWithSignsPath = host + receiveContract.FileWithSignsPath,
                 ContractStatusId = receiveContract.ContractStatusId,
             };
@@ -252,8 +254,8 @@ namespace CleanArchitecture.Application.Repository
                 .Include(c => c.CarModel)
                 .FirstOrDefault(c => c.Id == contractGroup.CarId);
 
-            string htmlContent = "<h1 style= " + "color: blue; text - align:center;" + "> CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
-            htmlContent += "<h1 style= " + "color: blue; text - align:center;" + "> Độc lập – Tự do – Hạnh phúc</h1>";
+            string htmlContent = "<h1 style='text-align:center;'>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
+            htmlContent += "<h1 style='text-align:center;'>Độc lập – Tự do – Hạnh phúc</h1>";
             htmlContent += "<h2>BIÊN BẢN GIAO NHẬN XE </h2>";
 
             htmlContent += "<p>Trước và sau khi cho thuê, kèm theo hợp đồng thuê xe số " + request.ContractGroupId + "</p>";
@@ -321,8 +323,8 @@ namespace CleanArchitecture.Application.Repository
                 .Include(c => c.CarModel)
                 .FirstOrDefault(c => c.Id == contractGroup.CarId);
 
-            string htmlContent = "<h1 style= " + "color: blue; text - align:center;" + "> CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
-            htmlContent += "<h1 style= " + "color: blue; text - align:center;" + "> Độc lập – Tự do – Hạnh phúc</h1>";
+            string htmlContent = "<h1 style='text-align:center;'>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
+            htmlContent += "<h1 style='text-align:center;'>Độc lập – Tự do – Hạnh phúc</h1>";
             htmlContent += "<h2>BIÊN BẢN GIAO NHẬN XE </h2>";
 
             htmlContent += "<p>Trước và sau khi cho thuê, kèm theo hợp đồng thuê xe số " + request.ContractGroupId + "</p>";
