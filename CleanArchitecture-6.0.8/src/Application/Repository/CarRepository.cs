@@ -1,9 +1,13 @@
 ﻿
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.Entities_SubModel.Car.SubModel;
+using CleanArchitecture.Domain.Entities_SubModel.ContractGroup.SubModel;
 using CleanArchitecture.Domain.Interface;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using PdfSharpCore;
+using PdfSharpCore.Pdf.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,16 +20,18 @@ namespace CleanArchitecture.Application.Repository
     {
         private readonly ContractContext _contractContext;
         private readonly ICarMakeRepository _carMakeController;
+        private readonly ICarModelRepository _carModelController;
         private readonly ICarScheduleRepository _carScheduleRepository;
-        
+
 
 
         public CarRepository(ContractContext contractContext,
-            ICarMakeRepository carMakeController, ICarScheduleRepository carScheduleRepository)
+            ICarMakeRepository carMakeController, ICarScheduleRepository carScheduleRepository, ICarModelRepository carModelRepository)
         {
             _contractContext = contractContext;
             _carMakeController = carMakeController;
             _carScheduleRepository = carScheduleRepository;
+            _carModelController = carModelRepository;
         }
 
         public int GetNumberOfCars(CarFilter filter)
@@ -47,6 +53,11 @@ namespace CleanArchitecture.Application.Repository
                 {
                     int carMakeId = _carMakeController.GetCarMakeIdByName(filter.CarMakeName);
                     cars = cars.Where(c => c.CarMakeId.Equals(carMakeId));
+                }
+                if (!string.IsNullOrWhiteSpace(filter.CarModelName))
+                {
+                    int carMakeId = _carModelController.GetCarModelIdByName(filter.CarModelName);
+                    cars = cars.Where(c => c.CarModelId.Equals(carMakeId));
                 }
                 if (filter.SeatNumber.HasValue)
                 {
@@ -80,6 +91,11 @@ namespace CleanArchitecture.Application.Repository
                     int carMakeId = _carMakeController.GetCarMakeIdByName(filter.CarMakeName);
                     cars = cars.Where(c => c.CarMakeId.Equals(carMakeId));
                 }
+                if (!string.IsNullOrWhiteSpace(filter.CarModelName))
+                {
+                    int carMakeId = _carModelController.GetCarModelIdByName(filter.CarModelName);
+                    cars = cars.Where(c => c.CarModelId.Equals(carMakeId));
+                }
                 if (filter.SeatNumber.HasValue)
                 {
                     cars = cars.Where(c => c.SeatNumber == filter.SeatNumber.Value);
@@ -97,93 +113,6 @@ namespace CleanArchitecture.Application.Repository
         {
             return _contractContext.Cars.Count(c => c.IsDeleted == false && c.CarStatusId == carStatusId);
         }
-
-        //public CarDataModel GetCarById(int carId)
-        //{
-        //    CarDataModel car = (from c in _contractContext.Cars
-        //               join cstatus in _contractContext.CarStatuses on c.CarStatusId equals cstatus.Id
-        //               join gi in _contractContext.CarGenerallInfos on c.Id equals gi.CarId
-        //               join cs in _contractContext.CarStates on c.Id equals cs.CarId
-        //               join cli in _contractContext.CarLoanInfos on c.Id equals cli.CarId
-        //               join cf in _contractContext.CarFiles on c.Id equals cf.CarId 
-        //               join ctk in _contractContext.CarTrackings on c.Id equals ctk.CarId
-        //                        join fc in _contractContext.ForControls.Where(x => x.CarId == carId).DefaultIfEmpty()
-        //               on true equals true
-        //               join cm in _contractContext.CarMakes on c.CarMakeId equals cm.Id
-        //               join cmo in _contractContext.CarModels on c.CarModelId equals cmo.Id
-        //               join cg in _contractContext.CarGenerations on c.CarGenerationId equals cg.Id
-        //               join cse in _contractContext.CarSeries on c.CarSeriesId equals cse.Id
-        //               join ct in _contractContext.CarTrims on c.CarTrimId equals ct.Id
-        //               where c.Id == carId
-
-        //               select new CarDataModel
-        //               {
-
-        //                   Id = c.Id,
-        //                   ParkingLotId = c.ParkingLotId,
-        //                   CarStatusId = c.CarStatusId,
-        //                   CarStatus = cstatus.Name,
-        //                   CarId = c.CarId,
-        //                   CarLicensePlates = c.CarLicensePlates,
-        //                   SeatNumber = c.SeatNumber,
-        //                   ModelYear = c.ModelYear,
-        //                   CarMakeId = c.CarMakeId,
-        //                   MakeName = cm.Name,
-        //                   CarModelId = c.CarModelId,
-        //                   ModelName = cmo.Name,
-        //                   CarGenerationId = c.CarGenerationId,
-        //                   GenerationName = cg.Name,
-        //                   GenerationYearBegin = cg.YearBegin,
-        //                   GenerationYearEnd = cg.YearEnd,
-        //                   CarSeriesId = c.CarSeriesId,
-        //                   SeriesName = cse.Name,
-        //                   CarTrimId = c.CarTrimId,
-        //                   TrimName = ct.Name,
-        //                   CarDescription = c.CarDescription,
-        //                   TrimStartProductYear = ct.StartProductYear,
-        //                   TrimEndProductYear = ct.EndProductYear,
-        //                   CreatedDate = c.CreatedDate,
-        //                   IsDeleted = c.IsDeleted,
-        //                   CarColor = c.CarColor,
-        //                   CarFuel = c.CarFuel,
-        //                   PriceForNormalDay = gi.PriceForNormalDay,
-        //                   PriceForWeekendDay = gi.PriceForWeekendDay,
-        //                   PriceForMonth = gi.PriceForMonth,
-        //                   LimitedKmForMonth = gi.LimitedKmForMonth,
-        //                   OverLimitedMileage = gi.OverLimitedMileage,
-        //                   CarStatusDescription = cs.CarStatusDescription,
-        //                   CurrentEtcAmount = cs.CurrentEtcAmount,
-        //                   FuelPercent = cs.FuelPercent,
-        //                   SpeedometerNumber = cs.SpeedometerNumber,
-        //                   CarOwnerName = cli.CarOwnerName,
-        //                   RentalMethod = cli.RentalMethod,
-        //                   RentalDate = cli.RentalDate,
-        //                   SpeedometerNumberReceive = cli.SpeedometerNumberReceive,
-        //                   PriceForDayReceive = cli.PriceForDayReceive,
-        //                   PriceForMonthReceive = cli.PriceForMonthReceive,
-        //                   Insurance = cli.Insurance,
-        //                   Maintenance = cli.Maintenance,
-        //                   LimitedKmForMonthReceive = cli.LimitedKmForMonthReceive,
-        //                   OverLimitedMileageReceive = cli.OverLimitedMileageReceive,
-        //                   FilePath = cf.FilePath,
-        //                   FrontImg = cf.FrontImg,
-        //                   BackImg = cf.BackImg,
-        //                   LeftImg = cf.LeftImg,
-        //                   RightImg = cf.BackImg,
-        //                   OrtherImg = cf.OrtherImg,
-        //                   CarFileCreatedDate = cf.CreatedDate,
-        //                   LinkTracking = ctk.LinkTracking,
-        //                   TrackingUsername = ctk.TrackingUsername,
-        //                   TrackingPassword = ctk.TrackingPassword,
-        //                   Etcusername = ctk.Etcusername,
-        //                   Etcpassword = ctk.Etcpassword,
-        //                   LinkForControl = fc != null ? fc.LinkForControl : null,
-        //                   PaymentMethod = fc != null ? fc.PaymentMethod : null,
-        //                   ForControlDay = fc != null ? fc.ForControlDay : null,
-        //                   DayOfPayment = fc != null ? fc.DayOfPayment : null
-        //               }).FirstOrDefault();
-        //    return car;
-        //}
 
         public CarDataModel GetCarById(int carId)
         {
@@ -273,7 +202,7 @@ namespace CleanArchitecture.Application.Repository
                 DayOfPayment = car.ForControl != null ? car.ForControl.DayOfPayment : null
             };
         }
-        
+
         public ICollection<CarDataModel> GetCars(int page, int pageSize, CarFilter filter)
         {
             if (page < 1)
@@ -305,6 +234,11 @@ namespace CleanArchitecture.Application.Repository
                     int carMakeId = _carMakeController.GetCarMakeIdByName(filter.CarMakeName);
                     cars = cars.Where(c => c.CarMakeId.Equals(carMakeId));
                 }
+                if (!string.IsNullOrWhiteSpace(filter.CarModelName))
+                {
+                    int carMakeId = _carModelController.GetCarModelIdByName(filter.CarModelName);
+                    cars = cars.Where(c => c.CarModelId.Equals(carMakeId));
+                }
                 if (filter.SeatNumber.HasValue)
                 {
                     cars = cars.Where(c => c.SeatNumber == filter.SeatNumber.Value);
@@ -315,7 +249,7 @@ namespace CleanArchitecture.Application.Repository
                 }
             }
 
-                return (from c in cars
+            return (from c in cars
                     join cstatus in _contractContext.CarStatuses on c.CarStatusId equals cstatus.Id
                     join cf in _contractContext.CarFiles on c.Id equals cf.CarId
                     join cm in _contractContext.CarMakes on c.CarMakeId equals cm.Id
@@ -336,14 +270,11 @@ namespace CleanArchitecture.Application.Repository
                         ModelName = cmo.Name,
                         CarGenerationId = c.CarGenerationId,
                         GenerationName = cg.Name,
-                        CarSeriesId = c.CarSeriesId,
-                        CarTrimId = c.CarTrimId,
-                        CreatedDate = c.CreatedDate,
                         IsDeleted = c.IsDeleted,
                         CarColor = c.CarColor,
                         CarFuel = c.CarFuel,
                         FrontImg = cf.FrontImg
-                        
+
                     }).OrderBy(c => c.Id).Skip(skip).Take(pageSize).ToList();
         }
 
@@ -378,6 +309,11 @@ namespace CleanArchitecture.Application.Repository
                     int carMakeId = _carMakeController.GetCarMakeIdByName(filter.CarMakeName);
                     cars = cars.Where(c => c.CarMakeId.Equals(carMakeId));
                 }
+                if (!string.IsNullOrWhiteSpace(filter.CarModelName))
+                {
+                    int carMakeId = _carModelController.GetCarModelIdByName(filter.CarModelName);
+                    cars = cars.Where(c => c.CarModelId.Equals(carMakeId));
+                }
                 if (filter.SeatNumber.HasValue)
                 {
                     cars = cars.Where(c => c.SeatNumber == filter.SeatNumber.Value);
@@ -388,40 +324,130 @@ namespace CleanArchitecture.Application.Repository
                 }
             }
             return (from c in cars
-                        join cstatus in _contractContext.CarStatuses on c.CarStatusId equals cstatus.Id
-                        join cf in _contractContext.CarFiles on c.Id equals cf.CarId
-                        join cm in _contractContext.CarMakes on c.CarMakeId equals cm.Id
-                        join cmo in _contractContext.CarModels on c.CarModelId equals cmo.Id
-                        join cg in _contractContext.CarGenerations on c.CarGenerationId equals cg.Id
-                        select new CarDataModel
-                        {
-                            Id = c.Id,
-                            ParkingLotId = c.ParkingLotId,
-                            CarStatusId = c.CarStatusId,
-                            CarStatus = cstatus.Name,
-                            CarLicensePlates = c.CarLicensePlates,
-                            SeatNumber = c.SeatNumber,
-                            ModelYear = c.ModelYear,
-                            CarMakeId = c.CarMakeId,
-                            MakeName = cm.Name,
-                            CarModelId = c.CarModelId,
-                            ModelName = cmo.Name,
-                            CarGenerationId = c.CarGenerationId,
-                            GenerationName = cg.Name,
-                            CarSeriesId = c.CarSeriesId,
-                            CarTrimId = c.CarTrimId,
-                            CreatedDate = c.CreatedDate,
-                            IsDeleted = c.IsDeleted,
-                            CarColor = c.CarColor,
-                            CarFuel = c.CarFuel,
-                            FrontImg = cf.FrontImg
-                        }).Where(c => c.IsDeleted == false)
+                    join cstatus in _contractContext.CarStatuses on c.CarStatusId equals cstatus.Id
+                    join cf in _contractContext.CarFiles on c.Id equals cf.CarId
+                    join cm in _contractContext.CarMakes on c.CarMakeId equals cm.Id
+                    join cmo in _contractContext.CarModels on c.CarModelId equals cmo.Id
+                    join cg in _contractContext.CarGenerations on c.CarGenerationId equals cg.Id
+                    select new CarDataModel
+                    {
+                        Id = c.Id,
+                        ParkingLotId = c.ParkingLotId,
+                        CarStatusId = c.CarStatusId,
+                        CarStatus = cstatus.Name,
+                        CarLicensePlates = c.CarLicensePlates,
+                        SeatNumber = c.SeatNumber,
+                        ModelYear = c.ModelYear,
+                        CarMakeId = c.CarMakeId,
+                        MakeName = cm.Name,
+                        CarModelId = c.CarModelId,
+                        ModelName = cmo.Name,
+                        CarGenerationId = c.CarGenerationId,
+                        GenerationName = cg.Name,
+                        IsDeleted = c.IsDeleted,
+                        CarColor = c.CarColor,
+                        CarFuel = c.CarFuel,
+                        FrontImg = cf.FrontImg
+                    }).Where(c => c.IsDeleted == false)
                             .OrderBy(c => c.Id)
                             .Skip(skip)
                             .Take(pageSize)
                             .ToList();
         }
 
+        //public ICollection<CarDataModel> GetCarsMaintenance(int page, int pageSize, out int count)
+        //{
+        //    if (page < 1)
+        //    {
+        //        page = 1;
+        //    }
+
+        //    if (pageSize < 1)
+        //    {
+        //        pageSize = 10;
+        //    }
+        //    int skip = (page - 1) * pageSize;
+
+        //    IQueryable<Car> cars = _contractContext.Cars
+        //        .Include(c => c.CarStatus)
+        //        .Include(c => c.CarFile)
+        //        .Include(c => c.CarMake)
+        //        .Include(c => c.CarModel)
+        //       .AsQueryable();
+
+        //    cars.Where(c => c.CarMaintenanceInfos.Any(m => m.KmTraveled >= (c.PeriodicMaintenanceLimit * 0.9)));
+
+        //       var carDataModels = cars
+        //        .OrderBy(c => c.Id)
+        //        .Skip(skip)
+        //        .Take(pageSize)
+        //        .Select(c => new CarDataModel
+        //         {
+        //             Id = c.Id,
+        //             CarStatusId = c.CarStatusId,
+        //             CarStatus = c.CarStatus.Name,
+        //             CarLicensePlates = c.CarLicensePlates,
+        //             SeatNumber = c.SeatNumber,
+        //             ModelYear = c.ModelYear,
+        //             CarMakeId = c.CarMakeId,
+        //             MakeName = c.CarMake.Name,
+        //             CarModelId = c.CarModelId,
+        //             ModelName = c.CarModel.Name,
+        //             CarGenerationId = c.CarGenerationId,
+        //             GenerationName = c.CarGeneration.Name,
+        //             IsDeleted = c.IsDeleted,
+        //             CarColor = c.CarColor,
+        //             CarFuel = c.CarFuel,
+        //             FrontImg = c.CarFile.FrontImg,
+        //             PeriodicMaintenanceLimit = c.PeriodicMaintenanceLimit,
+        //             KmTraveled = c.CarMaintenanceInfos.OrderByDescending(m => m.Id).FirstOrDefault().KmTraveled
+        //         })
+        //         .ToList();
+
+        //    count = carDataModels.Count();
+
+        //    return carDataModels;
+        //}
+
+        public ICollection<CarDataModel> GetCarsMaintenance(int page, int pageSize, out int count)
+        {
+            if (page < 1)
+            {
+                page = 1;
+            }
+
+            if (pageSize < 1)
+            {
+                pageSize = 10;
+            }
+            int skip = (page - 1) * pageSize;
+
+            var cars = _contractContext.Cars
+            .Include(c => c.CarStatus)
+            .Include(c => c.CarFile)
+            .Where(c => c.CarMaintenanceInfos.Any(m => m.KmTraveled >= (c.PeriodicMaintenanceLimit * 0.9)))
+            .Select(c => new CarDataModel
+            {
+                Id = c.Id,
+                CarStatusId = c.CarStatusId,
+                CarStatus = c.CarStatus.Name,
+                CarLicensePlates = c.CarLicensePlates,
+                SeatNumber = c.SeatNumber,
+                ModelYear = c.ModelYear,
+                CarModelId = c.CarModelId,
+                ModelName = c.CarModel.Name, // Set the ModelName property to the CarModel's Name property
+                IsDeleted = c.IsDeleted,
+                CarColor = c.CarColor,
+                CarFuel = c.CarFuel,
+                FrontImg = c.CarFile.FrontImg,
+                PeriodicMaintenanceLimit = c.PeriodicMaintenanceLimit,
+                KmTraveled = c.CarMaintenanceInfos.OrderByDescending(m => m.Id).FirstOrDefault().KmTraveled
+            });
+
+            count = cars.Count();
+            var response = cars.Skip(skip).Take(pageSize).ToList();
+            return response;
+        }
         public ICollection<Car> GetCarsByStatusId(int page, int pageSize, int carStatusId)
         {
             if (page < 1)
@@ -454,8 +480,17 @@ namespace CleanArchitecture.Application.Repository
             return saved > 0 ? true : false;
         }
 
-        public void CreateCar(CarCreateModel request)
+        public bool CreateCar(CarCreateModel request, out string errorMessage)
+
         {
+            errorMessage = string.Empty;
+
+            if (_contractContext.Cars.Any(u => u.CarLicensePlates == request.CarLicensePlates))
+            {
+                errorMessage = "Car with this license plates already exists";
+                return false;
+            }
+
             // Create new Car object and set its properties
             int defaultCarSatusId = Constant.CarStatusConstants.Expertising;
             var car = new Car
@@ -463,9 +498,9 @@ namespace CleanArchitecture.Application.Repository
                 ParkingLotId = request.ParkingLotId,
                 CarStatusId = defaultCarSatusId,
                 CarLicensePlates = request.CarLicensePlates,
-                ModelYear = request.ModelYear, 
+                ModelYear = request.ModelYear,
                 SeatNumber = request.SeatNumber,
-                CarMakeId = request.CarMakeId,              
+                CarMakeId = request.CarMakeId,
                 CarModelId = request.CarModelId,
                 CarGenerationId = request.CarGenerationId,
                 CarSeriesId = request.CarSeriesId,
@@ -476,7 +511,7 @@ namespace CleanArchitecture.Application.Repository
                 CarColor = request.CarColor,
                 CarFuel = request.CarFuel,
                 PeriodicMaintenanceLimit = request.PeriodicMaintenanceLimit
-                
+
             };
 
             // Save the new car to the database
@@ -532,18 +567,18 @@ namespace CleanArchitecture.Application.Repository
 
             var carFile = new CarFile
             {
-                    CarId = car.Id,
-                    FrontImg = request.FrontImg,
-                    BackImg = request.BackImg,
-                    LeftImg = request.LeftImg,
-                    RightImg = request.RightImg,
-                    OrtherImg = request.OrtherImg,
-                    CreatedDate = request.CarFileCreatedDate,
+                CarId = car.Id,
+                FrontImg = request.FrontImg,
+                BackImg = request.BackImg,
+                LeftImg = request.LeftImg,
+                RightImg = request.RightImg,
+                OrtherImg = request.OrtherImg,
+                CreatedDate = request.CarFileCreatedDate,
             };
-                // Save the new CarFile object to the database
+            // Save the new CarFile object to the database
             _contractContext.CarFiles.Add(carFile);
             _contractContext.SaveChanges();
-            
+
 
             var carTracking = new CarTracking
             {
@@ -557,6 +592,8 @@ namespace CleanArchitecture.Application.Repository
             // Save the new CarTracking object to the database
             _contractContext.CarTrackings.Add(carTracking);
             _contractContext.SaveChanges();
+
+            return Save();
 
         }
 
@@ -713,5 +750,117 @@ namespace CleanArchitecture.Application.Repository
                 .Take(pageSize)
                 .ToList();
         }
+
     }
+
+
+    //public CarDataModel GetCarById(int carId)
+    //{
+    //    CarDataModel car = (from c in _contractContext.Cars
+    //               join cstatus in _contractContext.CarStatuses on c.CarStatusId equals cstatus.Id
+    //               join gi in _contractContext.CarGenerallInfos on c.Id equals gi.CarId
+    //               join cs in _contractContext.CarStates on c.Id equals cs.CarId
+    //               join cli in _contractContext.CarLoanInfos on c.Id equals cli.CarId
+    //               join cf in _contractContext.CarFiles on c.Id equals cf.CarId 
+    //               join ctk in _contractContext.CarTrackings on c.Id equals ctk.CarId
+    //                        join fc in _contractContext.ForControls.Where(x => x.CarId == carId).DefaultIfEmpty()
+    //               on true equals true
+    //               join cm in _contractContext.CarMakes on c.CarMakeId equals cm.Id
+    //               join cmo in _contractContext.CarModels on c.CarModelId equals cmo.Id
+    //               join cg in _contractContext.CarGenerations on c.CarGenerationId equals cg.Id
+    //               join cse in _contractContext.CarSeries on c.CarSeriesId equals cse.Id
+    //               join ct in _contractContext.CarTrims on c.CarTrimId equals ct.Id
+    //               where c.Id == carId
+
+    //               select new CarDataModel
+    //               {
+
+    //                   Id = c.Id,
+    //                   ParkingLotId = c.ParkingLotId,
+    //                   CarStatusId = c.CarStatusId,
+    //                   CarStatus = cstatus.Name,
+    //                   CarId = c.CarId,
+    //                   CarLicensePlates = c.CarLicensePlates,
+    //                   SeatNumber = c.SeatNumber,
+    //                   ModelYear = c.ModelYear,
+    //                   CarMakeId = c.CarMakeId,
+    //                   MakeName = cm.Name,
+    //                   CarModelId = c.CarModelId,
+    //                   ModelName = cmo.Name,
+    //                   CarGenerationId = c.CarGenerationId,
+    //                   GenerationName = cg.Name,
+    //                   GenerationYearBegin = cg.YearBegin,
+    //                   GenerationYearEnd = cg.YearEnd,
+    //                   CarSeriesId = c.CarSeriesId,
+    //                   SeriesName = cse.Name,
+    //                   CarTrimId = c.CarTrimId,
+    //                   TrimName = ct.Name,
+    //                   CarDescription = c.CarDescription,
+    //                   TrimStartProductYear = ct.StartProductYear,
+    //                   TrimEndProductYear = ct.EndProductYear,
+    //                   CreatedDate = c.CreatedDate,
+    //                   IsDeleted = c.IsDeleted,
+    //                   CarColor = c.CarColor,
+    //                   CarFuel = c.CarFuel,
+    //                   PriceForNormalDay = gi.PriceForNormalDay,
+    //                   PriceForWeekendDay = gi.PriceForWeekendDay,
+    //                   PriceForMonth = gi.PriceForMonth,
+    //                   LimitedKmForMonth = gi.LimitedKmForMonth,
+    //                   OverLimitedMileage = gi.OverLimitedMileage,
+    //                   CarStatusDescription = cs.CarStatusDescription,
+    //                   CurrentEtcAmount = cs.CurrentEtcAmount,
+    //                   FuelPercent = cs.FuelPercent,
+    //                   SpeedometerNumber = cs.SpeedometerNumber,
+    //                   CarOwnerName = cli.CarOwnerName,
+    //                   RentalMethod = cli.RentalMethod,
+    //                   RentalDate = cli.RentalDate,
+    //                   SpeedometerNumberReceive = cli.SpeedometerNumberReceive,
+    //                   PriceForDayReceive = cli.PriceForDayReceive,
+    //                   PriceForMonthReceive = cli.PriceForMonthReceive,
+    //                   Insurance = cli.Insurance,
+    //                   Maintenance = cli.Maintenance,
+    //                   LimitedKmForMonthReceive = cli.LimitedKmForMonthReceive,
+    //                   OverLimitedMileageReceive = cli.OverLimitedMileageReceive,
+    //                   FilePath = cf.FilePath,
+    //                   FrontImg = cf.FrontImg,
+    //                   BackImg = cf.BackImg,
+    //                   LeftImg = cf.LeftImg,
+    //                   RightImg = cf.BackImg,
+    //                   OrtherImg = cf.OrtherImg,
+    //                   CarFileCreatedDate = cf.CreatedDate,
+    //                   LinkTracking = ctk.LinkTracking,
+    //                   TrackingUsername = ctk.TrackingUsername,
+    //                   TrackingPassword = ctk.TrackingPassword,
+    //                   Etcusername = ctk.Etcusername,
+    //                   Etcpassword = ctk.Etcpassword,
+    //                   LinkForControl = fc != null ? fc.LinkForControl : null,
+    //                   PaymentMethod = fc != null ? fc.PaymentMethod : null,
+    //                   ForControlDay = fc != null ? fc.ForControlDay : null,
+    //                   DayOfPayment = fc != null ? fc.DayOfPayment : null
+    //               }).FirstOrDefault();
+    //    return car;
+    //}
+
+    //public ICollection<CarDataModel> GetCarsMaintenance()
+    //{
+
+    //    var query = from car in _contractContext.Cars
+    //                join carStatus in _contractContext.CarStatuses on car.CarStatusId equals carStatus.Id
+    //                join maintenance in _contractContext.CarMaintenanceInfos on car.Id equals maintenance.CarId
+    //                select new CarDataModel
+    //                {
+    //                    Id = car.Id,
+    //                    CarLicensePlates = car.CarLicensePlates,
+    //                    CarStatusId = car.CarStatusId,
+    //                    CarStatus = carStatus.Name,
+    //                    PeriodicMaintenanceLimit = car.PeriodicMaintenanceLimit,
+    //                    SeatNumber = car.SeatNumber,
+    //                    KmTraveled = maintenance.KmTraveled
+    //                };
+
+    //    query = query.Where(c => c.KmTraveled >= (c.PeriodicMaintenanceLimit * 0.9));
+
+    //    var response = query.ToList();
+    //    return response;
+    //}
 }

@@ -9,7 +9,8 @@ namespace CleanArchitecture.Domain.Interface
 
         ICollection<CarMake> GetCarMakes();
 
-        int GetCarMakeIdByName (string name);   
+        int GetCarMakeIdByName (string name);
+
 
         bool CarMakeExit(int id);
 

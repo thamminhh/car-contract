@@ -26,10 +26,10 @@ namespace CleanArchitecture.Domain.Entities
         public string? CarDescription { get; set; }
         public string? CarColor { get; set; }
         public string? CarFuel { get; set; }
+        public double? PeriodicMaintenanceLimit { get; set; }
         public DateTime? CreatedDate { get; set; }
         public bool? IsDeleted { get; set; }
         public int? ModelYear { get; set; }
-        public double? PeriodicMaintenanceLimit { get; set; }
 
         public virtual CarModel? CarGeneration { get; set; }
         public virtual CarModel? CarMake { get; set; }

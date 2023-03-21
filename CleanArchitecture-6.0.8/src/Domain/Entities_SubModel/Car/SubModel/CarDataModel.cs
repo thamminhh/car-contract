@@ -21,11 +21,11 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
         public int? CarGenerationId { get; set; }
         public int? CarSeriesId { get; set; }
         public int?   CarTrimId { get; set; }
-        public string MakeName { get; set; }
-        public string ModelName { get; set; }
-        public string GenerationName { get; set; }
-        public string SeriesName { get; set; }
-        public string TrimName { get; set; }
+        public string? MakeName { get; set; }
+        public string? ModelName { get; set; }
+        public string? GenerationName { get; set; }
+        public string? SeriesName { get; set; }
+        public string? TrimName { get; set; }
 
         public string? CarDescription { get; set; }
         public int? GenerationYearBegin { get; set; }
@@ -102,6 +102,8 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
         public string? ForControlDay { get; set; }
 
         public string? DayOfPayment { get; set; }
+
+        public double? KmTraveled { get; set; }
 
         public ICollection<CarScheduleDataModel>? CarSchedules { get; set; }
 

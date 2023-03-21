@@ -9,6 +9,8 @@ namespace CleanArchitecture.Domain.Interface
 
         ICollection<CarModel> GetCarModelsByCarMakeId(int carMakeId);
 
+        int GetCarModelIdByName(string name);
+
         bool CarModelExit(int id);  
 
     }

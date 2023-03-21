@@ -29,6 +29,7 @@ namespace CleanArchitecture.Domain.Entities
         public int? ContractStatusId { get; set; }
 
         public virtual ContractGroup? ContractGroup { get; set; }
+        public virtual ContractStatus? ContractStatus { get; set; }
         public virtual User? Representative { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace CleanArchitecture.Domain.Entities
         public ContractStatus()
         {
             ReceiveContracts = new HashSet<ReceiveContract>();
+            RentContracts = new HashSet<RentContract>();
             TransferContracts = new HashSet<TransferContract>();
         }
 
@@ -15,6 +16,7 @@ namespace CleanArchitecture.Domain.Entities
         public string? Name { get; set; }
 
         public virtual ICollection<ReceiveContract> ReceiveContracts { get; set; }
+        public virtual ICollection<RentContract> RentContracts { get; set; }
         public virtual ICollection<TransferContract> TransferContracts { get; set; }
     }
 }

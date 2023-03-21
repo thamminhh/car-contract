@@ -282,8 +282,8 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<li>Địa chỉ hiện tại: " + contractGroup.CustomerInfo.CustomerAddress + "</li>";
             htmlContent += "<li>Số điện thoại: " + contractGroup.CustomerInfo.PhoneNumber + "</li>";
             htmlContent += "<li>CCCD/ CMND số: " + contractGroup.CustomerInfo.CitizenIdentificationInfoNumber + " </li>";
-            htmlContent += "<li>CCCD/ CMND số: " + contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive + " </li>";
-            htmlContent += "<li>CCCD/ CMND số: " + contractGroup.CustomerInfo.CitizenIdentificationInfoAddress + " </li>";
+            htmlContent += "<li>Ngày cấp: " + contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive + " </li>";
+            htmlContent += "<li>Địa chỉ: " + contractGroup.CustomerInfo.CitizenIdentificationInfoAddress + " </li>";
             htmlContent += "<li>Điện thoại người thân:(chỉ dùng trong trường hợp khẩn khi không liên lạc được với bên B): " + contractGroup.CustomerInfo.RelativeTel + "</li>";
             htmlContent += "</ul>";
 
@@ -351,8 +351,8 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<li>Địa chỉ hiện tại: " + contractGroup.CustomerInfo.CustomerAddress + "</li>";
             htmlContent += "<li>Số điện thoại: " + contractGroup.CustomerInfo.PhoneNumber + "</li>";
             htmlContent += "<li>CCCD/ CMND số: " + contractGroup.CustomerInfo.CitizenIdentificationInfoNumber + " </li>";
-            htmlContent += "<li>CCCD/ CMND số: " + contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive + " </li>";
-            htmlContent += "<li>CCCD/ CMND số: " + contractGroup.CustomerInfo.CitizenIdentificationInfoAddress + " </li>";
+            htmlContent += "<li>Ngày cấp: " + contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive + " </li>";
+            htmlContent += "<li>Địa chỉ: " + contractGroup.CustomerInfo.CitizenIdentificationInfoAddress + " </li>";
             htmlContent += "<li>Điện thoại người thân:(chỉ dùng trong trường hợp khẩn khi không liên lạc được với bên B): " + contractGroup.CustomerInfo.RelativeTel + "</li>";
             htmlContent += "</ul>";
 

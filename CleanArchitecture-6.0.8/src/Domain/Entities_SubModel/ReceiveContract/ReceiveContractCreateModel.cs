@@ -5,8 +5,7 @@ public class ReceiveContractCreateModel
 {
     public int? ReceiverId { get; set; }
     public int ContractGroupId { get; set; }
-
-    public int CarId { get; set; }
+    public int TransferContractId { get; set; }
     public DateTime? DateReceive { get; set; }
     public string? ReceiveAddress { get; set; }
     public int? CurrentCarStateSpeedometerNumber { get; set; }
@@ -21,7 +20,16 @@ public class ReceiveContractCreateModel
     public string? CurrentCarStateCarBackSeatImg { get; set; }
     public string? CurrentCarStateCarPhysicalDamage { get; set; }
     public string? DepositItemAsset { get; set; }
+    public bool? OriginalCondition { get; set; }
+    public string? CurrentCarStateCarDamageDescription { get; set; }
+    public string? OrtherViolation { get; set; }
     public double? CarInsuranceMoney { get; set; }
+    public bool? DetectedViolations { get; set; }
+    public string? SpeedingViolationDescription { get; set; }
+    public string? ForbiddenRoadViolationDescription { get; set; }
+    public string? TrafficLightViolationDescription { get; set; }
+    public double? ExtraTime { get; set; }
+    public double? UnpaidTicketMoney { get; set; }
     public DateTime? CreatedDate { get; set; }
 
 }

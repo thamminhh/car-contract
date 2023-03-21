@@ -21,6 +21,9 @@ namespace CleanArchitecture.Domain.Entities
         public string? CurrentAddress { get; set; }
         public string Email { get; set; } = null!;
         public string? Password { get; set; }
+        public string? CardImage { get; set; }
+        public byte[]? PasswordHash { get; set; }
+        public byte[]? PasswordSalt { get; set; }
         public string? Role { get; set; }
         public string? CitizenIdentificationInfoNumber { get; set; }
         public string? CitizenIdentificationInfoAddress { get; set; }
@@ -30,9 +33,6 @@ namespace CleanArchitecture.Domain.Entities
         public DateTime? PassportInfoDateReceive { get; set; }
         public DateTime? CreatedDate { get; set; }
         public bool? IsDeleted { get; set; }
-        public byte[]? PasswordHash { get; set; }
-        public byte[]? PasswordSalt { get; set; }
-        public string? CardImage { get; set; }
 
         public virtual ICollection<AppraisalRecord> AppraisalRecords { get; set; }
         public virtual ICollection<ContractGroup> ContractGroups { get; set; }

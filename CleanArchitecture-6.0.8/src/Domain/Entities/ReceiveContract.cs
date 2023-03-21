@@ -30,6 +30,16 @@ namespace CleanArchitecture.Domain.Entities
         public string? FilePath { get; set; }
         public string? FileWithSignsPath { get; set; }
         public int? ContractStatusId { get; set; }
+        public bool? OriginalCondition { get; set; }
+        public string? CurrentCarStateCarDamageDescription { get; set; }
+        public bool? DetectedViolations { get; set; }
+        public string? SpeedingViolationDescription { get; set; }
+        public string? ForbiddenRoadViolationDescription { get; set; }
+        public string? TrafficLightViolationDescription { get; set; }
+        public string? OrtherViolation { get; set; }
+        public double? TotalKilometersTraveled { get; set; }
+        public double? ExtraTime { get; set; }
+        public double? UnpaidTicketMoney { get; set; }
 
         public virtual ContractGroup? ContractGroup { get; set; }
         public virtual ContractStatus? ContractStatus { get; set; }

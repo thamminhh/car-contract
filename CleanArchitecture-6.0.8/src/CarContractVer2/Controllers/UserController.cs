@@ -20,7 +20,6 @@ namespace CarContractVer2.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
-        private static readonly IList<User> _users = new List<User>();
 
 
         public UserController(IUserRepository userRepository)

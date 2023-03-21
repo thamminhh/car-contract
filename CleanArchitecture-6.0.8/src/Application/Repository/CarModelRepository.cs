@@ -26,5 +26,11 @@ namespace CleanArchitecture.Application.Repository
         {
             return _contractContext.CarModels.Any(c => c.Id == id);
         }
+
+        public int GetCarModelIdByName(string carModelName)
+        {
+            CarModel carModel = _contractContext.CarModels.Where(c => c.Name == carModelName).FirstOrDefault();
+            return carModel.Id;
+        }
     }
 }

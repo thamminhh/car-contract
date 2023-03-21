@@ -9,7 +9,7 @@ namespace CleanArchitecture.Domain.Interface
         ICollection<CarDataModel> GetCars(int page, int pageSize, CarFilter filter);
 
         ICollection<CarDataModel> GetCarsActive(int page, int pageSize, CarFilter filter);
-
+        ICollection<CarDataModel> GetCarsMaintenance(int page, int pageSize, out int count);
         ICollection<Car> GetCarsByStatusId(int page, int pageSize, int carStatus);
 
         ICollection<Car> GetCarsByCarMakeId(int page, int pageSize, int carMakeId);
@@ -18,7 +18,7 @@ namespace CleanArchitecture.Domain.Interface
 
         bool CarExit(int id);
 
-        void CreateCar(CarCreateModel request);
+        bool CreateCar(CarCreateModel request, out string errorMessage);
 
         void UpdateCar(int id, CarUpdateModel request);
 

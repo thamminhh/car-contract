@@ -16,7 +16,7 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
         [AllowNull]
         public string? CarMakeName { get; set; }
         [AllowNull]
-        public string? CarModelId { get; set; }
+        public string? CarModelName { get; set; }
         [AllowNull]
         public string? CarColor { get; set;}
     }

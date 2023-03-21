@@ -1,3 +1,4 @@
+using CleanArchitecture.Application.Repository;
 using CleanArchitecture.Domain.Endpoints;
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.Entities_SubModel.Car.SubModel;
@@ -50,6 +51,17 @@ namespace CarContractVer2.Controllers
         }
 
         [HttpGet]
+        [Route(CarEndpoints.GetCarsMaintenance)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
+        public IActionResult GetCarsMaintenance(int page = 1, int pageSize = 10)
+        {
+            var listCar = _carRepository.GetCarsMaintenance(page, pageSize, out int count);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(new { cars = listCar, total = count });
+        }
+
+        [HttpGet]
         [Route(CarEndpoints.GetByStatus)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
         public IActionResult GetCarsByStatusId( [FromQuery] int carStatusId, int page = 1, int pageSize = 10)
@@ -96,9 +108,16 @@ namespace CarContractVer2.Controllers
         {
             if (request == null)
                 return BadRequest(ModelState);
-
-            _carRepository.CreateCar(request);
-            return Ok();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!_carRepository.CreateCar(request, out string errorMessage))
+            {
+                ModelState.AddModelError("", errorMessage);
+                return StatusCode(422, ModelState);
+            }
+            return Ok("Successfully Added");
         }
 
         [HttpPut]
