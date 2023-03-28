@@ -61,29 +61,40 @@ namespace CarContractVer2.Controllers
             return Ok(new { cars = listCar, total = count });
         }
 
-        [HttpGet]
-        [Route(CarEndpoints.GetByStatus)]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
-        public IActionResult GetCarsByStatusId( [FromQuery] int carStatusId, int page = 1, int pageSize = 10)
-        {
-            var listCar = _carRepository.GetCarsByStatusId(page, pageSize, carStatusId);
-            var count = _carRepository.GetNumberOfCarsByStatusId(carStatusId);
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(new { cars = listCar, total = count });
-        }
+        //[HttpGet]
+        //[Route(CarEndpoints.GetCarsRegistry)]
+        //[ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
+        //public IActionResult GetCarsRegistry()
+        //{
+        //    var listCar = _carRepository.GetCarsRegistry();
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
+        //    return Ok(new { cars = listCar, /*total = count*/ });
+        //}
 
-        [HttpGet]
-        [Route(CarEndpoints.GetByCarMakeName)]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
-        public IActionResult GetCarsByCarMakeName([FromQuery] string carMakeName, int page = 1, int pageSize = 10)
-        {
-            int carMakeId = _carMakeController.GetCarMakeIdByName(carMakeName);
-            var listCar = _carRepository.GetCarsByCarMakeId(page, pageSize, carMakeId);
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            return Ok(listCar);
-        }
+        //[HttpGet]
+        //[Route(CarEndpoints.GetByStatus)]
+        //[ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
+        //public IActionResult GetCarsByStatusId( [FromQuery] int carStatusId, int page = 1, int pageSize = 10)
+        //{
+        //    var listCar = _carRepository.GetCarsByStatusId(page, pageSize, carStatusId);
+        //    var count = _carRepository.GetNumberOfCarsByStatusId(carStatusId);
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
+        //    return Ok(new { cars = listCar, total = count });
+        //}
+
+        //[HttpGet]
+        //[Route(CarEndpoints.GetByCarMakeName)]
+        //[ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
+        //public IActionResult GetCarsByCarMakeName([FromQuery] string carMakeName, int page = 1, int pageSize = 10)
+        //{
+        //    int carMakeId = _carMakeController.GetCarMakeIdByName(carMakeName);
+        //    var listCar = _carRepository.GetCarsByCarMakeId(page, pageSize, carMakeId);
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
+        //    return Ok(listCar);
+        //}
 
         [HttpGet]
         [Route(CarEndpoints.GetSingle)]

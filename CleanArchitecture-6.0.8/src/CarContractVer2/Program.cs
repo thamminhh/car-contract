@@ -49,17 +49,18 @@ builder.Services.AddScoped<ICarTrimRepository, CarTrimRepository>();
 builder.Services.AddScoped<IParkingLotRepository, ParkingLotRepository>();
 builder.Services.AddScoped<ICustomerInfoRepository, CustomerInfoRepository>();
 builder.Services.AddScoped<IContractGroupRepository, ContractGroupRepository>();
-builder.Services.AddScoped<IContractFileRepository, ContractFileRepository>();
 builder.Services.AddScoped<IAppraisalRecordRepository, AppraisalRecordRepository>();
-builder.Services.AddScoped<IRentContractRepository, RentContractRepository>();
-builder.Services.AddScoped<ITransferContractRepository, TransferContractRepository>();
-builder.Services.AddScoped<IReceiveContractRepository, ReceiveContractRepository>();
+//builder.Services.AddScoped<IContractFileRepository, ContractFileRepository>();
+//builder.Services.AddScoped<IRentContractRepository, RentContractRepository>();
+//builder.Services.AddScoped<ITransferContractRepository, TransferContractRepository>();
+//builder.Services.AddScoped<IReceiveContractRepository, ReceiveContractRepository>();
 builder.Services.AddScoped<ICarStatusRepository, CarStatusRepository>();
 builder.Services.AddScoped<IContractGroupStatusRepository, ContractGroupStatusRepository>();
 builder.Services.AddScoped<ICarScheduleRepository, CarScheduleRepository>();
 builder.Services.AddScoped<ICarMaintenanceInfoRepository, CarMaintenanceInfoRepository>();
 builder.Services.AddScoped<ICarRegistryInfoRepository, CarRegistryInfoRepository>();
 builder.Services.AddScoped<FileRepository>();
+builder.Services.AddScoped<ICustomerFileRepository, CustomerFileRepository>();
 builder.Services.AddScoped<ContractGroupHub>();
 builder.Services.AddHttpContextAccessor();
 
@@ -95,7 +96,7 @@ builder.Services.AddDbContext<ContractContext>(otp => otp.UseSqlServer(builder.C
 
 
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP requestSystem.ArgumentException: 'Cannot instantiate implementation type 'CleanArchitecture.Domain.Interface.ICustomerFileRepository' for service type 'CleanArchitecture.Domain.Interface.ICustomerFileRepository'.' pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();

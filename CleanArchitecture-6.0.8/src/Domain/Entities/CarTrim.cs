@@ -13,5 +13,6 @@ namespace CleanArchitecture.Domain.Entities
         public int? EndProductYear { get; set; }
 
         public virtual CarModel? CarModel { get; set; }
+        public virtual CarSeries? CarSeries { get; set; }
     }
 }

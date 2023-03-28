@@ -40,19 +40,17 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
 
         public double SpeedometerNumberReceive { get; set; }
 
+        public double? OwnerSlitRatio { get; set; }
 
-        public string? PriceForDayReceive { get; set; }
+        public double? PriceForDayReceive { get; set; }
 
         public double PriceForMonthReceive { get; set; }
 
         public bool Insurance { get; set; }
 
-        public bool Maintenance { get; set; }
-
         public double LimitedKmForMonthReceive { get; set; }
 
         public double? OverLimitedMileageReceive { get; set; }
-        public string? FilePath { get; set; }
 
         public string? FrontImg { get; set; }
 
@@ -76,12 +74,5 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
 
         public string? Etcpassword { get; set; }
 
-        public string? LinkForControl { get; set; }
-
-        public string? PaymentMethod { get; set; }
-
-        public string? ForControlDay { get; set; }
-
-        public string? DayOfPayment { get; set; }
     }
 }

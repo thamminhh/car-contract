@@ -7,8 +7,7 @@ namespace CleanArchitecture.Domain.Entities
     {
         public int Id { get; set; }
         public int? CarId { get; set; }
-        public DateTime? LastRegistryDate { get; set; }
-        public DateTime? RegistryDate { get; set; }
+        public DateTime? RegistrationDeadline { get; set; }
         public double? RegistryAmount { get; set; }
         public string? RegistryInvoice { get; set; }
 

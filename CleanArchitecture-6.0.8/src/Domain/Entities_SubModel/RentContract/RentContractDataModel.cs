@@ -43,8 +43,7 @@ public class RentContractDataModel
     public string? FileWithSignsPath { get; set; }
     public bool? IsExported { get; set; }
     public double? PaymentAmount { get; set; }
-    public string? DepositItemAsset { get; set; }
-    public string? DepositItemDescription { get; set; }
+    public double? DepositInfoCarRental { get; set; }
     public double? DepositItemDownPayment { get; set; }
 
     public DateTime? CreatedDate { get; set; }

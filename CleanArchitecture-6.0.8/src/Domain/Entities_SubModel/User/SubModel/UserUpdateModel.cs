@@ -30,5 +30,5 @@ public class UserUpdateModel
     public DateTime? PassportInfoDateReceive { get; set; }
     public string? Role { get; set; }
     public bool? isDeleted { get; set; }
-
+    public int? ParkingLotId { get; set; }
 }

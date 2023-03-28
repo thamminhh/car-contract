@@ -1,5 +1,7 @@
+using CleanArchitecture.Application.Repository;
 using CleanArchitecture.Domain.Endpoints;
 using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.CarMake.Sub_Model;
 using CleanArchitecture.Domain.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,27 +47,20 @@ namespace CarContractVer2.Controllers
         //[Route(CarMakeEndpoints.Create)]
         //[ProducesResponseType(204)]
         //[ProducesResponseType(400)]
-        //public IActionResult CreateCarMake([FromBody] CarMake carMakeCreate)
+        //public IActionResult CreateCarMake([FromBody] CarMakeCreateModel request)
         //{
-        //    if (carMakeCreate == null)
+        //    if (request == null)
         //        return BadRequest(ModelState);
 
-        //    var carMake = _carMakeController.GetCarMakes()
-        //        .Where(c => c.Name.Trim().ToUpper() == carMakeCreate.Name.TrimEnd().ToUpper())
-        //        .FirstOrDefault();
-        //    if(carMake != null)
-        //    {
-        //        ModelState.AddModelError("", "Car Make Already Exist!!!");
-        //        return StatusCode(422, ModelState);
-        //    }
         //    if (!ModelState.IsValid)
         //    {
         //        return BadRequest(ModelState);
         //    }
-        //    if (!_carMakeController.CreateCarMake(carMakeCreate))
+
+        //    if (!_carMakeController.CreateCarMake(request, out string errorMessage))
         //    {
-        //        ModelState.AddModelError("", "Something went wrong while saving");
-        //        return StatusCode(500, ModelState);
+        //        ModelState.AddModelError("", errorMessage);
+        //        return StatusCode(422, ModelState);
         //    }
         //    return Ok("Successfully Added");
         //}
@@ -74,25 +69,22 @@ namespace CarContractVer2.Controllers
         [Route(CarMakeEndpoints.Update)]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        public IActionResult UpdateCarMake(int id, [FromBody] CarMake carMakeUpdate)
+        public IActionResult UpdateCarMake(int carMakeId, [FromBody] CarMakeUpdateModel request)
         {
-            if (carMakeUpdate == null)            
-                return BadRequest(ModelState);
-            
-            if(id != carMakeUpdate.Id)
-                return BadRequest(ModelState);
+            if (request == null || carMakeId != request.Id)
+                return BadRequest();
 
-            if (!_carMakeController.CarMakeExit(id))
+            // Check if the car with the specified id exists
+            if (!_carMakeController.CarMakeExit(carMakeId))
                 return NotFound();
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            if (!_carMakeController.UpdateCarMake(carMakeUpdate))
+            // Update the car and its related data
+            if (!_carMakeController.UpdateCarMake(carMakeId, request, out string errorMessage))
             {
-                ModelState.AddModelError("", "Something went wrong");
-                return StatusCode(500, ModelState);
+                ModelState.AddModelError("", errorMessage);
+                return StatusCode(422, ModelState);
             }
-            return NoContent();
+            return Ok("Successfully Updated");
         }
     }
 }

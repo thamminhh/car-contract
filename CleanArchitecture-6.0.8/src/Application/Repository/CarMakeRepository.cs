@@ -1,5 +1,6 @@
 ﻿
 using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.CarMake.Sub_Model;
 using CleanArchitecture.Domain.Interface;
 
 namespace CleanArchitecture.Application.Repository
@@ -25,8 +26,6 @@ namespace CleanArchitecture.Application.Repository
 
         public ICollection<CarMake> GetCarMakes()
         {
-            // Calculate the number of records to skip
-          
             return _contractContext.CarMakes.OrderBy(c => c.Id).ToList();
         }
 
@@ -35,16 +34,48 @@ namespace CleanArchitecture.Application.Repository
             return _contractContext.CarMakes.Any(c => c.Id == id);
         }
 
-        public bool CreateCarMake(CarMake carMake)
-        {
-            _contractContext.Add(carMake);
-            return Save();  
-        }
+        //public bool CreateCarMake(CarMakeCreateModel request, out string errorMessage)
+        //{
+        //    errorMessage = string.Empty;
 
-        public bool UpdateCarMake(CarMake carMake)
+        //    if (request.CarMakeName == null)
+        //    {
+        //        errorMessage = "Car make name don't allow null";
+        //        return false;
+        //    }
+        //    if (_contractContext.CarMakes.Any(u => u.Name == request.CarMakeName))
+        //    {
+        //        errorMessage = "This car make already exists";
+        //        return false;
+        //    }
+        //    var carMake = new CarMake();    
+        //    carMake.Name= request.CarMakeName;
+        //    carMake.CarMakeImg = request.CarMakeImage;
+        //    _contractContext.CarMakes.Add(carMake);
+        //    return Save();
+
+        //}
+
+        public bool UpdateCarMake(int id, CarMakeUpdateModel request, out string errorMessage)
         {
-            _contractContext.Update(carMake);
+            var carMake = _contractContext.CarMakes.Find(id);
+            errorMessage= string.Empty;
+            if (request.CarMakeName == null)
+            {
+                errorMessage = "Car make name don't allow null";
+                return false;
+            }
+            if (_contractContext.CarMakes.Any(u => u.Name == request.CarMakeName && request.CarMakeName != carMake.Name) )
+            {
+                errorMessage = "This car make already exists";
+                return false;
+            }
+            carMake.Name = request.CarMakeName;
+            carMake.CarMakeImg = request.CarMakeImage;
+
+            _contractContext.CarMakes.Update(carMake);
             return Save();
+
         }
 
         public bool Save()

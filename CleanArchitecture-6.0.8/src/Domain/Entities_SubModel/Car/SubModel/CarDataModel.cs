@@ -59,7 +59,9 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
 
         public double? SpeedometerNumberReceive { get; set; }
 
-        public string PriceForDayReceive { get; set; }
+        public double? OwnerSlitRatio { get; set; }
+
+        public double? PriceForDayReceive { get; set; }
 
         public double? PriceForMonthReceive { get; set; }
 
@@ -103,7 +105,11 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
 
         public string? DayOfPayment { get; set; }
 
+        public double? CarKmLastMaintenance { get; set; }
+
         public double? KmTraveled { get; set; }
+
+        public DateTime? RegistryDeadLine { get; set; }
 
         public ICollection<CarScheduleDataModel>? CarSchedules { get; set; }
 

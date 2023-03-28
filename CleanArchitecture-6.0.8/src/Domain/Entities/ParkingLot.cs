@@ -8,6 +8,7 @@ namespace CleanArchitecture.Domain.Entities
         public ParkingLot()
         {
             Cars = new HashSet<Car>();
+            Users = new HashSet<User>();
         }
 
         public int Id { get; set; }
@@ -20,5 +21,6 @@ namespace CleanArchitecture.Domain.Entities
         public string? ParkingLotImg { get; set; }
 
         public virtual ICollection<Car> Cars { get; set; }
+        public virtual ICollection<User> Users { get; set; }
     }
 }

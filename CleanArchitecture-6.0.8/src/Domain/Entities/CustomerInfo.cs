@@ -8,6 +8,7 @@ namespace CleanArchitecture.Domain.Entities
         public CustomerInfo()
         {
             ContractGroups = new HashSet<ContractGroup>();
+            CustomerFiles = new HashSet<CustomerFile>();
         }
 
         public int Id { get; set; }
@@ -19,14 +20,11 @@ namespace CleanArchitecture.Domain.Entities
         public DateTime? CitizenIdentificationInfoDateReceive { get; set; }
         public string? CustomerSocialInfoZalo { get; set; }
         public string? CustomerSocialInfoFacebook { get; set; }
-        public string? CustomerSocialInfoLinkedin { get; set; }
-        public string? CustomerSocialInfoOther { get; set; }
-        public string? AddtionalInfo { get; set; }
         public string? RelativeTel { get; set; }
-        public bool? ExpertiseInfoIsFirstTimeRent { get; set; }
-        public string? ExpertiseInfoTrustLevel { get; set; }
         public string? CompanyInfo { get; set; }
+        public string? CustomerEmail { get; set; }
 
         public virtual ICollection<ContractGroup> ContractGroups { get; set; }
+        public virtual ICollection<CustomerFile> CustomerFiles { get; set; }
     }
 }

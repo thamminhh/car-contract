@@ -74,11 +74,14 @@ namespace CleanArchitecture.Application.Repository
 
             if (filter != null)
             {
+                if (filter.ParkingLotId.HasValue)
+                {
+                    users = users.Where(u => u.ParkingLotId == filter.ParkingLotId);
+                }
                 if (!string.IsNullOrWhiteSpace(filter.Name))
                 {
                     users = users.Where(u => u.Name.Contains(filter.Name));
                 }
-
                 if (!string.IsNullOrWhiteSpace(filter.Email))
                 {
                     users = users.Where(u => u.Email.Contains(filter.Email));
@@ -120,11 +123,14 @@ namespace CleanArchitecture.Application.Repository
 
             if (filter != null)
             {
+                if (filter.ParkingLotId.HasValue)
+                {
+                    users = users.Where(u => u.ParkingLotId == filter.ParkingLotId);
+                }
                 if (!string.IsNullOrWhiteSpace(filter.Name))
                 {
                     users = users.Where(u => u.Name.Contains(filter.Name));
                 }
-
                 if (!string.IsNullOrWhiteSpace(filter.Email))
                 {
                     users = users.Where(u => u.Email.Contains(filter.Email));
@@ -186,6 +192,7 @@ namespace CleanArchitecture.Application.Repository
             }
 
             var user = new User();
+            user.ParkingLotId = userCreate.ParkingLotId;
             user.Name = userCreate.Name;
             user.PhoneNumber = userCreate.PhoneNumber;
             user.Job = userCreate.Job;
@@ -206,7 +213,7 @@ namespace CleanArchitecture.Application.Repository
             user.CreatedDate = userCreate.CreatedDate;
             user.IsDeleted = false;
 
-            _contractContext.Add(user);
+            _contractContext.Users.Add(user);
             return Save();
         }
         public bool UpdateUser(int id, UserUpdateModel request, out string errorMessage)
@@ -242,6 +249,7 @@ namespace CleanArchitecture.Application.Repository
             }
             
             user.Name = request.Name;
+            user.ParkingLotId = request.ParkingLotId;
             user.PhoneNumber = request.PhoneNumber;
             user.Job = request.Job;
             user.CurrentAddress = request.CurrentAddress;
@@ -257,7 +265,7 @@ namespace CleanArchitecture.Application.Repository
             user.IsDeleted = request.isDeleted;
             user.CardImage = request.CardImage;
 
-            _contractContext.Update(user);
+            _contractContext.Users.Update(user);
             return Save();
         }
         public bool UpdateUserRoleAsync(int id, UpdateUserRoleModel request)

@@ -4,9 +4,11 @@ using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.Entities_SubModel.Car.SubModel;
 using CleanArchitecture.Domain.Entities_SubModel.ContractGroup.SubModel;
 using CleanArchitecture.Domain.Interface;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.Linq;
 
 namespace CleanArchitecture.Application.Repository
@@ -14,35 +16,36 @@ namespace CleanArchitecture.Application.Repository
     public class ContractGroupRepository : IContractGroupRepository
     {
         private readonly ContractContext _contractContext;
+        private readonly ICustomerFileRepository _customerFileRepository;
 
 
-
-        public ContractGroupRepository(ContractContext contractContext)
+        public ContractGroupRepository(ContractContext contractContext, ICustomerFileRepository customerFile)
         {
             _contractContext = contractContext;
+            _customerFileRepository = customerFile;
         }
 
-        private static string changeIdContractIntoString(int? id)
-        {
-            if (id == null)
-            {
-                return null;
-            }
-            if (id == 1)
-            {
-                return ContractStatusConstant.ContractExportingName;
-            }
-            if (id == 2)
-            {
-                return ContractStatusConstant.ContractExportedName;
-            }
-            if (id == 3)
-            {
-                return ContractStatusConstant.ContractCancelledName;
-            }
-            return "";
+        //private static string changeIdContractIntoString(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return null;
+        //    }
+        //    if (id == 1)
+        //    {
+        //        return ContractStatusConstant.ContractExportingName;
+        //    }
+        //    if (id == 2)
+        //    {
+        //        return ContractStatusConstant.ContractExportedName;
+        //    }
+        //    if (id == 3)
+        //    {
+        //        return ContractStatusConstant.ContractCancelledName;
+        //    }
+        //    return "";
 
-        }
+        //}
 
         public int GetNumberOfContracts(ContractFilter filter)
         {
@@ -67,15 +70,16 @@ namespace CleanArchitecture.Application.Repository
         public ContractGroupDataModel GetContractGroupById(int contractGroupId)
         {
             ContractGroup contractGroup = _contractContext.ContractGroups
-                .Include(c => c.ContractFile)
                 .FirstOrDefault(c => c.Id == contractGroupId);
 
             var customerInfo = _contractContext.CustomerInfos.Find(contractGroup.CustomerInfoId);
             var contractGroupStatus = _contractContext.ContractGroupStatuses.Find(contractGroup.ContractGroupStatusId);
+            var customerFiles = _customerFileRepository.GetCustomerFilesByCustomerInfoId(customerInfo.Id);
 
             return new ContractGroupDataModel
             {
                 Id = contractGroup.Id,
+                CustomerInfoId = contractGroup.CustomerInfoId,
                 UserId = contractGroup.UserId,
                 CarId = contractGroup.CarId,
                 RentPurpose = contractGroup.RentPurpose,
@@ -83,43 +87,27 @@ namespace CleanArchitecture.Application.Repository
                 RentTo = contractGroup.RentTo,
                 RequireDescriptionInfoCarBrand = contractGroup.RequireDescriptionInfoCarBrand,
                 RequireDescriptionInfoSeatNumber = contractGroup.RequireDescriptionInfoSeatNumber,
-                RequireDescriptionInfoYearCreate = contractGroup.RequireDescriptionInfoYearCreate,
+                RequireDescriptionInfoPriceForDay = contractGroup.RequireDescriptionInfoPriceForDay,
                 RequireDescriptionInfoCarColor = contractGroup.RequireDescriptionInfoCarColor,
+                RequireDescriptionInfoGearBox = contractGroup.RequireDescriptionInfoGearBox,
                 DeliveryAddress = contractGroup.DeliveryAddress,
 
                 ContractGroupStatusId = contractGroup.ContractGroupStatusId,
                 ContractGroupStatusName = contractGroupStatus.Name,
 
-                CustomerInfoId = contractGroup.CustomerInfoId,
-
-                PhoneNumber = customerInfo.PhoneNumber,
-                CustomerSocialInfoZalo = customerInfo.CustomerSocialInfoZalo,
-                CustomerSocialInfoFacebook = customerInfo.CustomerSocialInfoFacebook,
-                CustomerSocialInfoLinkedin = customerInfo.CustomerSocialInfoLinkedin,
-                CustomerSocialInfoOther = customerInfo.CustomerSocialInfoOther,
-                AddtionalInfo = customerInfo.AddtionalInfo,
-                RelativeTel = customerInfo.RelativeTel,
-                ExpertiseInfoIsFirstTimeRent = customerInfo.ExpertiseInfoIsFirstTimeRent,
-                ExpertiseInfoTrustLevel = customerInfo.ExpertiseInfoTrustLevel,
-                CustomerAddress = customerInfo.CustomerAddress,
                 CustomerName = customerInfo.CustomerName,
-                CompanyInfo = customerInfo.CompanyInfo,
+                PhoneNumber = customerInfo.PhoneNumber,
+                CustomerAddress = customerInfo.CustomerAddress,
                 CitizenIdentificationInfoNumber = customerInfo.CitizenIdentificationInfoNumber,
                 CitizenIdentificationInfoAddress = customerInfo.CitizenIdentificationInfoAddress,
                 CitizenIdentificationInfoDateReceive = customerInfo.CitizenIdentificationInfoDateReceive,
+                CustomerSocialInfoZalo = customerInfo.CustomerSocialInfoZalo,
+                CustomerSocialInfoFacebook = customerInfo.CustomerSocialInfoFacebook,
+                RelativeTel = customerInfo.RelativeTel,
+                CompanyInfo = customerInfo.CompanyInfo,
+                CustomerEmail = customerInfo.CustomerEmail,
 
-                Path = contractGroup.ContractFile.Path,
-                CitizenIdentifyImage1 = contractGroup.ContractFile.CitizenIdentifyImage1,
-                CitizenIdentifyImage2 = contractGroup.ContractFile.CitizenIdentifyImage2,
-                DrivingLisenceImage1 = contractGroup.ContractFile.DrivingLisenceImage1,
-                DrivingLisenceImage2 = contractGroup.ContractFile.DrivingLisenceImage2,
-                HousePaperImages = contractGroup.ContractFile.HousePaperImages,
-                PassportImages = contractGroup.ContractFile.PassportImages,
-                OtherImages = contractGroup.ContractFile.OtherImages,
-                ExpertiseContracts = contractGroup.ContractFile.ExpertiseContracts,
-                RentContracts = contractGroup.ContractFile.RentContracts,
-                TransferContracts = contractGroup.ContractFile.TransferContracts,
-                ReceiveContracts = contractGroup.ContractFile.ReceiveContracts,
+                CustomerFiles = customerFiles,
 
             };
 
@@ -143,9 +131,6 @@ namespace CleanArchitecture.Application.Repository
                 .Include(c => c.CustomerInfo)
                 .Include(c => c.User)
                 .Include(c => c.ContractGroupStatus)
-                .Include(c => c.RentContract)
-                .Include(c => c.TransferContract)
-                .Include(c => c.ReceiveContract)
                 .AsQueryable();
 
             if (filter != null)
@@ -161,34 +146,17 @@ namespace CleanArchitecture.Application.Repository
             }
 
             var contractGroupDataModels = contractGroups
-                .OrderBy(c => c.Id)
+                .OrderByDescending(c => c.Id)
                 .Skip(skip)
                 .Take(pageSize)
                 .Select(c => new ContractGroupDataModel
                 {
                     Id = c.Id,
-                    CustomerInfoId = c.CustomerInfoId,
                     CustomerName = c.CustomerInfo.CustomerName,
                     UserId = c.UserId,
                     StaffEmail = c.User.Email,
                     ContractGroupStatusId = c.ContractGroupStatusId,
                     ContractGroupStatusName = c.ContractGroupStatus.Name,
-
-                    //ExpertiseContractId = c.ExpertiseContract != null? c.ExpertiseContract.Id : null,
-                    //ExpertiseContractStatusId = c.ExpertiseContract != null ? c.ExpertiseContract.ContractStatusId: null,
-                    //ExpertiseContractStatusName = c.ExpertiseContract != null ? changeIdContractIntoString(c.ExpertiseContract.ContractStatusId) : null,
-
-                    RentContractId = c.RentContract != null ? c.RentContract.Id : null,
-                    RentContractStatusId = c.RentContract != null ? c.RentContract.ContractStatusId : null,
-                    RentContractStatusName = c.RentContract != null ? changeIdContractIntoString(c.RentContract.ContractStatusId) : null,
-
-                    TransferContractId = c.TransferContract != null ? c.TransferContract.Id : null,
-                    TransferContractStatusId = c.TransferContract != null ? c.TransferContract.ContractStatusId : null,
-                    TransferContractStatusName = c.TransferContract != null ? changeIdContractIntoString(c.TransferContract.ContractStatusId) : null,
-
-                    ReceiveContractId = c.ReceiveContract != null ? c.ReceiveContract.Id : null,
-                    ReceiveContractStatusId = c.ReceiveContract != null ? c.ReceiveContract.ContractStatusId : null,
-                    ReceiveContractStatusName = c.ReceiveContract != null ? changeIdContractIntoString(c.ReceiveContract.ContractStatusId) : null
                 })
                 .ToList();
 
@@ -209,21 +177,17 @@ namespace CleanArchitecture.Application.Repository
         {
             var customerInfo = new CustomerInfo
             {
-                PhoneNumber = request.PhoneNumber,
+                PhoneNumber = request.CustomerPhoneNumber,
                 CustomerName = request.CustomerName,
+                CustomerAddress = request.CustomerAddress,
+                CustomerEmail = request.CustomerEmail,
+                CitizenIdentificationInfoNumber = request.CustomerCitizenIdentificationInfoNumber,
+                CitizenIdentificationInfoAddress = request.CustomerCitizenIdentificationInfoAddress,
+                CitizenIdentificationInfoDateReceive = request.CustomerCitizenIdentificationInfoDate,
                 CustomerSocialInfoZalo = request.CustomerSocialInfoZalo,
                 CustomerSocialInfoFacebook = request.CustomerSocialInfoFacebook,
-                CustomerSocialInfoLinkedin = request.CustomerSocialInfoLinkedin,
-                CustomerSocialInfoOther = request.CustomerSocialInfoOther,
-                AddtionalInfo = request.AddtionalInfo,
                 RelativeTel = request.RelativeTel,
-                ExpertiseInfoIsFirstTimeRent = request.ExpertiseInfoIsFirstTimeRent,
-                ExpertiseInfoTrustLevel = request.ExpertiseInfoTrustLevel,
                 CompanyInfo = request.CompanyInfo,
-                CustomerAddress = request.CustomerAddress,
-                CitizenIdentificationInfoNumber = request.CitizenIdentificationInfoNumber,
-                CitizenIdentificationInfoAddress = request.CitizenIdentificationInfoAddress,
-                CitizenIdentificationInfoDateReceive = request.CitizenIdentificationInfoDateReceive,
 
             };
             // Save the new ContractGroupGenerallInfos object to the database
@@ -241,104 +205,116 @@ namespace CleanArchitecture.Application.Repository
                 RentTo = request.RentTo,
                 RequireDescriptionInfoCarBrand = request.RequireDescriptionInfoCarBrand,
                 RequireDescriptionInfoSeatNumber = request.RequireDescriptionInfoSeatNumber,
-                RequireDescriptionInfoYearCreate = request.RequireDescriptionInfoYearCreate,
+                RequireDescriptionInfoPriceForDay = request.RequireDescriptionInfoPriceForDay,
                 RequireDescriptionInfoCarColor = request.RequireDescriptionInfoCarColor,
-                ContractGroupStatusId = contractGroupIdDefault,
+                RequireDescriptionInfoGearBox = request.RequireDescriptionInfoGearBox,
                 DeliveryAddress = request.CustomerAddress,
+                ContractGroupStatusId = contractGroupIdDefault,
             };
 
             // Save the new ContractGroup to the database
             _contractContext.ContractGroups.Add(contractGroup);
             _contractContext.SaveChanges();
 
-            // Create new ContractGroupStates object and set its properties
-            var contractFile = new ContractFile
-            {
-                ContractGroupId = contractGroup.Id,
-                CitizenIdentifyImage1 = request.CitizenIdentifyImage1,
-                CitizenIdentifyImage2 = request.CitizenIdentifyImage2,
-                DrivingLisenceImage1 = request.DrivingLisenceImage1,
-                DrivingLisenceImage2 = request.DrivingLisenceImage2,
-                HousePaperImages = request.HousePaperImages,
-                PassportImages = request.PassportImages,
-                OtherImages = request.OtherImages,
-                CreateDate = request.CreateDate
-            };
+            var customerFiles = request.CustomerFiles;
+            List<CustomerFile> customerFileList = new List<CustomerFile>();
 
-            // Save the new ContractGroupStates object to the database
-            _contractContext.ContractFiles.Add(contractFile);
-            _contractContext.SaveChanges();
+            if (customerFiles != null && customerFiles.Any())
+            {
+                foreach (var fileCreate in customerFiles)
+                {
+                    var file = new CustomerFile
+                    {
+                        CustomerInfoId = customerInfo.Id,
+                        TypeOfDocument = fileCreate.TypeOfDocument,
+                        Title = fileCreate.Title,
+                        DocumentImg = fileCreate.DocumentImg,
+                        DocumentDescription = fileCreate.DocumentDescription,
+                    };
+
+                    customerFileList.Add(file);
+                }
+
+                // add all new CustomerFiles to the database context in a single transaction
+                _contractContext.CustomerFiles.AddRange(customerFileList);
+                _contractContext.SaveChanges();
+            }
         }
+
 
         public void UpdateContractGroup(int id, ContractGroupUpdateModel request)
         {
             // Retrieve the ContractGroup object from the database
-            var ContractGroup = _contractContext.ContractGroups.Find(id);
+            var contractGroup = _contractContext.ContractGroups.Find(id);
 
             // Update the properties of the ContractGroup object
-            ContractGroup.CustomerInfoId = request.CustomerInfoId;
-            ContractGroup.UserId = request.UserId;
-            ContractGroup.CarId = request.CarId;
-            ContractGroup.RentPurpose = request.RentPurpose;
-            ContractGroup.RentFrom = request.RentFrom;
-            ContractGroup.RentTo = request.RentTo;
-            ContractGroup.RequireDescriptionInfoCarBrand = request.RequireDescriptionInfoCarBrand;
-            ContractGroup.RequireDescriptionInfoSeatNumber = request.RequireDescriptionInfoSeatNumber;
-            ContractGroup.RequireDescriptionInfoYearCreate = request.RequireDescriptionInfoYearCreate;
-            ContractGroup.RequireDescriptionInfoCarColor = request.RequireDescriptionInfoCarColor;
-            ContractGroup.ContractGroupStatusId = request.ContractGroupStatusId;
+            contractGroup.CustomerInfoId = request.CustomerInfoId;
+            contractGroup.UserId = request.UserId;
+            contractGroup.CarId = request.CarId;
+            contractGroup.RentPurpose = request.RentPurpose;
+            contractGroup.RentFrom = request.RentFrom;
+            contractGroup.RentTo = request.RentTo;
+            contractGroup.RequireDescriptionInfoCarBrand = request.RequireDescriptionInfoCarBrand;
+            contractGroup.RequireDescriptionInfoSeatNumber = request.RequireDescriptionInfoSeatNumber;
+            contractGroup.RequireDescriptionInfoPriceForDay = request.RequireDescriptionInfoPriceForDay;
+            contractGroup.RequireDescriptionInfoGearBox = request.RequireDescriptionInfoGearBox;
+            contractGroup.RequireDescriptionInfoCarColor = request.RequireDescriptionInfoCarColor;
+            contractGroup.DeliveryAddress = request.DeliveryAddress;
+            contractGroup.ContractGroupStatusId = request.ContractGroupStatusId;
 
 
             // Save the changes to the database
-            _contractContext.ContractGroups.Update(ContractGroup);
+            _contractContext.ContractGroups.Update(contractGroup);
             _contractContext.SaveChanges();
 
             // Retrieve the ContractGroupGenerallInfos object from the database
             var customerInfo = _contractContext.CustomerInfos.Find(request.CustomerInfoId);
+            var customerFiles = request.CustomerFiles;
+            if (customerInfo != null)
+            {
+                customerInfo.CustomerName = request.CustomerName;
+                customerInfo.PhoneNumber = request.PhoneNumber;
+                customerInfo.CustomerAddress = request.CustomerAddress;
+                customerInfo.CitizenIdentificationInfoAddress = request.CitizenIdentificationInfoAddress;
+                customerInfo.CitizenIdentificationInfoDateReceive = request.CitizenIdentificationInfoDateReceive;
+                customerInfo.CustomerSocialInfoZalo = request.CustomerSocialInfoZalo;
+                customerInfo.CustomerSocialInfoFacebook = request.CustomerSocialInfoFacebook;
+                customerInfo.RelativeTel = request.RelativeTel;
+                customerInfo.CompanyInfo = request.CompanyInfo;
+                customerInfo.CustomerEmail = request.CustomerEmail;
 
-            // Update the properties of the ContractGroupGenerallInfos object
-            customerInfo.CustomerName = request.CustomerName;
-            customerInfo.PhoneNumber = request.PhoneNumber;
-            customerInfo.CustomerSocialInfoZalo = request.CustomerSocialInfoZalo;
-            customerInfo.CustomerSocialInfoFacebook = request.CustomerSocialInfoFacebook;
-            customerInfo.CustomerSocialInfoLinkedin = request.CustomerSocialInfoLinkedin;
-            customerInfo.CustomerSocialInfoOther = request.CustomerSocialInfoOther;
-            customerInfo.AddtionalInfo = request.AddtionalInfo;
-            customerInfo.RelativeTel = request.RelativeTel;
-            customerInfo.ExpertiseInfoIsFirstTimeRent = request.ExpertiseInfoIsFirstTimeRent;
-            customerInfo.ExpertiseInfoTrustLevel = request.ExpertiseInfoTrustLevel;
-            customerInfo.CompanyInfo = request.CompanyInfo;
-            customerInfo.CustomerAddress = request.CustomerAddress;
-            customerInfo.CitizenIdentificationInfoNumber = request.CitizenIdentificationInfoNumber;
-            customerInfo.CitizenIdentificationInfoAddress = request.CitizenIdentificationInfoAddress;
-            customerInfo.CitizenIdentificationInfoDateReceive = request.CitizenIdentificationInfoDateReceive;
+                if (customerFiles != null)
+                {
+                    foreach (var file in customerFiles)
+                    {
+                        var existingFile = _contractContext.CustomerFiles.FirstOrDefault(cf => cf.Id == file.Id && cf.CustomerInfoId == customerInfo.Id);
+                        if (existingFile != null)
+                        {
+                            existingFile.TypeOfDocument = file.TypeOfDocument ?? existingFile.TypeOfDocument;
+                            existingFile.Title = file.Title ?? existingFile.Title;
+                            existingFile.DocumentImg = file.DocumentImg ?? existingFile.DocumentImg;
+                            existingFile.DocumentDescription = file.DocumentDescription ?? existingFile.DocumentDescription;
+                        }
+                        else
+                        {
+                            _contractContext.CustomerFiles.Add(new CustomerFile
+                            {
+                                CustomerInfoId = customerInfo.Id,
+                                TypeOfDocument = file.TypeOfDocument,
+                                Title = file.Title,
+                                DocumentImg = file.DocumentImg,
+                                DocumentDescription = file.DocumentDescription,
+                            });
+                        }
 
-
-            // Save the changes to the database
-            _contractContext.CustomerInfos.Update(customerInfo);
-            _contractContext.SaveChanges();
-
-            // Retrieve the ContractGroupStates object from the database
-            var contractFile = _contractContext.ContractFiles.Where(c => c.ContractGroupId == id).FirstOrDefault();
-
-            // Update the properties of the ContractGroupStates object
-            contractFile.Path = request.Path;
-            contractFile.CitizenIdentifyImage1 = request.CitizenIdentifyImage1;
-            contractFile.CitizenIdentifyImage2 = request.CitizenIdentifyImage2;
-            contractFile.DrivingLisenceImage1 = request.DrivingLisenceImage1;
-            contractFile.DrivingLisenceImage2 = request.DrivingLisenceImage2;
-            contractFile.HousePaperImages = request.HousePaperImages;
-            contractFile.PassportImages = request.PassportImages;
-            contractFile.OtherImages = request.OtherImages;
-            contractFile.ExpertiseContracts = request.ExpertiseContracts;
-            contractFile.RentContracts = request.RentContracts;
-            contractFile.TransferContracts = request.TransferContracts;
-            contractFile.ReceiveContracts = request.ReceiveContracts;
-
-            // Save the changes to the database
-            _contractContext.ContractFiles.Update(contractFile);
-            _contractContext.SaveChanges();
+                    }
+                }
+                _contractContext.CustomerInfos.Update(customerInfo);
+                _contractContext.SaveChanges();
+            }
         }
+
+        // Retrieve the ContractGroupStates object from the database
 
         public bool UpdateContractGroupStatus(int id, ContractGroupUpdateStatusModel request)
         {

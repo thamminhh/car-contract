@@ -15,6 +15,7 @@ namespace CleanArchitecture.Domain.Entities
         }
 
         public int Id { get; set; }
+        public int? ParkingLotId { get; set; }
         public string? Name { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Job { get; set; }
@@ -34,6 +35,7 @@ namespace CleanArchitecture.Domain.Entities
         public DateTime? CreatedDate { get; set; }
         public bool? IsDeleted { get; set; }
 
+        public virtual ParkingLot? ParkingLot { get; set; }
         public virtual ICollection<AppraisalRecord> AppraisalRecords { get; set; }
         public virtual ICollection<ContractGroup> ContractGroups { get; set; }
         public virtual ICollection<ReceiveContract> ReceiveContracts { get; set; }

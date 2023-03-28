@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.CustomerInfos;
 
 namespace CleanArchitecture.Domain.Interface
 {
@@ -6,13 +7,14 @@ namespace CleanArchitecture.Domain.Interface
     {
 
         CustomerInfo GetCustomerInfoById(int id);
+        CustomerInfoDataModel GetCustomerInfoByCitizenIdentificationInfoNumber(string citizenIdentificationInfoNumber);
 
         ICollection<CustomerInfo> GetCustomerInfos();
 
-        bool CustomerInfoExit(int id);
+        public bool CustomerInfoExit(string citizenIdentificationInfoNumber);
 
-        bool CreateCustomerInfo(CustomerInfo CustomerInfo);
-        bool UpdateCustomerInfo(CustomerInfo CustomerInfo);
+        bool CreateCustomerInfo(CustomerInfo customerInfo);
+        public bool UpdateCustomerInfo(string citizenIdentificationInfoNumber, CustomerInfoUpdateModel customerInfo);
         bool Save();
 
     }

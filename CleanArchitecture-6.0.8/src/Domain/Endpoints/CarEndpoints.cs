@@ -9,7 +9,8 @@ public class CarEndpoints
     public const string GetByStatus = Base + "/status";
     public const string GetByCarMakeName = Base + "/carMakeName";
     public const string GetSingle = Base + "/{carId}";
-    public const string GetCarsMaintenance = Base + "/maintenance";
+    public const string GetCarsMaintenance = Base + "/need-maintenance";
+    public const string GetCarsRegistry = Base + "/need-registry";
     public const string Create = Base + "/create";
     public const string Update = Base + "/update/{id}";
     public const string UpdateCarStatus = Base + "/update-status/{id}";

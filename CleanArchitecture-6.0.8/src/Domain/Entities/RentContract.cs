@@ -15,6 +15,7 @@ namespace CleanArchitecture.Domain.Entities
         public double? CarGeneralInfoAtRentPricePerHourExceed { get; set; }
         public double? CarGeneralInfoAtRentLimitedKmForMonth { get; set; }
         public double? CarGeneralInfoAtRentPriceForMonth { get; set; }
+        public double? DeliveryFee { get; set; }
         public double? DownPayment { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string? CustomerSignature { get; set; }
@@ -23,9 +24,10 @@ namespace CleanArchitecture.Domain.Entities
         public string? FileWithSignsPath { get; set; }
         public bool? IsExported { get; set; }
         public double? PaymentAmount { get; set; }
-        public string? DepositItemAsset { get; set; }
+        public double? DepositInfoCarRental { get; set; }
         public string? DepositItemDescription { get; set; }
         public double? DepositItemDownPayment { get; set; }
+        public string? CancelReason { get; set; }
         public int? ContractStatusId { get; set; }
 
         public virtual ContractGroup? ContractGroup { get; set; }

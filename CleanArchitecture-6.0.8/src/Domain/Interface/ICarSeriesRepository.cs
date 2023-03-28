@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.CarSeries.Sub_Model;
 
 namespace CleanArchitecture.Domain.Interface
 {
@@ -9,7 +10,9 @@ namespace CleanArchitecture.Domain.Interface
 
         ICollection <CarSeries> GetCarSeriesByCarModelAndCarGeneration(int carModelId, int carGenerationId);
 
-        bool CarSeriesExit(int id);  
+        bool CarSeriesExit(int id);
+
+        public bool UpdateCarSeries(int id, CarSeriesUpdateModel request, out string errorMessage);
 
     }
 }

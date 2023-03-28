@@ -8,6 +8,7 @@ namespace CleanArchitecture.Domain.Entities
         public ContractGroup()
         {
             AppraisalRecords = new HashSet<AppraisalRecord>();
+            RentContracts = new HashSet<RentContract>();
         }
 
         public int Id { get; set; }
@@ -17,11 +18,11 @@ namespace CleanArchitecture.Domain.Entities
         public string? RentPurpose { get; set; }
         public DateTime? RentFrom { get; set; }
         public DateTime? RentTo { get; set; }
-        public int? RequireDescriptionInfoCarClass { get; set; }
         public string? RequireDescriptionInfoCarBrand { get; set; }
         public int? RequireDescriptionInfoSeatNumber { get; set; }
-        public int? RequireDescriptionInfoYearCreate { get; set; }
+        public double? RequireDescriptionInfoPriceForDay { get; set; }
         public string? RequireDescriptionInfoCarColor { get; set; }
+        public string? RequireDescriptionInfoGearBox { get; set; }
         public string? DeliveryAddress { get; set; }
         public int? ContractGroupStatusId { get; set; }
 
@@ -29,10 +30,9 @@ namespace CleanArchitecture.Domain.Entities
         public virtual ContractGroupStatus? ContractGroupStatus { get; set; }
         public virtual CustomerInfo? CustomerInfo { get; set; }
         public virtual User? User { get; set; }
-        public virtual ContractFile? ContractFile { get; set; }
         public virtual ReceiveContract? ReceiveContract { get; set; }
-        public virtual RentContract? RentContract { get; set; }
         public virtual TransferContract? TransferContract { get; set; }
         public virtual ICollection<AppraisalRecord> AppraisalRecords { get; set; }
+        public virtual ICollection<RentContract> RentContracts { get; set; }
     }
 }

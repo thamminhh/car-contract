@@ -1,5 +1,7 @@
 using CleanArchitecture.Domain.Endpoints;
 using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.CarGeneration.Sub_Model;
+using CleanArchitecture.Domain.Entities_SubModel.CarMake.Sub_Model;
 using CleanArchitecture.Domain.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,6 +41,28 @@ namespace CarContractVer2.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(carGeneration);
+        }
+
+        [HttpPut]
+        [Route(CarGenerationEndpoints.Update)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public IActionResult UpdateCarMake(int carGenerationId, [FromBody] CarGenerationUpdateModel request)
+        {
+            if (request == null || carGenerationId != request.Id)
+                return BadRequest();
+
+            // Check if the car with the specified id exists
+            if (!_carGenerationRepository.CarGenerationExit(carGenerationId))
+                return NotFound();
+
+            // Update the car and its related data
+            if (!_carGenerationRepository.UpdateCarGeneration(carGenerationId, request, out string errorMessage))
+            {
+                ModelState.AddModelError("", errorMessage);
+                return StatusCode(422, ModelState);
+            }
+            return Ok("Successfully Updated");
         }
     }
 }

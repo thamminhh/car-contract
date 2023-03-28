@@ -5,6 +5,8 @@ namespace CleanArchitecture.Domain.Entities_SubModel.User.SubModel
     public class UserFilter
     {
         [AllowNull]
+        public int? ParkingLotId { get; set; }
+        [AllowNull]
         public string? Name { get; set; }
 
         [AllowNull]

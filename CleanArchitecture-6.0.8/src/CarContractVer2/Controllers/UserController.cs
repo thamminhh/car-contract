@@ -106,7 +106,7 @@ namespace CarContractVer2.Controllers
                 return StatusCode(422, ModelState);
             }
 
-            return Ok();
+            return Ok("Successfully Updated");
         }
 
         [HttpPut]

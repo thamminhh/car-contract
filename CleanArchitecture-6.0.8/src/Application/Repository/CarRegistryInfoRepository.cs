@@ -28,8 +28,7 @@ namespace CleanArchitecture.Application.Repository
             {
                 Id = id,
                 CarId = carRegistryInfos.CarId,
-                LastRegistryDate = carRegistryInfos.LastRegistryDate,
-                RegistryDate = carRegistryInfos.RegistryDate,
+                RegistrationDeadline = carRegistryInfos.RegistrationDeadline,
                 RegistryAmount = carRegistryInfos.RegistryAmount,
                 RegistryInvoice = carRegistryInfos.RegistryInvoice,
 
@@ -54,8 +53,7 @@ namespace CleanArchitecture.Application.Repository
             var carRegistryInfo = new CarRegistryInfo
             {
                 CarId = request.CarId,
-                LastRegistryDate = request.LastRegistryDate,
-                RegistryDate = request.RegistryDate,
+                RegistrationDeadline = request.RegistrationDeadline,
                 RegistryAmount = request.RegistryAmount,
                 RegistryInvoice = request.RegistryInvoice,
 
@@ -69,9 +67,7 @@ namespace CleanArchitecture.Application.Repository
             var carRegistryInfo = _contractContext.CarRegistryInfos.Find(id);
 
                 carRegistryInfo.CarId = request.CarId;
-                carRegistryInfo.LastRegistryDate = request.LastRegistryDate;
-                carRegistryInfo.RegistryDate = request.RegistryDate;
-                carRegistryInfo.RegistryAmount = request.RegistryAmount;
+                carRegistryInfo.RegistrationDeadline = request.RegistrationDeadline;
                 carRegistryInfo.RegistryInvoice = request.RegistryInvoice;
 
             _contractContext.CarRegistryInfos.Update(carRegistryInfo);

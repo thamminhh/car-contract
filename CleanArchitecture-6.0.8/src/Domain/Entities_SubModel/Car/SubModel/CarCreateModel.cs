@@ -38,30 +38,30 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
 
         public double SpeedometerNumberReceive { get; set; }
 
-        public string? PriceForDayReceive { get; set; }
+        public double? OwnerSlitRatio { get; set; }
+
+        public double? PriceForDayReceive { get; set; }
 
         public double PriceForMonthReceive { get; set; }
 
         public bool Insurance { get; set; }
 
-        public bool Maintenance { get; set; }
-
         public double LimitedKmForMonthReceive { get; set; }
 
         public double OverLimitedMileageReceive { get; set; }
 
-        public string FrontImg { get; set; }
+        public string? FrontImg { get; set; }
 
-        public string BackImg { get; set; }
+        public string? BackImg { get; set; }
 
-        public string LeftImg { get; set; }
+        public string? LeftImg { get; set; }
 
-        public string RightImg { get; set; }
+        public string? RightImg { get; set; }
 
         public string? OrtherImg { get; set; }
 
-        public DateTime CarFileCreatedDate { get; set; }
-
+        public double CarKmLastMaintenance { get; set; }
+        public DateTime RegistrationDeadline { get; set; }
         public string LinkTracking { get; set; }
 
         public string TrackingUsername { get; set; }

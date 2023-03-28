@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.CarMake.Sub_Model;
 
 namespace CleanArchitecture.Domain.Interface
 {
@@ -14,8 +15,8 @@ namespace CleanArchitecture.Domain.Interface
 
         bool CarMakeExit(int id);
 
-        bool CreateCarMake(CarMake carmake);
-        bool UpdateCarMake(CarMake carMake);
+        //public bool CreateCarMake(CarMakeCreateModel request, out string errorMessage);
+        public bool UpdateCarMake(int id, CarMakeUpdateModel request, out string errorMessage);
         bool Save();
 
     }

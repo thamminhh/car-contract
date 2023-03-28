@@ -8,6 +8,6 @@ public class CarModelEndpoints
     public const string GetSingle = Base + "/{id}";
     public const string GetByCarMakeId = Base + "/get-by-carMakeId/{carMakeId}";
     public const string Create = Base + "/create";
-    public const string Update = Base + "/update/{id}";
+    public const string Update = Base + "/update/{carModelId}";
     public const string Delete = Base + "/delete/{id}";
 }
