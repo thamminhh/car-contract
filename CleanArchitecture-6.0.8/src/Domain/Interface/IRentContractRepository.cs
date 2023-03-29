@@ -8,7 +8,9 @@ namespace CleanArchitecture.Domain.Interface
 
         RentContractDataModel GetRentContractById(int id);
 
-        RentContractDataModel GetRentContractByContractGroupId(int contractGroupId);
+        RentContractDataModel GetLastRentContractByContractGroupId(int contractGroupId);
+
+        public ICollection<RentContractDataModel> GetRentContractByContractGroupId(int contractGroupId);
 
         void CreateRentContract(RentContractCreateModel request);
 

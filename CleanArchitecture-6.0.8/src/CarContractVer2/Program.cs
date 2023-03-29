@@ -51,7 +51,7 @@ builder.Services.AddScoped<ICustomerInfoRepository, CustomerInfoRepository>();
 builder.Services.AddScoped<IContractGroupRepository, ContractGroupRepository>();
 builder.Services.AddScoped<IAppraisalRecordRepository, AppraisalRecordRepository>();
 //builder.Services.AddScoped<IContractFileRepository, ContractFileRepository>();
-//builder.Services.AddScoped<IRentContractRepository, RentContractRepository>();
+builder.Services.AddScoped<IRentContractRepository, RentContractRepository>();
 //builder.Services.AddScoped<ITransferContractRepository, TransferContractRepository>();
 //builder.Services.AddScoped<IReceiveContractRepository, ReceiveContractRepository>();
 builder.Services.AddScoped<ICarStatusRepository, CarStatusRepository>();

@@ -16,7 +16,6 @@ namespace CleanArchitecture.Domain.Entities
         public double? CarGeneralInfoAtRentLimitedKmForMonth { get; set; }
         public double? CarGeneralInfoAtRentPriceForMonth { get; set; }
         public double? DeliveryFee { get; set; }
-        public double? DownPayment { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string? CustomerSignature { get; set; }
         public string? StaffSignature { get; set; }

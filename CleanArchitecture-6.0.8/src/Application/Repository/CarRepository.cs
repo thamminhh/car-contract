@@ -210,7 +210,7 @@ namespace CleanArchitecture.Application.Repository
                 CarFileCreatedDate = car.CarFile?.CreatedDate,
                 CarKmLastMaintenance = carMaintenanceInfo.CarKmlastMaintenance,
                 KmTraveled = carMaintenanceInfo.KmTraveled,
-                RegistryDeadLine = carRegistryInfo.RegistrationDeadline,
+                RegistrationDeadline = carRegistryInfo.RegistrationDeadline,
 
                 LinkTracking = car.CarTracking.LinkTracking,
                 TrackingUsername = car.CarTracking.TrackingUsername,

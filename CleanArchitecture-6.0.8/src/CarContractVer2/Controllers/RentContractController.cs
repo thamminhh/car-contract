@@ -37,16 +37,26 @@ namespace CarContractVer2.Controllers
         }
 
         [HttpGet]
+        [Route(RentContractEndpoints.GetLastByContractGroupId)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<RentContract>))]
+        public IActionResult GetLastRentContractByContractGroupId(int contractGroupId)
+        {
+            var rentContract = _rentContractRepository.GetLastRentContractByContractGroupId(contractGroupId);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(rentContract);
+        }
+
+        [HttpGet]
         [Route(RentContractEndpoints.GetByContractGroupId)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<RentContract>))]
-        public IActionResult GetRentContractByContractGroupId(int contractGroupId)
+        public IActionResult GetListRentContractByContractGroupId(int contractGroupId)
         {
             var rentContract = _rentContractRepository.GetRentContractByContractGroupId(contractGroupId);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(rentContract);
         }
-
 
         [HttpPost]
         [Route(RentContractEndpoints.Create)]

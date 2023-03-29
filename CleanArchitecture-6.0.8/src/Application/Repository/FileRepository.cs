@@ -21,7 +21,7 @@ public class FileRepository
             _httpContextAccessor = httpContextAccessor;
     }
 
-    public PdfDocument GeneratePdfAsync(string htmlContent, string fileName)
+    public PdfDocument GeneratePdfAsync(string htmlContent)
     {
         var document = new PdfDocument();
         PdfGenerator.AddPdfPages(document, htmlContent, PageSize.A4);

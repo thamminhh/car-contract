@@ -16,5 +16,4 @@ public class AppraisalRecordCreateModel
     public string? ResultDescription { get; set; }
     public double? DepositInfoCarRental { get; set; }
     public double? DepositInfoDownPayment { get; set; }
-    public double? PaymentAmount { get; set; }
 }

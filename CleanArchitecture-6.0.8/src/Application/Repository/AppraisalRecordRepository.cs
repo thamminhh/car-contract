@@ -87,10 +87,10 @@ namespace CleanArchitecture.Application.Repository
 
             return appraisalRecordModel;
         }
-        public ICollection <AppraisalRecordDataModel> GetAppraisalRecordByContractGroupId(int contractGroupId)
+        public ICollection<AppraisalRecordDataModel> GetAppraisalRecordByContractGroupId(int contractGroupId)
         {
 
-            var  appraisalRecords = _contractContext.AppraisalRecords.Where(c => c.ContractGroupId == contractGroupId).ToList();
+            var appraisalRecords = _contractContext.AppraisalRecords.Where(c => c.ContractGroupId == contractGroupId).ToList();
 
             var host = _fileRepository.GetCurrentHost();
 
@@ -114,8 +114,8 @@ namespace CleanArchitecture.Application.Repository
                     DepositInfoDownPayment = c.DepositInfoDownPayment,
                 }).ToList();
 
-                return appraisalRecordModels;
-         }
+            return appraisalRecordModels;
+        }
 
 
         public bool AppraisalRecordExit(int id)
@@ -131,9 +131,8 @@ namespace CleanArchitecture.Application.Repository
             }
 
             string htmlContent = CreateAppraisalRecordContent(request);
-            string fileName = "AppraisalRecord" + ".pdf";
 
-            var file = _fileRepository.GeneratePdfAsync(htmlContent, fileName);
+            var file = _fileRepository.GeneratePdfAsync(htmlContent);
 
             var filePath = _fileRepository.SaveFileToFolder(file, "1");
 
@@ -147,20 +146,20 @@ namespace CleanArchitecture.Application.Repository
                 ResultDescription = request.ResultDescription,
                 FilePath = filePath,
                 DepositInfoDownPayment = request.DepositInfoDownPayment,
-                PaymentAmount = request.PaymentAmount
             };
             _contractContext.AppraisalRecords.Add(appraisalRecord);
             _contractContext.SaveChanges();
 
             var contractGroupStatus = 1;
-            if (request.ResultOfInfo == false && request.ResultOfCar == false) 
+            if (request.ResultOfInfo == false && request.ResultOfCar == false)
             {
                 contractGroupStatus = Constant.ContractGroupConstant.FailInfo;
             }
-            if(request.ResultOfInfo == true && request.ResultOfCar == false) {
+            if (request.ResultOfInfo == true && request.ResultOfCar == false)
+            {
                 contractGroupStatus = Constant.ContractGroupConstant.FailCar;
             }
-            if(request.ResultOfInfo == true && request.ResultOfCar == true)
+            if (request.ResultOfInfo == true && request.ResultOfCar == true)
             {
                 contractGroupStatus = Constant.ContractGroupConstant.ContractGroupExpertised;
             }
@@ -178,11 +177,9 @@ namespace CleanArchitecture.Application.Repository
             {
                 _contractGroupController.UpdateContractCarId(request.ContractGroupId, request.CarId);
             }
-
             string htmlContent = UpdateAppraisalRecordContent(request);
-            string fileName = "AppraisalRecord" + ".pdf";
 
-            var file = _fileRepository.GeneratePdfAsync(htmlContent, fileName);
+            var file = _fileRepository.GeneratePdfAsync(htmlContent);
 
             var filePath = _fileRepository.SaveFileToFolder(file, "1");
 
@@ -234,7 +231,7 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<h1 style='text-align:center;'>Độc lập – Tự do – Hạnh phúc</h1>";
             htmlContent += "<h1>Biên bản thẩm định </h1>";
             htmlContent += "<h2>Nhân viên thẩm định: </h2>";
-            htmlContent += "<p>Hôm nay, ngày " + request.ExpertiseDate +"</p>";
+            htmlContent += "<p>Hôm nay, ngày " + request.ExpertiseDate + "</p>";
 
             htmlContent += "<ul>";
             htmlContent += "<li>Địa chỉ: " + expertiser.CurrentAddress + "</li>";
@@ -260,15 +257,15 @@ namespace CleanArchitecture.Application.Repository
             {
                 htmlContent += "<li>Kết quả chọn xe: Đạt</li>";
             }
-            htmlContent += "<li>Mô tả kết quả: " + request.ResultDescription + " </li>"; 
+            htmlContent += "<li>Mô tả kết quả: " + request.ResultDescription + " </li>";
             htmlContent += "</ul>";
 
 
             htmlContent += "<p>Thông tin đặt cọc : </p>";
             htmlContent += "<ul>";
             htmlContent += "<li>Số tiền đặt cọc thuê xe: " + request.DepositInfoCarRental + " VNĐ</li>";
-            htmlContent += "<li>Số tiền đặt cọc: " + request.DepositInfoDownPayment+ " VNĐ</li>";
-            htmlContent += "</ul>";    
+            htmlContent += "<li>Số tiền đặt cọc: " + request.DepositInfoDownPayment + " VNĐ</li>";
+            htmlContent += "</ul>";
 
             return htmlContent;
 

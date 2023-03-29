@@ -109,7 +109,7 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
 
         public double? KmTraveled { get; set; }
 
-        public DateTime? RegistryDeadLine { get; set; }
+        public DateTime? RegistrationDeadline { get; set; }
 
         public ICollection<CarScheduleDataModel>? CarSchedules { get; set; }
 
