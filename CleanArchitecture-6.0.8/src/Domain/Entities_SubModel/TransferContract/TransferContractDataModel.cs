@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CleanArchitecture.Domain.Entities_SubModel.TransferContractFile.SubModel;
 
 namespace CleanArchitecture.Domain.Entities_SubModel.TransferContract;
 public class TransferContractDataModel
 {
     public int Id { get; set; }
     public int? TransfererId { get; set; }
-
-    public int? RepresentativeId { get; set; }
     public string? TransfererName { get; set; }
     public string? TransfererPhoneNumber { get; set; }
 
@@ -24,7 +23,6 @@ public class TransferContractDataModel
     public DateTime? CustomerCitizenIdentificationInfoDateReceive { get; set; }
 
     public string? ModelName { get; set; }
-
     public string? CarLicensePlates { get; set; }
     public int? SeatNumber { get; set; }
 
@@ -34,20 +32,15 @@ public class TransferContractDataModel
     public int? CurrentCarStateFuelPercent { get; set; }
     public double? CurrentCarStateCurrentEtcAmount { get; set; }
     public string? CurrentCarStateCarStatusDescription { get; set; }
-    public string? CurrentCarStateCarFrontImg { get; set; }
-    public string? CurrentCarStateCarBackImg { get; set; }
-    public string? CurrentCarStateCarLeftImg { get; set; }
-    public string? CurrentCarStateCarRightImg { get; set; }
-    public string? CurrentCarStateCarInteriorImg { get; set; }
-    public string? CurrentCarStateCarBackSeatImg { get; set; }
-    public string? DepositItemPaper { get; set; }
+    public double? DepositItemDownPayment { get; set; }
     public string? DepositItemAsset { get; set; }
-    public string? DepositItemAssetInfo { get; set; }
+    public string? DepositItemDescription { get; set; }
     public bool? IsExported { get; set; }
     public string? CustomerSignature { get; set; }
     public string? StaffSignature { get; set; }
-
     public string? FilePath { get; set; }
     public string? FileWithSignsPath { get; set; }
     public int? ContractStatusId { get; set; }
+
+    public ICollection<TransferContractFileDataModel> TransferContractFileDataModels { get; set; }
 }

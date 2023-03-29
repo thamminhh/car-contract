@@ -112,7 +112,6 @@ namespace CleanArchitecture.Application.Repository
                                 DocumentDescription = file.DocumentDescription,
                         });
                         }
-
                     }
                 }
                 _contractContext.CustomerInfos.Update(customerInfo);

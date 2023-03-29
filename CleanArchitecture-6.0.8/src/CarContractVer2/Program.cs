@@ -52,7 +52,7 @@ builder.Services.AddScoped<IContractGroupRepository, ContractGroupRepository>();
 builder.Services.AddScoped<IAppraisalRecordRepository, AppraisalRecordRepository>();
 //builder.Services.AddScoped<IContractFileRepository, ContractFileRepository>();
 builder.Services.AddScoped<IRentContractRepository, RentContractRepository>();
-//builder.Services.AddScoped<ITransferContractRepository, TransferContractRepository>();
+builder.Services.AddScoped<ITransferContractRepository, TransferContractRepository>();
 //builder.Services.AddScoped<IReceiveContractRepository, ReceiveContractRepository>();
 builder.Services.AddScoped<ICarStatusRepository, CarStatusRepository>();
 builder.Services.AddScoped<IContractGroupStatusRepository, ContractGroupStatusRepository>();
@@ -61,6 +61,7 @@ builder.Services.AddScoped<ICarMaintenanceInfoRepository, CarMaintenanceInfoRepo
 builder.Services.AddScoped<ICarRegistryInfoRepository, CarRegistryInfoRepository>();
 builder.Services.AddScoped<FileRepository>();
 builder.Services.AddScoped<ICustomerFileRepository, CustomerFileRepository>();
+builder.Services.AddScoped<ITransferContractFileRepository, TransferContractFileRepository>();
 builder.Services.AddScoped<ContractGroupHub>();
 builder.Services.AddHttpContextAccessor();
 
