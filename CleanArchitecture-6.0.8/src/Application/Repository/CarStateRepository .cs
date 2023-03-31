@@ -26,5 +26,12 @@ namespace CleanArchitecture.Application.Repository
         {
             return _contractContext.CarStates.Any(c => c.Id == id);
         }
+        public void UpdateCarSpeedometerNumber (int carId, double kmTraverled)
+        {
+            var carStates = _contractContext.CarStates.Where(c => c.CarId == carId).FirstOrDefault();
+            carStates.SpeedometerNumber = carStates.SpeedometerNumber + kmTraverled;
+            _contractContext.CarStates.Update(carStates);
+            _contractContext.SaveChanges();
+        }
     }
 }

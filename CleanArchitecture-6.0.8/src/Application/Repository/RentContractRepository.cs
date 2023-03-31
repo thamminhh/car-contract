@@ -1,6 +1,7 @@
 ﻿using System.Net.NetworkInformation;
 using CleanArchitecture.Application.Constant;
 using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.CarSchedules.SubModel;
 using CleanArchitecture.Domain.Entities_SubModel.ContractGroup.SubModel;
 using CleanArchitecture.Domain.Entities_SubModel.RentContract;
 using CleanArchitecture.Domain.Interface;
@@ -16,12 +17,15 @@ namespace CleanArchitecture.Application.Repository
         private readonly FileRepository _fileRepository;
         private readonly IContractGroupRepository _contractGroupRepository;
         private readonly IAppraisalRecordRepository _appraisalRecordRepository;
-        public RentContractRepository(ContractContext contractContext, FileRepository fileRepository, IContractGroupRepository contractGroupRepository, IAppraisalRecordRepository appraisalRecordRepository)
+        private readonly ICarScheduleRepository _carScheduleRepository;
+        public RentContractRepository(ContractContext contractContext, FileRepository fileRepository,
+            IContractGroupRepository contractGroupRepository, IAppraisalRecordRepository appraisalRecordRepository, ICarScheduleRepository carScheduleRepository)
         {
             _contractContext = contractContext;
             _fileRepository = fileRepository;
             _contractGroupRepository = contractGroupRepository;
             _appraisalRecordRepository = appraisalRecordRepository;
+            _carScheduleRepository = carScheduleRepository;
         }
 
         public RentContractDataModel GetRentContractById(int id)
@@ -141,7 +145,7 @@ namespace CleanArchitecture.Application.Repository
             };
         }
 
-        public ICollection <RentContractDataModel> GetRentContractByContractGroupId(int contractGroupId)
+        public ICollection<RentContractDataModel> GetRentContractByContractGroupId(int contractGroupId)
         {
             var rentContracts = _contractContext.RentContracts.Where(c => c.ContractGroupId == contractGroupId).ToList();
             var host = _fileRepository.GetCurrentHost();
@@ -210,6 +214,7 @@ namespace CleanArchitecture.Application.Repository
             string htmlContent = CreateRentContractContent(request);
             var file = _fileRepository.GeneratePdfAsync(htmlContent);
             var filePath = _fileRepository.SaveFileToFolder(file, request.ContractGroupId.ToString());
+
             //Create RentContract in db
             var defaultContractId = ContractStatusConstant.ContractExporting;
             var appraisalRecord = _appraisalRecordRepository.GetLastAppraisalRecordByContractGroupId(request.ContractGroupId);
@@ -270,31 +275,58 @@ namespace CleanArchitecture.Application.Repository
 
             rentContract.IsExported = request.IsExported;
             rentContract.PaymentAmount = request.PaymentAmount;
-
+            rentContract.CancelReason = request.CancelReason;
             rentContract.CustomerSignature = request.CustomerSignature;
             rentContract.StaffSignature = request.StaffSignature;
+
             if (request.CustomerSignature != null && request.StaffSignature != null)
             {
                 rentContract.ContractStatusId = Constant.ContractStatusConstant.ContractExported;
-                rentContract.FileWithSignsPath = filePath;
             }
             else
             {
                 rentContract.ContractStatusId = request.ContractStatusId;
             }
-            rentContract.FilePath = request.FilePath;
+            if (request.CancelReason != null)
+            {
+                rentContract.ContractStatusId = Constant.ContractStatusConstant.ContractCancelled;
+            }
+            rentContract.FileWithSignsPath = filePath;
             rentContract.DepositItemDescription = request.DepositItemDescription;
 
             _contractContext.RentContracts.Update(rentContract);
             _contractContext.SaveChanges();
 
+            if (request.CancelReason != null)
+            {
+                var contractGroupStatusRentCancel = Constant.ContractGroupConstant.RentContractCancel;
+                var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+                contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+                contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusRentCancel;
+                _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+            }
             if (request.CustomerSignature != null && request.StaffSignature != null)
             {
+                //Update ContractGroupStatus
                 var contractGroupStatusRentSigned = Constant.ContractGroupConstant.RentContractSigned;
                 var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
                 contractGroupUpdateStatusModel.Id = request.ContractGroupId;
                 contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusRentSigned;
                 _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+
+                //get ContractGroup 
+                var contractGroup = _contractContext.ContractGroups
+                .FirstOrDefault(c => c.Id == request.ContractGroupId);
+
+                //Create CarSchedule
+                var carRentStatus = Constant.CarStatusConstants.Renting;
+                var carScheduleCreateModel = new CarScheduleCreateModel();
+                carScheduleCreateModel.CarId = contractGroup.CarId;
+                carScheduleCreateModel.DateStart = contractGroup.RentFrom;
+                carScheduleCreateModel.DateStart = contractGroup.RentTo;
+                carScheduleCreateModel.CarStatusId = carRentStatus;
+                
+                _carScheduleRepository.CreateCarSchedule(carScheduleCreateModel);
             }
         }
 
@@ -311,6 +343,14 @@ namespace CleanArchitecture.Application.Repository
 
         public string CreateRentContractContent(RentContractCreateModel request)
         {
+            var representer = _contractContext.Users.FirstOrDefault(c => c.Id == request.RepresentativeId);
+            var contractGroup = _contractContext.ContractGroups
+               .Include(c => c.CustomerInfo)
+               .FirstOrDefault(c => c.Id == request.ContractGroupId);
+            var car = _contractContext.Cars
+            .Include(c => c.CarModel)
+            .FirstOrDefault(c => c.Id == contractGroup.CarId);
+            var appraisalRecord = _appraisalRecordRepository.GetLastAppraisalRecordByContractGroupId(request.ContractGroupId);
 
             string htmlContent = "<h1 style= " + "color: blue; text - align:center;" + "> CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
             htmlContent += "<h1 style= " + "color: blue; text - align:center;" + "> Độc lập – Tự do – Hạnh phúc</h1>";
@@ -321,30 +361,32 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<p>Hôm nay, ngày " + request.CreatedDate + ", chúng tôi gồm:</p>";
             htmlContent += "<h2>BÊN CHO THUÊ XE (BÊN A): </h2>";
             htmlContent += "<ul>";
-            //htmlContent += "<li>Địa chỉ: " + request.RepresentativeAddress + "</li>";
-            //htmlContent += "<li>Đại diện: " + request.RepresentativeName + "</li>";
-            //htmlContent += "<li>Điện thoại: " + request.RepresentativePhoneNumber + " </li>";
+            htmlContent += "<li>Địa chỉ: " + representer.CurrentAddress + "</li>";
+            htmlContent += "<li>Đại diện: " + representer.Name + "</li>";
+            htmlContent += "<li>Điện thoại: " + representer.PhoneNumber + " </li>";
             htmlContent += "</ul>";
             htmlContent += "<h2>BÊN THUÊ XE (BÊN B):</h2>";
-            //htmlContent += "<ul>";
-            //htmlContent += "<li>Địa chỉ hiện tại: " + request.CustomerAddress + "</li>";
-            //htmlContent += "<li>Số điện thoại: " + request.CustomerPhoneNumber + "</li>";
-            //htmlContent += "<li>CCCD/ CMND số: " + request.CustomerCitizenIdentificationInfoNumber + "</li>";
-            //htmlContent += "<li>Cấp ngày: " + request.CustomerCitizenIdentificationInfoDateReceive + "</li>";
-            //htmlContent += "</ul>";
+            htmlContent += "<ul>";
+            htmlContent += "<li>Địa chỉ hiện tại: " + contractGroup.CustomerInfo.CustomerAddress + "</li>";
+            htmlContent += "<li>Số điện thoại: " + contractGroup.CustomerInfo.PhoneNumber + "</li>";
+            htmlContent += "<li>CCCD/ CMND số: " + contractGroup.CustomerInfo.CitizenIdentificationInfoNumber + "</li>";
+            htmlContent += "<li>Cấp ngày: " + contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive + "</li>";
+            htmlContent += "</ul>";
             htmlContent += "<p>Sau khi bàn bạc, thỏa thuận, hai bên cùng nhất trí ký hợp đồng thuê xe với các điều khoản sau:</p>";
             htmlContent += "<h2>Điều I: Nội dung hợp đồng</h2>";
             htmlContent += "<p>Bên A đồng ý cho Bên B thuê xác xe ô tô để phục vụ mục đích đi lại:</p>";
             htmlContent += "<ul>";
-            //htmlContent += "<li>Hiệu xe: " + request.CarModel + "</li>";
-            //htmlContent += "<li>Biển số: " + request.CarLicensePlates + "</li>";
-            //htmlContent += "<li>Bắt đầu từ: " + request.RentFrom + " </li>";
-            //htmlContent += "<li>Đến: " + request.RentTo + "</li>";
+            htmlContent += "<li>Hiệu xe: " + car.CarModel.Name + "</li>";
+            htmlContent += "<li>Biển số: " + car.CarLicensePlates + "</li>";
+            htmlContent += "<li>Bắt đầu từ: " + contractGroup.RentFrom + " </li>";
+            htmlContent += "<li>Đến: " + contractGroup.RentTo + "</li>";
             htmlContent += "</ul>";
             htmlContent += "<h2>Điều II: Thanh toán (giá chưa bao gồm VAT)</h2>";
             htmlContent += "<ul>";
             htmlContent += "<li>Giới hạn hành trình: " + request.CarGeneralInfoAtRentLimitedKmForMonth + " Km/Ngày</li>";
-            //htmlContent += "<li>Đặt cọc giữ xe: " + request.DepositItemDownPayment + " VNĐ </li>";
+            htmlContent += "<li>Đặt cọc giữ xe: " + appraisalRecord.DepositInfoCarRental + " VNĐ </li>";
+            htmlContent += "<li>Mô tả: " + request.DepositItemDescription+ " VNĐ </li>";
+            htmlContent += "<li>Đặt cọc hợp đồng: " + appraisalRecord.DepositInfoDownPayment + " VNĐ </li>";
             htmlContent += "<li>Phí phát sinh Km: " + request.CarGeneralInfoAtRentPricePerKmExceed + "/Km</li>";
             htmlContent += "<li>Tổng tiền thuê xe: " + request.PaymentAmount + "</li>";
             htmlContent += "<li>Phí phát sinh thời gian: " + request.CarGeneralInfoAtRentPricePerHourExceed + "/giờ </li>";
@@ -411,40 +453,50 @@ namespace CleanArchitecture.Application.Repository
         public string UpdateRentContractContent(RentContractUpdateModel request)
         {
 
-            string htmlContent = "<h1 style='text-align:center;'>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
-            htmlContent += "<h1 style='text-align:center;'>Độc lập – Tự do – Hạnh phúc</h1>";
+            var representer = _contractContext.Users.FirstOrDefault(c => c.Id == request.RepresentativeId);
+            var contractGroup = _contractContext.ContractGroups
+               .Include(c => c.CustomerInfo)
+               .FirstOrDefault(c => c.Id == request.ContractGroupId);
+            var car = _contractContext.Cars
+            .Include(c => c.CarModel)
+            .FirstOrDefault(c => c.Id == contractGroup.CarId);
+            var appraisalRecord = _appraisalRecordRepository.GetLastAppraisalRecordByContractGroupId(request.ContractGroupId);
 
+            string htmlContent = "<h1 style= " + "color: blue; text - align:center;" + "> CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
+            htmlContent += "<h1 style= " + "color: blue; text - align:center;" + "> Độc lập – Tự do – Hạnh phúc</h1>";
             htmlContent += "<h2>HỢP ĐỒNG CHO THUÊ XE </h2>";
             htmlContent += "<ul><li>Căn cứ Bộ Luật dân sự số 91/2015/QH13 nước CHXHCN Việt Nam ngày 01/01/2017</li>";
             htmlContent += "<li>Căn cứ Luật thương mại số 36/2005/QH11 nước CHXHCN Việt Nam ngày 26/06/2005</li>";
             htmlContent += "<li>Căn cứ vào khả năng cung cấp và nhu cầu của hai bên.</li></ul>";
-            //htmlContent += "<p>Hôm nay, ngày " + request.CreatedDate + ", chúng tôi gồm:</p>";
+            htmlContent += "<p>Hôm nay, ngày " + DateTime.Today + ", chúng tôi gồm:</p>";
             htmlContent += "<h2>BÊN CHO THUÊ XE (BÊN A): </h2>";
-            //htmlContent += "<ul>";
-            //htmlContent += "<li>Địa chỉ: " + request.RepresentativeAddress + "</li>";
-            //htmlContent += "<li>Đại diện: " + request.RepresentativeName + "</li>";
-            //htmlContent += "<li>Điện thoại: " + request.RepresentativePhoneNumber + " </li>";
-            //htmlContent += "</ul>";
-            //htmlContent += "<h2>BÊN THUÊ XE (BÊN B):</h2>";
-            //htmlContent += "<ul>";
-            //htmlContent += "<li>Địa chỉ hiện tại: " + request.CustomerAddress + "</li>";
-            //htmlContent += "<li>Số điện thoại: " + request.CustomerPhoneNumber + "</li>";
-            //htmlContent += "<li>CCCD/ CMND số: " + request.CustomerCitizenIdentificationInfoNumber + " </li>";
-            //htmlContent += "<li>Cấp ngày: " + request.CustomerCitizenIdentificationInfoDateReceive + " </li>";
+            htmlContent += "<ul>";
+            htmlContent += "<li>Địa chỉ: " + representer.CurrentAddress + "</li>";
+            htmlContent += "<li>Đại diện: " + representer.Name + "</li>";
+            htmlContent += "<li>Điện thoại: " + representer.PhoneNumber + " </li>";
+            htmlContent += "</ul>";
+            htmlContent += "<h2>BÊN THUÊ XE (BÊN B):</h2>";
+            htmlContent += "<ul>";
+            htmlContent += "<li>Địa chỉ hiện tại: " + contractGroup.CustomerInfo.CustomerAddress + "</li>";
+            htmlContent += "<li>Số điện thoại: " + contractGroup.CustomerInfo.PhoneNumber + "</li>";
+            htmlContent += "<li>CCCD/ CMND số: " + contractGroup.CustomerInfo.CitizenIdentificationInfoNumber + "</li>";
+            htmlContent += "<li>Cấp ngày: " + contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive + "</li>";
             htmlContent += "</ul>";
             htmlContent += "<p>Sau khi bàn bạc, thỏa thuận, hai bên cùng nhất trí ký hợp đồng thuê xe với các điều khoản sau:</p>";
             htmlContent += "<h2>Điều I: Nội dung hợp đồng</h2>";
             htmlContent += "<p>Bên A đồng ý cho Bên B thuê xác xe ô tô để phục vụ mục đích đi lại:</p>";
             htmlContent += "<ul>";
-            //htmlContent += "<li>Hiệu xe: " + request.CarModel + "</li>";
-            //htmlContent += "<li>Biển số: " + request.CarLicensePlates + "</li>";
-            //htmlContent += "<li>Bắt đầu từ: " + request.RentFrom + " </li>";
-            //htmlContent += "<li>Đến: " + request.RentTo + "</li>";
+            htmlContent += "<li>Hiệu xe: " + car.CarModel.Name + "</li>";
+            htmlContent += "<li>Biển số: " + car.CarLicensePlates + "</li>";
+            htmlContent += "<li>Bắt đầu từ: " + contractGroup.RentFrom + " </li>";
+            htmlContent += "<li>Đến: " + contractGroup.RentTo + "</li>";
             htmlContent += "</ul>";
             htmlContent += "<h2>Điều II: Thanh toán (giá chưa bao gồm VAT)</h2>";
             htmlContent += "<ul>";
             htmlContent += "<li>Giới hạn hành trình: " + request.CarGeneralInfoAtRentLimitedKmForMonth + " Km/Ngày</li>";
-            //htmlContent += "<li>Đặt cọc giữ xe: " + request.DepositItemDownPayment + " VNĐ </li>";
+            htmlContent += "<li>Đặt cọc giữ xe: " + appraisalRecord.DepositInfoCarRental + " VNĐ </li>";
+            htmlContent += "<li>Mô tả: " + request.DepositItemDescription + " VNĐ </li>";
+            htmlContent += "<li>Đặt cọc hợp đồng: " + appraisalRecord.DepositInfoDownPayment + " VNĐ </li>";
             htmlContent += "<li>Phí phát sinh Km: " + request.CarGeneralInfoAtRentPricePerKmExceed + "/Km</li>";
             htmlContent += "<li>Tổng tiền thuê xe: " + request.PaymentAmount + "</li>";
             htmlContent += "<li>Phí phát sinh thời gian: " + request.CarGeneralInfoAtRentPricePerHourExceed + "/giờ </li>";
@@ -497,7 +549,7 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<li>2. Hợp đồng này được lập thành 02 bản có giá trị pháp lý như nhau và có hiệu lực kể từ ngày ký.</li>";
             htmlContent += "</ul>";
 
-            htmlContent += "<h3>&nbsp;&nbsp;&nbsp;&nbsp;BÊN A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+            htmlContent += "<h3>&nbsp;&nbsp;&nbsp;&nbsp;BÊN A &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
                 "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
                 "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
                 ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
@@ -510,6 +562,11 @@ namespace CleanArchitecture.Application.Repository
             }
             if (request.CustomerSignature != null)
             {
+                htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
+               ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
                 htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;<img style= 'width:100px; height:100%' src='" + request.CustomerSignature + "' />";
             }
 

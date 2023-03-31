@@ -20,10 +20,9 @@ public class RentContractUpdateModel
     public double? DeliveryFee { get; set; }
     public string? CustomerSignature { get; set; }
     public string? StaffSignature { get; set; }
-    public string? FilePath { get; set; }
-    public string? FileWithSignsPath { get; set; }
     public bool? IsExported { get; set; }
     public double? PaymentAmount { get; set; }
     public string? DepositItemDescription { get; set; }
+    public string? CancelReason { get; set; }
     public int? ContractStatusId { get; set; }
 }

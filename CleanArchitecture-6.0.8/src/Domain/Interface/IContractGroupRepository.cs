@@ -10,6 +10,8 @@ namespace CleanArchitecture.Domain.Interface
 
         ICollection<ContractGroupDataModel> GetContractGroups(int page, int pageSize, ContractFilter filter);
 
+        ICollection<ContractGroupDataModel> GetContractGroupsByParkingLotId(int page, int pageSize,int parkingLotId, ContractFilter filter);
+
         ContractGroupDataModel GetContractGroupById(int contractGroupId);
         
         bool ContractGroupExit(int id);

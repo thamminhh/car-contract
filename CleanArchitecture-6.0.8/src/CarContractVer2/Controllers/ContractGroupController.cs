@@ -34,6 +34,17 @@ namespace CarContractVer2.Controllers
                 return BadRequest(ModelState);
             return Ok(new { contracts = listContractGroup, total = count });
         }
+        [HttpGet]
+        [Route(ContractGroupEndpoints.GetByParkingLotId)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ContractGroup>))]
+        public IActionResult GetContractGroupByParkingLotId( int parkingLotId, [FromQuery] ContractFilter filter, int page = 1, int pageSize = 10)
+        {
+            var count = _contractGroupRepository.GetNumberOfContracts(filter);
+            var listContractGroup = _contractGroupRepository.GetContractGroupsByParkingLotId(page, pageSize,parkingLotId, filter);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(new { contracts = listContractGroup, total = count });
+        }
         //[HttpGet]
         //[Route(ContractGroupEndpoints.GetSingle)]
         //[ProducesResponseType(200, Type = typeof(IEnumerable<ContractGroup>))]

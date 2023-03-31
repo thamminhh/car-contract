@@ -218,22 +218,22 @@ namespace CleanArchitecture.Application.Repository
             transferContract.IsExported = request.IsExported;
             transferContract.CustomerSignature = request.CustomerSignature;
             transferContract.StaffSignature = request.StaffSignature;
-            transferContract.FilePath = filePath;
+            transferContract.FileWithSignsPath = filePath;
+            transferContract.ContractGroupId = request.ContractGroupId;
             if (request.CustomerSignature != null && request.StaffSignature != null)
             {
                 transferContract.ContractStatusId = Constant.ContractStatusConstant.ContractExported;
-                transferContract.FileWithSignsPath = filePath;
             }
             else
             {
                 transferContract.ContractStatusId = request.ContractStatusId;
             }
-            if(transferContractFiles != null)
+            if (transferContractFiles != null)
             {
                 foreach (var transferContractFile in transferContractFiles)
                 {
                     var existingFile = _contractContext.TransferContractFiles.FirstOrDefault(cf => cf.Id == transferContractFile.Id && cf.TransferContractId == transferContract.Id);
-                    if(existingFile != null)
+                    if (existingFile != null)
                     {
                         existingFile.Title = transferContractFile.Title ?? existingFile.Title;
                         existingFile.DocumentImg = transferContractFile.DocumentImg ?? existingFile.DocumentImg;
@@ -252,7 +252,6 @@ namespace CleanArchitecture.Application.Repository
                 }
 
             }
-
             _contractContext.TransferContracts.Update(transferContract);
             _contractContext.SaveChanges();
 
@@ -427,6 +426,11 @@ namespace CleanArchitecture.Application.Repository
             }
             if (request.CustomerSignature != null)
             {
+                htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
+              ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
                 htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;<img style= 'width:100px; height:100%' src='" + request.CustomerSignature + "' />";
             }
 

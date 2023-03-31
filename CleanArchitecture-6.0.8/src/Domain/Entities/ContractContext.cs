@@ -543,9 +543,9 @@ namespace CleanArchitecture.Domain.Entities
                     .HasMaxLength(255)
                     .HasColumnName("DepositItem_Asset");
 
-                entity.Property(e => e.DepositItemAssetInfo)
+                entity.Property(e => e.DepositItemDescription)
                     .HasMaxLength(255)
-                    .HasColumnName("DepositItem_AssetInfo");
+                    .HasColumnName("DepositItem_Description");
 
                 entity.Property(e => e.DepositItemDownPayment).HasColumnName("DepositItem_DownPayment");
 
@@ -585,9 +585,9 @@ namespace CleanArchitecture.Domain.Entities
             {
                 entity.ToTable("ReceiveContractFile");
 
-                entity.Property(e => e.Title)
-                    .HasMaxLength(255)
-                    .HasColumnName("Title ");
+                entity.Property(e => e.DocumentDescription).HasMaxLength(255);
+
+                entity.Property(e => e.Title).HasMaxLength(255);
 
                 entity.HasOne(d => d.ReceiveContract)
                     .WithMany(p => p.ReceiveContractFiles)

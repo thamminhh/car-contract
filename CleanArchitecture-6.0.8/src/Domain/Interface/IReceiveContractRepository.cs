@@ -6,7 +6,7 @@ namespace CleanArchitecture.Domain.Interface
     public interface IReceiveContractRepository
     {
 
-        ReceiveContractDataModel GetReceiveContractById(int id);
+        //ReceiveContractDataModel GetReceiveContractById(int id);
 
         ReceiveContractDataModel GetReceiveContractByContractGroupId(int contractGroupId);
 

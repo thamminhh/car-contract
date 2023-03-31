@@ -21,7 +21,7 @@ namespace CleanArchitecture.Domain.Entities
         public double? CurrentCarStateCurrentEtcAmount { get; set; }
         public string? CurrentCarStateCarStatusDescription { get; set; }
         public string? DepositItemAsset { get; set; }
-        public string? DepositItemAssetInfo { get; set; }
+        public string? DepositItemDescription { get; set; }
         public double? DepositItemDownPayment { get; set; }
         public bool? ReturnDepostiItem { get; set; }
         public DateTime? CreatedDate { get; set; }

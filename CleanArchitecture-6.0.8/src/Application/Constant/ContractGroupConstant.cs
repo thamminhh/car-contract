@@ -14,7 +14,9 @@ public class ContractGroupConstant
     public const int ReceiveContractNotCreate       = 11; //"Chưa tạo HĐ nhận"
     public const int ReceiveContractNotSign         = 12; //"Chưa kí HĐ nhận""
     public const int ReceiveContractSigned          = 13; //"Đã kí HĐ nhận"
-    public const int ContractCancel                 = 14; //"Đã Hủy"
+    public const int RentContractCancel             = 14; //"Đã Hủy HĐ thuê"
+    public const int TransferContractCancel         = 15; //"Đã Hủy HĐ giao"
+    public const int ContractInspecting             = 16; //"Đang nghiệm thu"
 
     //public const string RentContractNotExisted = "Hợp đồng thuê không tồn tại !";
     //public const string RentContractNotFinished = "Hợp đồng thuê chưa hoàn thành !";

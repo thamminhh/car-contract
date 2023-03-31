@@ -5,6 +5,7 @@ public class ContractGroupEndpoints
     public const string Area = "";
     public const string Base = Area + "/contractgroup";
     public const string GetAll = Base;
+    public const string GetByParkingLotId = Base +"/parking-lot-id/{parkingLotId}";
     public const string GetSingle = Base + "/{contractGroupId}";
     public const string Create = Base + "/create";
     public const string Update = Base + "/update/{id}";

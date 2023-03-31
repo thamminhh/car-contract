@@ -163,6 +163,56 @@ namespace CleanArchitecture.Application.Repository
             return contractGroupDataModels;
         }
 
+        public ICollection<ContractGroupDataModel> GetContractGroupsByParkingLotId(int page, int pageSize, int parkingLotId, ContractFilter filter)
+
+        {
+            if (page < 1)
+            {
+                page = 1;
+            }
+
+            if (pageSize < 1)
+            {
+                pageSize = 10;
+            }
+
+            int skip = (page - 1) * pageSize;
+
+            IQueryable<ContractGroup> contractGroups = _contractContext.ContractGroups
+                .Include(c => c.CustomerInfo)
+                .Include(c => c.User)
+                .Include(c => c.ContractGroupStatus)
+                .Where(c => c.Car.ParkingLotId == parkingLotId)
+                .AsQueryable();
+
+            if (filter != null)
+            {
+                if (filter.ContractGroupStatusId.HasValue)
+                {
+                    contractGroups = contractGroups.Where(c => c.ContractGroupStatusId == filter.ContractGroupStatusId);
+                }
+                if (filter.UserId.HasValue)
+                {
+                    contractGroups = contractGroups.Where(c => c.UserId == filter.UserId);
+                }
+            }
+
+            var contractGroupDataModels = contractGroups
+                .OrderByDescending(c => c.Id)
+                .Skip(skip)
+                .Take(pageSize)
+                .Select(c => new ContractGroupDataModel
+                {
+                    Id = c.Id,
+                    CustomerName = c.CustomerInfo.CustomerName,
+                    UserId = c.UserId,
+                    StaffEmail = c.User.Email,
+                    ContractGroupStatusId = c.ContractGroupStatusId,
+                    ContractGroupStatusName = c.ContractGroupStatus.Name,
+                })
+                .ToList();
+            return contractGroupDataModels;
+        }
 
         public bool ContractGroupExit(int id)
         {
@@ -240,7 +290,6 @@ namespace CleanArchitecture.Application.Repository
                 _contractContext.SaveChanges();
             }
         }
-
 
         public void UpdateContractGroup(int id, ContractGroupUpdateModel request)
         {
@@ -347,6 +396,7 @@ namespace CleanArchitecture.Application.Repository
             ContractGroup.CarId = carId;
             return Save();
         }
+
 
         //public ICollection<ContractGroupDataModel> GetContractGroups(int page, int pageSize, ContractFilter filter)
         //{

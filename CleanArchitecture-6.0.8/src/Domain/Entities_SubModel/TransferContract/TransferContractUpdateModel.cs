@@ -23,8 +23,6 @@ public class TransferContractUpdateModel
     public bool? IsExported { get; set; }
     public string? CustomerSignature { get; set; }
     public string? StaffSignature { get; set; }
-    public string? FilePath { get; set; }
-    public string? FileWithSignsPath { get; set; }
     public int? ContractStatusId { get; set; }
     public ICollection<TransferContractFileDataModel> TransferContractFileDataModels { get; set; }
 }

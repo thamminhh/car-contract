@@ -49,6 +49,7 @@ namespace CleanArchitecture.Application.Repository
                 ResultDescription = appraisalRecord.ResultDescription,
                 FilePath = host + appraisalRecord.FilePath,
                 DepositInfoDownPayment = appraisalRecord.DepositInfoDownPayment,
+                DepositInfoCarRental = appraisalRecord.DepositInfoCarRental,
             };
         }
 
@@ -83,6 +84,8 @@ namespace CleanArchitecture.Application.Repository
                 ResultDescription = lastRecord.ResultDescription,
                 FilePath = host + lastRecord.FilePath,
                 DepositInfoDownPayment = lastRecord.DepositInfoDownPayment,
+                DepositInfoCarRental = lastRecord.DepositInfoCarRental,
+
             };
 
             return appraisalRecordModel;
@@ -112,6 +115,8 @@ namespace CleanArchitecture.Application.Repository
                     ResultDescription = c.ResultDescription,
                     FilePath = host + c.FilePath,
                     DepositInfoDownPayment = c.DepositInfoDownPayment,
+                    DepositInfoCarRental = c.DepositInfoCarRental,
+
                 }).ToList();
 
             return appraisalRecordModels;
@@ -146,6 +151,7 @@ namespace CleanArchitecture.Application.Repository
                 ResultDescription = request.ResultDescription,
                 FilePath = filePath,
                 DepositInfoDownPayment = request.DepositInfoDownPayment,
+                DepositInfoCarRental = request.DepositInfoCarRental,
             };
             _contractContext.AppraisalRecords.Add(appraisalRecord);
             _contractContext.SaveChanges();
