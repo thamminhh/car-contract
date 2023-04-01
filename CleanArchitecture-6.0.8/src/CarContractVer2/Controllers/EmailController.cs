@@ -22,13 +22,14 @@ public class EmailController : ControllerBase
             subject = "test mail";
             // Create the email message
             MailMessage message = new MailMessage();
-            message.From = new MailAddress("lauren33@ethereal.email");
+            message.From = new MailAddress("minhtqse130067@fpt.edu.vn");
             message.To.Add(recipient);
             message.Subject = subject;
             message.Body = body;
 
-            // Send the email
+            // Send the emails
             client.Send(message);
+            //this is need to be fix
 
             return Ok();
         }
