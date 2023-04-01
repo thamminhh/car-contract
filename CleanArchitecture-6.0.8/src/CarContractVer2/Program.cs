@@ -12,6 +12,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using CleanArchitecture.Application.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using CleanArchitecture.Domain.Entities_SubModel.Email;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
@@ -64,6 +66,7 @@ builder.Services.AddScoped<ICustomerFileRepository, CustomerFileRepository>();
 builder.Services.AddScoped<ITransferContractFileRepository, TransferContractFileRepository>();
 builder.Services.AddScoped<IReceiveContractFileRepository, ReceiveContractFileRepository>();
 builder.Services.AddScoped<ContractGroupHub>();
+builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSwaggerGen(options =>

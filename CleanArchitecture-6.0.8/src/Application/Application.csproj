@@ -25,6 +25,8 @@
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.11" />
         <PackageReference Include="Polybioz.HtmlRenderer.PdfSharp.Core" Version="1.0.0" />
         <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="6.0.0" />
+        <PackageReference Include="MimeKit" Version="3.6.1" />
+        <PackageReference Include="MailKit" Version="3.6.0" />
     </ItemGroup>
 
     <ItemGroup>

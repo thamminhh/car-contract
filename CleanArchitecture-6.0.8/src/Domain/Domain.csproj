@@ -20,4 +20,10 @@
       <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.11" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Entities_SubModel\Email\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Entities_SubModel\Email\" />
+    </ItemGroup>
 </Project>

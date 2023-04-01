@@ -24,6 +24,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="6.0.0" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="6.0.0" />
+    <PackageReference Include="MailKit" Version="3.6.0" />
+    <PackageReference Include="MimeKit" Version="3.6.1" />
   </ItemGroup>
 
   <ItemGroup>
