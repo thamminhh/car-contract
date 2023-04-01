@@ -27,6 +27,7 @@ namespace CleanArchitecture.Domain.Interface
         bool UpdateContractCarId(int id, int? carId);
 
         int GetNumberOfContracts(ContractFilter filter);
+        int GetContractGroupsByParkingLotId(int parkingLotId, ContractFilter filter);
 
     }
 }

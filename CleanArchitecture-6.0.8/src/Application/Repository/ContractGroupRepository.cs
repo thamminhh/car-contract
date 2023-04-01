@@ -67,6 +67,32 @@ namespace CleanArchitecture.Application.Repository
                 return contracts.Count();
             }
         }
+
+        public int GetContractGroupsByParkingLotId(int parkingLotId, ContractFilter filter)
+        {
+            {
+                IQueryable<ContractGroup> contractGroups = _contractContext.ContractGroups
+                    .Include(c => c.CustomerInfo)
+                    .Include(c => c.User)
+                    .Include(c => c.ContractGroupStatus)
+                    .Where(c => c.Car.ParkingLotId == parkingLotId)
+                    .AsQueryable();
+
+                if (filter != null)
+                {
+                    if (filter.ContractGroupStatusId.HasValue)
+                    {
+                        contractGroups = contractGroups.Where(c => c.ContractGroupStatusId == filter.ContractGroupStatusId);
+                    }
+                    if (filter.UserId.HasValue)
+                    {
+                        contractGroups = contractGroups.Where(c => c.UserId == filter.UserId);
+                    }
+
+                }
+                return contractGroups.Count();
+            }
+        }
         public ContractGroupDataModel GetContractGroupById(int contractGroupId)
         {
             ContractGroup contractGroup = _contractContext.ContractGroups
