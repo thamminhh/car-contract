@@ -68,6 +68,7 @@ namespace CleanArchitecture.Application.Repository
 
                 carRegistryInfo.CarId = request.CarId;
                 carRegistryInfo.RegistrationDeadline = request.RegistrationDeadline;
+                carRegistryInfo.RegistryAmount = request.RegistryAmount;
                 carRegistryInfo.RegistryInvoice = request.RegistryInvoice;
 
             _contractContext.CarRegistryInfos.Update(carRegistryInfo);

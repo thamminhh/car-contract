@@ -61,16 +61,16 @@ namespace CarContractVer2.Controllers
             return Ok(new { cars = listCar, total = count });
         }
 
-        //[HttpGet]
-        //[Route(CarEndpoints.GetCarsRegistry)]
-        //[ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
-        //public IActionResult GetCarsRegistry()
-        //{
-        //    var listCar = _carRepository.GetCarsRegistry();
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-        //    return Ok(new { cars = listCar, /*total = count*/ });
-        //}
+        [HttpGet]
+        [Route(CarEndpoints.GetCarsRegistry)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
+        public IActionResult GetCarsRegistry()
+        {
+            var listCar = _carRepository.GetCarsRegistry();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(new { cars = listCar, /*total = count*/ });
+        }
 
         //[HttpGet]
         //[Route(CarEndpoints.GetByStatus)]

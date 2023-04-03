@@ -8,9 +8,7 @@ namespace CleanArchitecture.Domain.Entities_SubModel.CarRegistryInfo.SubModel;
 public class CarRegistryInfoCreateModel
 {
     public int? CarId { get; set; }
-    public DateTime? LastRegistryDate { get; set; }
-    public DateTime? RegistryDate { get; set; }
+    public DateTime? RegistrationDeadline { get; set; }
     public double? RegistryAmount { get; set; }
     public string? RegistryInvoice { get; set; }
-    public DateTime? RegistrationDeadline { get; set; }
 }

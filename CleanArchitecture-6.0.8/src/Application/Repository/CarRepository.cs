@@ -435,38 +435,101 @@ namespace CleanArchitecture.Application.Repository
             return response;
         }
 
-    //    public ICollection<CarDataModel> GetCarsRegistry()
-    //    {
-    //        var currentUtcDateTime = DateTime.Today;
-    //        var year = 365;
 
-    //        var cars = _contractContext.Cars
-    //        .Include(c => c.CarStatus)
-    //        .Include(c => c.CarFile)
-    //        .Select(c => new CarDataModel
-    //        {
-    //            Id = c.Id,
-    //            CarStatusId = c.CarStatusId,
-    //            CarStatus = c.CarStatus.Name,
-    //            CarLicensePlates = c.CarLicensePlates,
-    //            SeatNumber = c.SeatNumber,
-    //            ModelYear = c.ModelYear,
-    //            CarModelId = c.CarModelId,
-    //            ModelName = c.CarModel.Name, // Set the ModelName property to the CarModel's Name property
-    //            IsDeleted = c.IsDeleted,
-    //            CarColor = c.CarColor,
-    //            CarFuel = c.CarFuel,
-    //            FrontImg = c.CarFile.FrontImg,
-    //            LastRegistryDate = c.CarRegistryInfos.OrderByDescending(m => m.Id).FirstOrDefault().LastRegistryDate,
+        //public ICollection<CarDataModel> GetCarsRegistry()
+        //{
+        //    var currentDateTime = DateTime.Today;
 
-    //        })
-    //        .AsEnumerable() // execute the query up to this point
-    //.Where(c => _contractContext.CarRegistryInfos
-    //    .Where(cr => cr.CarId == c.Id && cr.LastRegistryDate != null)
-    //    .Any(cr => Math.Round((currentUtcDateTime - cr.LastRegistryDate.Value).TotalDays) >= year))
-    //.ToList();
-    //        return cars;
-    //    }
+        //    var cars = _contractContext.Cars
+        //        .Include(c => c.CarStatus)
+        //        .Include(c => c.CarFile)
+        //        .Where(c => c.CarRegistryInfos.Any(m => EF.Functions.DateDiffDay(m.RegistrationDeadline, currentDateTime) <= 30))
+        //        .Select(c => new CarDataModel
+        //        {
+        //            Id = c.Id,
+        //            CarStatusId = c.CarStatusId,
+        //            CarStatus = c.CarStatus.Name,
+        //            CarLicensePlates = c.CarLicensePlates,
+        //            SeatNumber = c.SeatNumber,
+        //            ModelYear = c.ModelYear,
+        //            CarModelId = c.CarModelId,
+        //            ModelName = c.CarModel.Name,
+        //            IsDeleted = c.IsDeleted,
+        //            CarColor = c.CarColor,
+        //            CarFuel = c.CarFuel,
+        //            FrontImg = c.CarFile.FrontImg,
+        //            RegistrationDeadline = c.CarRegistryInfos
+        //                .OrderByDescending(m => m.Id)
+        //                .FirstOrDefault().RegistrationDeadline,
+        //        })
+        //        .ToList();
+
+        //    return cars;
+        //}
+
+        public ICollection<CarDataModel> GetCarsRegistry()
+        {
+            var currentDateTime = DateTime.Today;
+
+            var cars = _contractContext.Cars
+                .Include(c => c.CarStatus)
+                .Include(c => c.CarFile)
+                .Select(c => new CarDataModel
+                {
+                    Id = c.Id,
+                    CarStatusId = c.CarStatusId,
+                    CarStatus = c.CarStatus.Name,
+                    CarLicensePlates = c.CarLicensePlates,
+                    SeatNumber = c.SeatNumber,
+                    ModelYear = c.ModelYear,
+                    CarModelId = c.CarModelId,
+                    ModelName = c.CarModel.Name,
+                    IsDeleted = c.IsDeleted,
+                    CarColor = c.CarColor,
+                    CarFuel = c.CarFuel,
+                    FrontImg = c.CarFile.FrontImg,
+                    RegistrationDeadline = c.CarRegistryInfos
+                        .OrderByDescending(m => m.Id)
+                        .FirstOrDefault().RegistrationDeadline,
+                })
+                .Where(c => (EF.Functions.DateDiffDay(currentDateTime, c.RegistrationDeadline ) <= 30))
+
+                .ToList();
+
+            return cars;
+        }
+
+
+        //public ICollection<CarDataModel> GetCarsRegistry()
+        //{
+        //    var currentUtcDateTime = DateTime.Today;
+
+        //    var cars = _contractContext.Cars
+        //        .Include(c => c.CarStatus)
+        //        .Include(c => c.CarFile)
+        //        .Select(c => new CarDataModel
+        //        {
+        //            Id = c.Id,
+        //            CarStatusId = c.CarStatusId,
+        //            CarStatus = c.CarStatus.Name,
+        //            CarLicensePlates = c.CarLicensePlates,
+        //            SeatNumber = c.SeatNumber,
+        //            ModelYear = c.ModelYear,
+        //            CarModelId = c.CarModelId,
+        //            ModelName = c.CarModel.Name,
+        //            IsDeleted = c.IsDeleted,
+        //            CarColor = c.CarColor,
+        //            CarFuel = c.CarFuel,
+        //            FrontImg = c.CarFile.FrontImg,
+        //            RegistrationDeadline = c.CarRegistryInfos
+        //                .OrderByDescending(m => m.Id)
+        //                .FirstOrDefault().RegistrationDeadline,
+        //        })
+        //        .Where(c => (c.RegistrationDeadline.Value.CompareTo(currentUtcDateTime) <= 30))
+        //        .ToList();
+
+        //    return cars;
+        //}
 
 
         public ICollection<Car> GetCarsByStatusId(int page, int pageSize, int carStatusId)
@@ -606,7 +669,7 @@ namespace CleanArchitecture.Application.Repository
             {
                 CarId = car.Id,
                 CarKmlastMaintenance = request.CarKmLastMaintenance,
-                KmTraveled = request.SpeedometerNumber - request.CarKmLastMaintenance ,
+                KmTraveled = request.SpeedometerNumber - request.CarKmLastMaintenance,
             };
             _contractContext.CarMaintenanceInfos.Add(carMaintenanceInfo);
             _contractContext.SaveChanges();
