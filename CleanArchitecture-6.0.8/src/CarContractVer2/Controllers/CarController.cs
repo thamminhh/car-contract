@@ -64,12 +64,12 @@ namespace CarContractVer2.Controllers
         [HttpGet]
         [Route(CarEndpoints.GetCarsRegistry)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
-        public IActionResult GetCarsRegistry()
+        public IActionResult GetCarsRegistry(int page = 1, int pageSize = 10)
         {
-            var listCar = _carRepository.GetCarsRegistry();
+            var listCar = _carRepository.GetCarsRegistry(page, pageSize, out int count);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            return Ok(new { cars = listCar, /*total = count*/ });
+            return Ok(new { cars = listCar, total = count });
         }
 
         //[HttpGet]

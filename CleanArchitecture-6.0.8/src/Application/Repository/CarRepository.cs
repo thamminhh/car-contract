@@ -467,8 +467,19 @@ namespace CleanArchitecture.Application.Repository
         //    return cars;
         //}
 
-        public ICollection<CarDataModel> GetCarsRegistry()
+        public ICollection<CarDataModel> GetCarsRegistry(int page, int pageSize, out int count)
         {
+            if (page < 1)
+            {
+                page = 1;
+            }
+
+            if (pageSize < 1)
+            {
+                pageSize = 10;
+            }
+            int skip = (page - 1) * pageSize;
+
             var currentDateTime = DateTime.Today;
 
             var cars = _contractContext.Cars
@@ -495,8 +506,9 @@ namespace CleanArchitecture.Application.Repository
                 .Where(c => (EF.Functions.DateDiffDay(currentDateTime, c.RegistrationDeadline ) <= 30))
 
                 .ToList();
-
-            return cars;
+            count = cars.Count();
+            var response = cars.Skip(skip).Take(pageSize).ToList();
+            return response;
         }
 
 
