@@ -60,7 +60,6 @@ namespace CleanArchitecture.Application.Repository
             {
                 CarId = request.CarId,
                 CarKmlastMaintenance = request.CarKmlastMaintenance,
-                KmTraveled = request.KmTraveled,
                 MaintenanceDate = request.MaintenanceDate,
                 MaintenanceInvoice = request.MaintenanceInvoice,
                 MaintenanceAmount = request.MaintenanceAmount

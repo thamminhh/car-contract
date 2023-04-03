@@ -300,7 +300,6 @@ namespace CleanArchitecture.Application.Repository
             receiveContract.OrtherViolation = request.OrtherViolation;
             receiveContract.ViolationMoney = request.ViolationMoney;
 
-
             _contractContext.ReceiveContracts.Update(receiveContract);
             _contractContext.SaveChanges();
 
@@ -317,12 +316,32 @@ namespace CleanArchitecture.Application.Repository
 
                 var contractGroup = _contractContext.ContractGroups
                 .FirstOrDefault(c => c.Id == request.ContractGroupId);
+
                 //Update CarStatus 
                 var carAvailableStatus = Constant.CarStatusConstants.Available;
                 var carStatusUpdateModel = new CarUpdateStatusModel();
                 carStatusUpdateModel.id = (int)contractGroup.CarId;
                 carStatusUpdateModel.CarStatusId = carAvailableStatus;
                 _carRepository.UpdateCarStatus((int)contractGroup.CarId, carStatusUpdateModel);
+                _contractContext.SaveChanges();
+
+                //Update CarState
+                var carState = _contractContext.CarStates.Where(c => c.CarId == contractGroup.CarId).FirstOrDefault();
+                carState.CurrentEtcAmount = request.CurrentCarStateCurrentEtcAmount;
+                carState.FuelPercent = request.CurrentCarStateFuelPercent;
+                carState.SpeedometerNumber = request.CurrentCarStateSpeedometerNumber;
+                _contractContext.CarStates.Update(carState);
+                _contractContext.SaveChanges();
+
+                //Update CarMaintainanceInfo
+                var carMaintenanceInfo = _contractContext.CarMaintenanceInfos
+                    .Where(c => c.CarId == contractGroup.CarId)
+                    .OrderByDescending(c => c.Id)
+                    .FirstOrDefault();
+
+                carMaintenanceInfo.KmTraveled = carMaintenanceInfo.KmTraveled + request.TotalKilometersTraveled;
+                _contractContext.CarMaintenanceInfos.Update(carMaintenanceInfo);
+                _contractContext.SaveChanges();
             }
         }
 

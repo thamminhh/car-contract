@@ -50,21 +50,25 @@ namespace CleanArchitecture.Application.Repository
         public int GetNumberOfContracts(ContractFilter filter)
         {
             {
-                IQueryable<ContractGroup> contracts = _contractContext.ContractGroups;
+                IQueryable<ContractGroup> contractGroups = _contractContext.ContractGroups;
 
                 if (filter != null)
                 {
                     if (filter.ContractGroupStatusId.HasValue)
                     {
-                        contracts = contracts.Where(c => c.ContractGroupStatusId == filter.ContractGroupStatusId);
+                        contractGroups = contractGroups.Where(c => c.ContractGroupStatusId == filter.ContractGroupStatusId);
                     }
                     if (filter.UserId.HasValue)
                     {
-                        contracts = contracts.Where(c => c.UserId == filter.UserId);
+                        contractGroups = contractGroups.Where(c => c.UserId == filter.UserId);
+                    }
+                    if (!string.IsNullOrWhiteSpace(filter.CitizenIdentificationInfoNumber))
+                    {
+                        contractGroups = contractGroups.Where(c => c.CustomerInfo.CitizenIdentificationInfoNumber == filter.CitizenIdentificationInfoNumber);
                     }
 
                 }
-                return contracts.Count();
+                return contractGroups.Count();
             }
         }
 
@@ -87,6 +91,10 @@ namespace CleanArchitecture.Application.Repository
                     if (filter.UserId.HasValue)
                     {
                         contractGroups = contractGroups.Where(c => c.UserId == filter.UserId);
+                    }
+                    if (!string.IsNullOrWhiteSpace(filter.CitizenIdentificationInfoNumber))
+                    {
+                        contractGroups = contractGroups.Where(c => c.CustomerInfo.CitizenIdentificationInfoNumber == filter.CitizenIdentificationInfoNumber);
                     }
 
                 }
@@ -169,6 +177,11 @@ namespace CleanArchitecture.Application.Repository
                 {
                     contractGroups = contractGroups.Where(c => c.UserId == filter.UserId);
                 }
+                if (!string.IsNullOrWhiteSpace(filter.CitizenIdentificationInfoNumber))
+                {
+                    contractGroups = contractGroups.Where(c => c.CustomerInfo.CitizenIdentificationInfoNumber == filter.CitizenIdentificationInfoNumber);
+                }
+
             }
 
             var contractGroupDataModels = contractGroups
@@ -183,6 +196,7 @@ namespace CleanArchitecture.Application.Repository
                     StaffEmail = c.User.Email,
                     ContractGroupStatusId = c.ContractGroupStatusId,
                     ContractGroupStatusName = c.ContractGroupStatus.Name,
+                    CitizenIdentificationInfoNumber = c.CustomerInfo.CitizenIdentificationInfoNumber,
                 })
                 .ToList();
 
@@ -221,6 +235,10 @@ namespace CleanArchitecture.Application.Repository
                 {
                     contractGroups = contractGroups.Where(c => c.UserId == filter.UserId);
                 }
+                if (!string.IsNullOrWhiteSpace(filter.CitizenIdentificationInfoNumber))
+                {
+                    contractGroups = contractGroups.Where(c => c.CustomerInfo.CitizenIdentificationInfoNumber == filter.CitizenIdentificationInfoNumber);
+                }
             }
 
             var contractGroupDataModels = contractGroups
@@ -235,6 +253,8 @@ namespace CleanArchitecture.Application.Repository
                     StaffEmail = c.User.Email,
                     ContractGroupStatusId = c.ContractGroupStatusId,
                     ContractGroupStatusName = c.ContractGroupStatus.Name,
+                    CitizenIdentificationInfoNumber = c.CustomerInfo.CitizenIdentificationInfoNumber,
+
                 })
                 .ToList();
             return contractGroupDataModels;

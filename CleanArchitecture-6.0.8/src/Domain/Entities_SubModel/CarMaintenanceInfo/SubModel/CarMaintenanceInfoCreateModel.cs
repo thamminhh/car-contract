@@ -9,9 +9,7 @@ public class CarMaintenanceInfoCreateModel
 {
     public int? CarId { get; set; }
     public double? CarKmlastMaintenance { get; set; }
-    public double? KmTraveled { get; set; }
     public DateTime? MaintenanceDate { get; set; }
     public string? MaintenanceInvoice { get; set; }
     public double? MaintenanceAmount { get; set; }
-
 }
