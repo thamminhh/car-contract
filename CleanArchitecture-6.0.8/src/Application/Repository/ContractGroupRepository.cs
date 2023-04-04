@@ -17,12 +17,14 @@ namespace CleanArchitecture.Application.Repository
     {
         private readonly ContractContext _contractContext;
         private readonly ICustomerFileRepository _customerFileRepository;
+        private readonly ICustomerInfoRepository _customerInfoRepository;
 
 
-        public ContractGroupRepository(ContractContext contractContext, ICustomerFileRepository customerFile)
+        public ContractGroupRepository(ContractContext contractContext, ICustomerFileRepository customerFile, ICustomerInfoRepository customerInfoRepository)
         {
             _contractContext = contractContext;
             _customerFileRepository = customerFile;
+            _customerInfoRepository = customerInfoRepository;
         }
 
         //private static string changeIdContractIntoString(int? id)
@@ -144,9 +146,7 @@ namespace CleanArchitecture.Application.Repository
                 CustomerFiles = customerFiles,
 
             };
-
         }
-
         public ICollection<ContractGroupDataModel> GetContractGroups(int page, int pageSize, ContractFilter filter)
         {
             if (page < 1)
@@ -181,9 +181,7 @@ namespace CleanArchitecture.Application.Repository
                 {
                     contractGroups = contractGroups.Where(c => c.CustomerInfo.CitizenIdentificationInfoNumber == filter.CitizenIdentificationInfoNumber);
                 }
-
             }
-
             var contractGroupDataModels = contractGroups
                 .OrderByDescending(c => c.Id)
                 .Skip(skip)
@@ -199,10 +197,8 @@ namespace CleanArchitecture.Application.Repository
                     CitizenIdentificationInfoNumber = c.CustomerInfo.CitizenIdentificationInfoNumber,
                 })
                 .ToList();
-
             return contractGroupDataModels;
         }
-
         public ICollection<ContractGroupDataModel> GetContractGroupsByParkingLotId(int page, int pageSize, int parkingLotId, ContractFilter filter)
 
         {
@@ -271,25 +267,88 @@ namespace CleanArchitecture.Application.Repository
         }
         public void CreateContractGroup(ContractGroupCreateModel request)
         {
-            var customerInfo = new CustomerInfo
+            //Find customerinfo if exit, update
+            var customerInfoExits = _customerInfoRepository.GetCustomerInfoByCitizenIdentificationInfoNumber(request.CustomerCitizenIdentificationInfoNumber);
+            var customerInfo = _contractContext.CustomerInfos.Find(customerInfoExits.Id);
+            var customerFiles = request.CustomerFiles;
+            if (customerInfo != null)
             {
-                PhoneNumber = request.CustomerPhoneNumber,
-                CustomerName = request.CustomerName,
-                CustomerAddress = request.CustomerAddress,
-                CustomerEmail = request.CustomerEmail,
-                CitizenIdentificationInfoNumber = request.CustomerCitizenIdentificationInfoNumber,
-                CitizenIdentificationInfoAddress = request.CustomerCitizenIdentificationInfoAddress,
-                CitizenIdentificationInfoDateReceive = request.CustomerCitizenIdentificationInfoDate,
-                CustomerSocialInfoZalo = request.CustomerSocialInfoZalo,
-                CustomerSocialInfoFacebook = request.CustomerSocialInfoFacebook,
-                RelativeTel = request.RelativeTel,
-                CompanyInfo = request.CompanyInfo,
+                customerInfo.PhoneNumber = request.CustomerPhoneNumber;
+                customerInfo.CustomerName = request.CustomerName;
+                customerInfo.CustomerAddress = request.CustomerAddress;
+                customerInfo.CustomerEmail = request.CustomerEmail;
+                customerInfo.CitizenIdentificationInfoNumber = request.CustomerCitizenIdentificationInfoNumber;
+                customerInfo.CitizenIdentificationInfoAddress = request.CustomerCitizenIdentificationInfoAddress;
+                customerInfo.CitizenIdentificationInfoDateReceive = request.CustomerCitizenIdentificationInfoDate;
+                customerInfo.CustomerSocialInfoZalo = request.CustomerSocialInfoZalo;
+                customerInfo.CustomerSocialInfoFacebook = request.CustomerSocialInfoFacebook;
+                customerInfo.RelativeTel = request.RelativeTel;
+                customerInfo.CompanyInfo = request.CompanyInfo;
 
-            };
-            // Save the new ContractGroupGenerallInfos object to the database
-            _contractContext.CustomerInfos.Add(customerInfo);
-            _contractContext.SaveChanges();
-            // Create new ContractGroup object and set its properties
+                if (customerFiles != null)
+                {
+                    foreach (var file in customerFiles)
+                    {
+
+                        _contractContext.CustomerFiles.Add(new CustomerFile
+                        {
+                            CustomerInfoId = customerInfo.Id,
+                            TypeOfDocument = file.TypeOfDocument,
+                            Title = file.Title,
+                            DocumentImg = file.DocumentImg,
+                            DocumentDescription = file.DocumentDescription,
+                        });
+
+                    }
+                    _contractContext.CustomerInfos.Update(customerInfo);
+                    _contractContext.SaveChanges();
+                }
+            }
+            else
+            {
+                customerInfo = new CustomerInfo
+                {
+                    PhoneNumber = request.CustomerPhoneNumber,
+                    CustomerName = request.CustomerName,
+                    CustomerAddress = request.CustomerAddress,
+                    CustomerEmail = request.CustomerEmail,
+                    CitizenIdentificationInfoNumber = request.CustomerCitizenIdentificationInfoNumber,
+                    CitizenIdentificationInfoAddress = request.CustomerCitizenIdentificationInfoAddress,
+                    CitizenIdentificationInfoDateReceive = request.CustomerCitizenIdentificationInfoDate,
+                    CustomerSocialInfoZalo = request.CustomerSocialInfoZalo,
+                    CustomerSocialInfoFacebook = request.CustomerSocialInfoFacebook,
+                    RelativeTel = request.RelativeTel,
+                    CompanyInfo = request.CompanyInfo,
+
+                };
+                // Save the new ContractGroupGenerallInfos object to the database
+                _contractContext.CustomerInfos.Add(customerInfo);
+                _contractContext.SaveChanges();
+
+                List<CustomerFile> customerFileList = new List<CustomerFile>();
+
+                if (customerFiles != null && customerFiles.Any())
+                {
+                    foreach (var fileCreate in customerFiles)
+                    {
+                        var file = new CustomerFile
+                        {
+                            CustomerInfoId = customerInfo.Id,
+                            TypeOfDocument = fileCreate.TypeOfDocument,
+                            Title = fileCreate.Title,
+                            DocumentImg = fileCreate.DocumentImg,
+                            DocumentDescription = fileCreate.DocumentDescription,
+                        };
+
+                        customerFileList.Add(file);
+                    }
+
+                    // add all new CustomerFiles to the database context in a single transaction
+                    _contractContext.CustomerFiles.AddRange(customerFileList);
+                    _contractContext.SaveChanges();
+                    // Create new ContractGroup object and set its properties
+                }
+            }
 
             int contractGroupIdDefault = Constant.ContractGroupConstant.ContractGroupNotExpertised;
             var contractGroup = new ContractGroup
@@ -312,29 +371,6 @@ namespace CleanArchitecture.Application.Repository
             _contractContext.ContractGroups.Add(contractGroup);
             _contractContext.SaveChanges();
 
-            var customerFiles = request.CustomerFiles;
-            List<CustomerFile> customerFileList = new List<CustomerFile>();
-
-            if (customerFiles != null && customerFiles.Any())
-            {
-                foreach (var fileCreate in customerFiles)
-                {
-                    var file = new CustomerFile
-                    {
-                        CustomerInfoId = customerInfo.Id,
-                        TypeOfDocument = fileCreate.TypeOfDocument,
-                        Title = fileCreate.Title,
-                        DocumentImg = fileCreate.DocumentImg,
-                        DocumentDescription = fileCreate.DocumentDescription,
-                    };
-
-                    customerFileList.Add(file);
-                }
-
-                // add all new CustomerFiles to the database context in a single transaction
-                _contractContext.CustomerFiles.AddRange(customerFileList);
-                _contractContext.SaveChanges();
-            }
         }
 
         public void UpdateContractGroup(int id, ContractGroupUpdateModel request)
@@ -362,7 +398,7 @@ namespace CleanArchitecture.Application.Repository
             _contractContext.ContractGroups.Update(contractGroup);
             _contractContext.SaveChanges();
 
-            // Retrieve the ContractGroupGenerallInfos object from the database
+            // Retrieve the CustomerInfos object from the database
             var customerInfo = _contractContext.CustomerInfos.Find(request.CustomerInfoId);
             var customerFiles = request.CustomerFiles;
             if (customerInfo != null)

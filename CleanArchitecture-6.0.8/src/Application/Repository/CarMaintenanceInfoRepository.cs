@@ -60,11 +60,18 @@ namespace CleanArchitecture.Application.Repository
             {
                 CarId = request.CarId,
                 CarKmlastMaintenance = request.CarKmlastMaintenance,
+                KmTraveled = 0,
                 MaintenanceDate = request.MaintenanceDate,
                 MaintenanceInvoice = request.MaintenanceInvoice,
                 MaintenanceAmount = request.MaintenanceAmount
             };
             _contractContext.CarMaintenanceInfos.Add(carMaintenanceInfo);
+            _contractContext.SaveChanges();
+
+            //Update CarState
+            var carState = _contractContext.CarStates.Where(c => c.CarId == request.CarId).FirstOrDefault();
+            carState.SpeedometerNumber = request.CarKmlastMaintenance;
+            _contractContext.CarStates.Update(carState);
             _contractContext.SaveChanges();
         }
 
@@ -80,6 +87,12 @@ namespace CleanArchitecture.Application.Repository
             carMaintenanceInfo.MaintenanceAmount = request.MaintenanceAmount;
 
             _contractContext.CarMaintenanceInfos.Update(carMaintenanceInfo);
+            _contractContext.SaveChanges();
+
+            //Update CarState
+            var carState = _contractContext.CarStates.Where(c => c.CarId == request.CarId).FirstOrDefault();
+            carState.SpeedometerNumber = request.CarKmlastMaintenance;
+            _contractContext.CarStates.Update(carState);
             _contractContext.SaveChanges();
         }
 

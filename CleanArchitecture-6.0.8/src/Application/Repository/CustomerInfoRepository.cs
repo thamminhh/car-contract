@@ -33,7 +33,6 @@ namespace CleanArchitecture.Application.Repository
             return _contractContext.CustomerInfos.Any(c => c.CitizenIdentificationInfoNumber == citizenIdentificationInfoNumber);
         }
 
-
         public bool CreateCustomerInfo(CustomerInfo customerInfo)
         {
             _contractContext.Add(customerInfo);
@@ -68,8 +67,8 @@ namespace CleanArchitecture.Application.Repository
                 CustomerEmail = customerInfo.CustomerEmail,
                 CustomerFiles = customerFiles,
             };
-
         }
+
         public bool UpdateCustomerInfo(string citizenIdentificationInfoNumber, CustomerInfoUpdateModel request)
         {
             var customerInfo = _contractContext.CustomerInfos
