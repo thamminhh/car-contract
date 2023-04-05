@@ -254,6 +254,14 @@ namespace CleanArchitecture.Application.Repository
             receiveContract.DepositItemDescription = request.DepositItemDescription;
             receiveContract.DepositItemDownPayment = request.DepositItemDownPayment;
             receiveContract.ReturnDepostiItem = request.ReturnDepostiItem;
+            if(request.ReturnDepostiItem == false)
+            {
+                var contractGroupStatusInspecting = Constant.ContractGroupConstant.ContractInspecting;
+                var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+                contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+                contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusInspecting;
+                _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+            }
             receiveContract.CustomerSignature = request.CustomerSignature;
             receiveContract.StaffSignature = request.StaffSignature;
             receiveContract.FileWithSignsPath = filePath;
@@ -289,6 +297,7 @@ namespace CleanArchitecture.Application.Repository
                     }
                 }
             }
+
             receiveContract.TotalKilometersTraveled = totalKilometersTraveled;
             receiveContract.CurrentCarStateCarDamageDescription = request.CurrentCarStateCarDamageDescription;
             receiveContract.InsuranceMoney = request.InsuranceMoney;
@@ -302,8 +311,6 @@ namespace CleanArchitecture.Application.Repository
 
             _contractContext.ReceiveContracts.Update(receiveContract);
             _contractContext.SaveChanges();
-
-
 
             if (request.CustomerSignature != null && request.StaffSignature != null)
             {

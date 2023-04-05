@@ -271,7 +271,7 @@ namespace CleanArchitecture.Application.Repository
             var customerInfoExits = _customerInfoRepository.GetCustomerInfoByCitizenIdentificationInfoNumber(request.CustomerCitizenIdentificationInfoNumber);
             var customerInfo = _contractContext.CustomerInfos.Find(customerInfoExits.Id);
             var customerFiles = request.CustomerFiles;
-            if (customerInfo != null)
+            if (customerInfoExits != null)
             {
                 customerInfo.PhoneNumber = request.CustomerPhoneNumber;
                 customerInfo.CustomerName = request.CustomerName;
@@ -314,9 +314,9 @@ namespace CleanArchitecture.Application.Repository
                     _contractContext.SaveChanges();
                 }
             }
-            else
+            if (customerInfoExits == null)
             {
-                customerInfo = new CustomerInfo
+                var newCustomerInfo = new CustomerInfo
                 {
                     PhoneNumber = request.CustomerPhoneNumber,
                     CustomerName = request.CustomerName,
@@ -332,7 +332,7 @@ namespace CleanArchitecture.Application.Repository
 
                 };
                 // Save the new ContractGroupGenerallInfos object to the database
-                _contractContext.CustomerInfos.Add(customerInfo);
+                _contractContext.CustomerInfos.Add(newCustomerInfo);
                 _contractContext.SaveChanges();
 
                 List<CustomerFile> customerFileList = new List<CustomerFile>();
