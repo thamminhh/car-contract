@@ -289,15 +289,25 @@ namespace CleanArchitecture.Application.Repository
                 {
                     foreach (var file in customerFiles)
                     {
-
-                        _contractContext.CustomerFiles.Add(new CustomerFile
+                        var existingFile = _contractContext.CustomerFiles.FirstOrDefault(cf => cf.Id == file.Id && cf.CustomerInfoId == customerInfo.Id);
+                        if (existingFile != null)
                         {
-                            CustomerInfoId = customerInfo.Id,
-                            TypeOfDocument = file.TypeOfDocument,
-                            Title = file.Title,
-                            DocumentImg = file.DocumentImg,
-                            DocumentDescription = file.DocumentDescription,
-                        });
+                            existingFile.TypeOfDocument = file.TypeOfDocument ?? existingFile.TypeOfDocument;
+                            existingFile.Title = file.Title ?? existingFile.Title;
+                            existingFile.DocumentImg = file.DocumentImg ?? existingFile.DocumentImg;
+                            existingFile.DocumentDescription = file.DocumentDescription ?? existingFile.DocumentDescription;
+                        }
+                        else
+                        {
+                            _contractContext.CustomerFiles.Add(new CustomerFile
+                            {
+                                CustomerInfoId = customerInfo.Id,
+                                TypeOfDocument = file.TypeOfDocument,
+                                Title = file.Title,
+                                DocumentImg = file.DocumentImg,
+                                DocumentDescription = file.DocumentDescription,
+                            });
+                        }
 
                     }
                     _contractContext.CustomerInfos.Update(customerInfo);

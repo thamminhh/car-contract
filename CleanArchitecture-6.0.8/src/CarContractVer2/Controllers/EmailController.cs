@@ -14,7 +14,7 @@ public class MailController : ControllerBase
             this.mailService = mailService;
         }
         [HttpPost("send")]
-        public async Task<IActionResult> SendMail([FromForm] MailRequest request)
+        public async Task<IActionResult> SendMail(MailRequest request)
         {
             try
             {

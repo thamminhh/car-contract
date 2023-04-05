@@ -27,6 +27,6 @@ namespace CleanArchitecture.Domain.Entities_SubModel.ContractGroup.SubModel
         public DateTime? CustomerCitizenIdentificationInfoDate { get; set; }
         public string? RelativeTel { get; set; }
         public string? CompanyInfo { get; set; }
-        public ICollection<CustomerFileCreateModel> CustomerFiles { get; set; }
+        public ICollection<CustomerFileDataModel> CustomerFiles { get; set; }
     }
 }
