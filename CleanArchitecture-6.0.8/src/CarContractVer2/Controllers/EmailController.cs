@@ -3,31 +3,50 @@
 namespace CarContractVer2.Controllers;
 using System.Net;
 using System.Net.Mail;
+using System.Threading;
+using CleanArchitecture.Application.Repository;
 using CleanArchitecture.Domain.Entities_SubModel.Email;
 using CleanArchitecture.Domain.Interface;
 
 public class MailController : ControllerBase
+{
+    private readonly IMailService mailService;
+    private readonly IUserRepository _userRepository;
+        public MailController(IMailService mailService, IUserRepository userRepository)
     {
-        private readonly IMailService mailService;
-        public MailController(IMailService mailService)
+        this.mailService = mailService;
+        _userRepository = userRepository;   
+    }
+    [HttpPost("send")]
+    public async Task<IActionResult> SendMail(MailRequest request)
+    {
+        try
         {
-            this.mailService = mailService;
+            await mailService.SendEmailAsync(request);
+            return Ok();
         }
-        [HttpPost("send")]
-        public async Task<IActionResult> SendMail(MailRequest request)
+        catch (Exception ex)
         {
-            try
-            {
-                await mailService.SendEmailAsync(request);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-
+            throw;
         }
     }
+    [HttpPost("encodeId")]
+    public async Task<IActionResult> EncodeId(int id)
+    {
+
+        var hash = _userRepository.EncodeId(id);
+        return Ok(hash);
+    }
+    [HttpPost("decodeId")]
+    public async Task<IActionResult> DecodeId(byte[] encoded)
+    {
+        if (_userRepository.TryDecodeId(encoded, out int id))
+        {
+            return Ok(id);
+        }
+        return BadRequest();
+    }
+}
 
 //public class EmailController : ControllerBase
 //{

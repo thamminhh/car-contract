@@ -17,9 +17,11 @@ namespace CleanArchitecture.Application.Repository
     public class MailService : IMailService
     {
         private readonly MailSettings _mailSettings;
-        public MailService(IOptions<MailSettings> mailSettings)
+        private readonly IUserRepository _userRepository;
+        public MailService(IOptions<MailSettings> mailSettings, IUserRepository userRepository)
         {
             _mailSettings = mailSettings.Value;
+            _userRepository = userRepository;   
         }
 
 
@@ -46,7 +48,10 @@ namespace CleanArchitecture.Application.Repository
             //        }
             //    }
             //}
-            builder.HtmlBody = mailRequest.Body;
+            //var rentContract
+
+            var body = mailRequest.Body;
+            builder.HtmlBody = body;
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
             smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);

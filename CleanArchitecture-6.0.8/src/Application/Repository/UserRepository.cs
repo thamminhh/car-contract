@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using PdfSharpCore.Pdf.Filters;
+using System.Text;
 
 namespace CleanArchitecture.Application.Repository
 {
@@ -95,7 +96,7 @@ namespace CleanArchitecture.Application.Repository
                 {
                     users = users.Where(u => u.IsDeleted == filter.IsDeleted.Value);
                 }
-                
+
             }
             return users.Count();
         }
@@ -247,7 +248,7 @@ namespace CleanArchitecture.Application.Repository
                     return false;
                 }
             }
-            
+
             user.Name = request.Name;
             user.ParkingLotId = request.ParkingLotId;
             user.PhoneNumber = request.PhoneNumber;
@@ -310,7 +311,7 @@ namespace CleanArchitecture.Application.Repository
                 errorMessage = "Password incorect";
                 return false;
             }
-            if(request.NewPassword != request.ConfirmPassword)
+            if (request.NewPassword != request.ConfirmPassword)
             {
                 errorMessage = "Confirm password and new password don't match";
                 return false;
@@ -344,5 +345,42 @@ namespace CleanArchitecture.Application.Repository
         //{
         //    throw new NotImplementedException();
         //}
+
+        public byte[] EncodeId(int id)
+        {
+            byte[] salt = new byte[] { 0x01, 0x02, 0x03, 0x04 };
+
+            var data = $"{id}";
+
+            using (var hmac = new HMACSHA512(salt))
+            {
+                return hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
+            }
+        }
+        public bool TryDecodeId(byte[] encoded,/* byte[] salt,*/ out int id)
+        {
+            byte[] salt = new byte[] { 0x01, 0x02, 0x03, 0x04 };
+            using (var hmac = new HMACSHA512(salt))
+            { 
+                    // The encoded value matches the expected hash, so decoding is successful
+                    id = int.Parse(Encoding.UTF8.GetString(encoded));
+                    return true;
+            }
+        }
+        private static bool ConstantTimeEquals(byte[] a, byte[] b)
+        {
+            if (a == null || b == null || a.Length != b.Length)
+            {
+                return false;
+            }
+
+            var result = 0;
+            for (var i = 0; i < a.Length; i++)
+            {
+                result |= a[i] ^ b[i];
+            }
+
+            return result == 0;
+        }
     }
 }
