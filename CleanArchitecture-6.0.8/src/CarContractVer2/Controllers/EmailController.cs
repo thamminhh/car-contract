@@ -33,18 +33,29 @@ public class MailController : ControllerBase
     [HttpPost("encodeId")]
     public async Task<IActionResult> EncodeId(int id)
     {
-
-        var hash = _userRepository.EncodeId(id);
-        return Ok(hash);
-    }
-    [HttpPost("decodeId")]
-    public async Task<IActionResult> DecodeId(byte[] encoded)
-    {
-        if (_userRepository.TryDecodeId(encoded, out int id))
+        if(id != null)
         {
-            return Ok(id);
+            _userRepository.EncodeId(id, out byte[]? idHash, out byte[]? idSalt, out long timestamp);
+            return Ok(new {idHash, idSalt, timestamp});
         }
         return BadRequest();
+    }
+    [HttpPost("decodeId")]
+    public async Task<IActionResult> DecodeId(int expectedId, byte[] hash, byte[] salt, long timestamp)
+    {
+        
+        if (!_userRepository.DecodeId(expectedId, hash, salt, timestamp))
+        {
+            return BadRequest("false");
+        }
+        return Ok();
+    }
+
+    [HttpPost("decodeLink")]
+    public IActionResult DecodeLink(string link)
+    {
+            string result = mailService.DecodeLink(link);
+            return Ok(result);
     }
 }
 

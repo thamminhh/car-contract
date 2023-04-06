@@ -31,9 +31,10 @@ namespace CleanArchitecture.Domain.Interface
 
         bool EmailExit(string email);
 
-        public byte[] EncodeId(int id);
+        public void EncodeId(int? id, out byte[]? idHash, out byte[]? idSalt, out long timestamp);
 
-        public bool TryDecodeId(byte[] encoded, out int id);
+        public bool DecodeId(int expectedId, byte[] hash, byte[] salt, long timestamp);
+
 
 
     }

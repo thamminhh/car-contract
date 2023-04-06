@@ -6,6 +6,8 @@ namespace CleanArchitecture.Domain.Interface
     public interface IMailService
     {
         Task SendEmailAsync(MailRequest mailRequest);
+
+        public string DecodeLink(string link);
     }
 }
 

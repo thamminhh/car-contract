@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Configuration;
 using PdfSharpCore.Pdf.Filters;
 using System.Text;
+using NuGet.Packaging.Signing;
 
 namespace CleanArchitecture.Application.Repository
 {
@@ -27,48 +28,6 @@ namespace CleanArchitecture.Application.Repository
         {
             return email.Trim().ToUpper();
         }
-
-        public string CreateToken(string email)
-        {
-            var user = GetUserByEmail(email);
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
-            };
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value));
-
-            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: cred);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
-        }
-
-        public void CreatePasswordHash(string? password, out byte[]? passwordHash, out byte[]? passwordSalt)
-        {
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
-        }
-
-        public bool VerifyPasswordHash(string? password, byte[]? passwordHash, byte[]? passwordSalt)
-        {
-            using (var hmac = new HMACSHA512(passwordSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(passwordHash);
-            }
-        }
-
         public int GetNumberOfUsers(UserFilter filter)
         {
             IQueryable<User> users = _contractContext.Users.AsQueryable();
@@ -341,46 +300,120 @@ namespace CleanArchitecture.Application.Repository
             return Save();
         }
 
+
+        public string CreateToken(string email)
+        {
+            var user = GetUserByEmail(email);
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+                _configuration.GetSection("AppSettings:Token").Value));
+
+            var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: cred);
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
+        }
+
+        public void CreatePasswordHash(string? password, out byte[]? passwordHash, out byte[]? passwordSalt)
+        {
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        public bool VerifyPasswordHash(string? password, byte[]? passwordHash, byte[]? passwordSalt)
+        {
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
+            }
+        }
+
+        public void EncodeId(int? id, out byte[]? idHash, out byte[]? idSalt, out long timestamp)
+        {
+            timestamp = DateTime.UtcNow.Ticks;
+            using (var hmac = new HMACSHA512())
+            {
+                idSalt = hmac.Key;
+                idHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(id.ToString()));
+            }
+        }
+        public bool DecodeId(int expectedId, byte[] hash, byte[] salt, long timestamp)
+        {
+            var timeout = TimeSpan.FromDays(1);
+            var currentTimestamp = DateTime.UtcNow.Ticks;
+            if (currentTimestamp - timestamp > timeout.Ticks)
+            {
+                // The timestamp has expired, return false
+                return false;
+            }
+            using (var hmac = new HMACSHA512(salt))
+            {
+                var expectedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(expectedId.ToString()));
+                if (!hash.SequenceEqual(expectedHash))
+                {
+                    // The hash does not match the expected hash, return false
+                    return false;
+                }
+            }
+            // The hash and timestamp are valid, return true
+            return true;
+        }
+
+
         //public bool UpdateUserRole(int id, string role)
         //{
         //    throw new NotImplementedException();
         //}
 
-        public byte[] EncodeId(int id)
-        {
-            byte[] salt = new byte[] { 0x01, 0x02, 0x03, 0x04 };
+        //public byte[] EncodeId(int id)
+        //{
+        //    byte[] salt = new byte[] { 0x01, 0x02, 0x03, 0x04 };
 
-            var data = $"{id}";
+        //    var data = $"{id}";
 
-            using (var hmac = new HMACSHA512(salt))
-            {
-                return hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
-            }
-        }
-        public bool TryDecodeId(byte[] encoded,/* byte[] salt,*/ out int id)
-        {
-            byte[] salt = new byte[] { 0x01, 0x02, 0x03, 0x04 };
-            using (var hmac = new HMACSHA512(salt))
-            { 
-                    // The encoded value matches the expected hash, so decoding is successful
-                    id = int.Parse(Encoding.UTF8.GetString(encoded));
-                    return true;
-            }
-        }
-        private static bool ConstantTimeEquals(byte[] a, byte[] b)
-        {
-            if (a == null || b == null || a.Length != b.Length)
-            {
-                return false;
-            }
+        //    using (var hmac = new HMACSHA512(salt))
+        //    {
+        //        return hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
+        //    }
+        //}
+        //public bool TryDecodeId(byte[] encoded,/* byte[] salt,*/ out int id)
+        //{
+        //    byte[] salt = new byte[] { 0x01, 0x02, 0x03, 0x04 };
+        //    using (var hmac = new HMACSHA512(salt))
+        //    { 
+        //            // The encoded value matches the expected hash, so decoding is successful
+        //            id = int.Parse(Encoding.UTF8.GetString(encoded));
+        //            return true;
+        //    }
+        //}
+        //private static bool ConstantTimeEquals(byte[] a, byte[] b)
+        //{
+        //    if (a == null || b == null || a.Length != b.Length)
+        //    {
+        //        return false;
+        //    }
 
-            var result = 0;
-            for (var i = 0; i < a.Length; i++)
-            {
-                result |= a[i] ^ b[i];
-            }
+        //    var result = 0;
+        //    for (var i = 0; i < a.Length; i++)
+        //    {
+        //        result |= a[i] ^ b[i];
+        //    }
 
-            return result == 0;
-        }
+        //    return result == 0;
+        //}
     }
 }

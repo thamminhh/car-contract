@@ -21,9 +21,8 @@ namespace CleanArchitecture.Application.Repository
         public MailService(IOptions<MailSettings> mailSettings, IUserRepository userRepository)
         {
             _mailSettings = mailSettings.Value;
-            _userRepository = userRepository;   
+            _userRepository = userRepository;
         }
-
 
         public async Task SendEmailAsync(MailRequest mailRequest)
         {
@@ -49,8 +48,12 @@ namespace CleanArchitecture.Application.Repository
             //    }
             //}
             //var rentContract
+            byte[]? hash;
+            byte[]? salt;
 
-            var body = mailRequest.Body;
+            _userRepository.EncodeId(mailRequest.RentContractId, out hash, out salt, out long timestamp);
+
+            var body = mailRequest.LinkHost + Convert.ToBase64String(hash) + "/" + mailRequest.RentContractId + "/" + Convert.ToBase64String(salt) + "/" + timestamp;
             builder.HtmlBody = body;
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
@@ -58,6 +61,44 @@ namespace CleanArchitecture.Application.Repository
             smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
             await smtp.SendAsync(email);
             smtp.Disconnect(true);
+        }
+
+        public string DecodeLink(string link)
+        {
+            string result = "";
+            var (linkHost, hash, id, salt, timestamp) = ParseLink(link);
+            var checkIdandTimeSpan = _userRepository.DecodeId(id, hash, salt, timestamp);
+            if (checkIdandTimeSpan)
+            {
+                result = linkHost + "/" + id;
+            }
+            else
+            {
+                result = "This link is time out";
+            }
+            return result;
+        }
+        public (string LinkHost, byte[] Hash, int Id, byte[] Salt, long Timestamp) ParseLink(string link)
+        {
+            // Split the link into its component parts
+            var parts = link.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+
+            // Extract the link host
+            var linkHost = parts[0];
+
+            // Extract the hash
+            var hash = Convert.FromBase64String(parts[1]);
+
+            // Extract the ID
+            var id = int.Parse(parts[2]);
+
+            // Extract the salt
+            var salt = Convert.FromBase64String(parts[3]);
+
+            // Extract the timestamp
+            var timestamp = long.Parse(parts[4]);
+
+            return (linkHost, hash, id, salt, timestamp);
         }
     }
 }
