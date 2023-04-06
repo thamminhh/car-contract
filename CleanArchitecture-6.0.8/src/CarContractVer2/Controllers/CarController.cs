@@ -18,12 +18,10 @@ namespace CarContractVer2.Controllers
 
 
         public CarController(ICarRepository carRepository, ICarMakeRepository carMakeController
-            , IWebHostEnvironment webHostEnvironment
-            )
+            , IWebHostEnvironment webHostEnvironment)
         {
             _carRepository = carRepository;
             _carMakeController = carMakeController;
-
         }
 
         [HttpGet]
@@ -49,6 +47,7 @@ namespace CarContractVer2.Controllers
                 return BadRequest(ModelState);
             return Ok(new { cars = listCar, total = count });
         }
+
 
         [HttpGet]
         [Route(CarEndpoints.GetCarsMaintenance)]

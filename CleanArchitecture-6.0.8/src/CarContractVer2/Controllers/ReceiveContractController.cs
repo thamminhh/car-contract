@@ -12,11 +12,13 @@ namespace CarContractVer2.Controllers
     public class ReceiveContractController : ControllerBase
     {
         private readonly IReceiveContractRepository _receiveContractRepository;
+        private readonly IReceiveContractFileRepository _receiveContractFileRepository;
 
 
-        public ReceiveContractController(IReceiveContractRepository receiveContractRepository)
+        public ReceiveContractController(IReceiveContractRepository receiveContractRepository, IReceiveContractFileRepository receiveContractFileRepository)
         {
             _receiveContractRepository = receiveContractRepository;
+            _receiveContractFileRepository = receiveContractFileRepository;
         }
 
         //[HttpGet]
@@ -84,6 +86,21 @@ namespace CarContractVer2.Controllers
                 return StatusCode(500, ModelState);
             }
             return NoContent();
+        }
+
+        [HttpDelete]
+        [Route(ReceiveContractEndpoints.DeleteReceiveContractFile)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> Delete(int receiveContractFileId)
+        {
+            bool deleted = await _receiveContractFileRepository.DeleteReceiveContractFile(receiveContractFileId);
+
+            if (deleted)
+            {
+                return Ok("Deleted"); // Object deleted successfully
+            }
+            return NotFound(); // Object not found
         }
     }
 }

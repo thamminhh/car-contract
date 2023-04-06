@@ -10,7 +10,8 @@ namespace CleanArchitecture.Domain.Entities
         public DateTime? RegistrationDeadline { get; set; }
         public double? RegistryAmount { get; set; }
         public string? RegistryInvoice { get; set; }
-
+        public string? RegistryAddress { get; set; }
+        public string? CertificateRegistryDocument { get; set; }
         public virtual Car? Car { get; set; }
     }
 }

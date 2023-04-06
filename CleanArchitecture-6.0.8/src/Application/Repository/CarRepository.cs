@@ -75,6 +75,17 @@ namespace CleanArchitecture.Application.Repository
                 {
                     cars = cars.Where(c => c.CarTrimId == filter.CarTrimId);
                 }
+                if (filter.DateStart.HasValue && filter.DateEnd.HasValue)
+                {
+                    // Find the car ids that have schedules during the specified time period
+                    var conflictingCarIds = _contractContext.CarSchedules
+                        .Where(s => s.DateStart < filter.DateEnd && s.DateEnd > filter.DateStart)
+                        .Select(s => s.CarId)
+                        .Distinct();
+
+                    // Exclude the cars that have schedules during the specified time period
+                    cars = cars.Where(c => !conflictingCarIds.Contains(c.Id));
+                }
             }
             return cars.Count();
         }
@@ -118,6 +129,17 @@ namespace CleanArchitecture.Application.Repository
                 if (filter.CarTrimId.HasValue)
                 {
                     cars = cars.Where(c => c.CarTrimId == filter.CarTrimId);
+                }
+                if (filter.DateStart.HasValue && filter.DateEnd.HasValue)
+                {
+                    // Find the car ids that have schedules during the specified time period
+                    var conflictingCarIds = _contractContext.CarSchedules
+                        .Where(s => s.DateStart < filter.DateEnd && s.DateEnd > filter.DateStart)
+                        .Select(s => s.CarId)
+                        .Distinct();
+
+                    // Exclude the cars that have schedules during the specified time period
+                    cars = cars.Where(c => !conflictingCarIds.Contains(c.Id));
                 }
             }
 
@@ -272,7 +294,19 @@ namespace CleanArchitecture.Application.Repository
                 {
                     cars = cars.Where(c => c.CarTrimId == filter.CarTrimId);
                 }
+                if (filter.DateStart.HasValue && filter.DateEnd.HasValue)
+                {
+                    // Find the car ids that have schedules during the specified time period
+                    var conflictingCarIds = _contractContext.CarSchedules
+                        .Where(s => s.DateStart < filter.DateEnd && s.DateEnd > filter.DateStart)
+                        .Select(s => s.CarId)
+                        .Distinct();
+
+                    // Exclude the cars that have schedules during the specified time period
+                    cars = cars.Where(c => !conflictingCarIds.Contains(c.Id));
+                }
             }
+           
             return (from c in cars
                     join cstatus in _contractContext.CarStatuses on c.CarStatusId equals cstatus.Id
                     join cf in _contractContext.CarFiles on c.Id equals cf.CarId into CarFile 
@@ -445,7 +479,17 @@ namespace CleanArchitecture.Application.Repository
                 {
                     cars = cars.Where(c => c.CarTrimId == filter.CarTrimId);
                 }
+                if (filter.DateStart.HasValue && filter.DateEnd.HasValue)
+                {
+                    // Find the car ids that have schedules during the specified time period
+                    var conflictingCarIds = _contractContext.CarSchedules
+                        .Where(s => s.DateStart < filter.DateEnd && s.DateEnd > filter.DateStart)
+                        .Select(s => s.CarId)
+                        .Distinct();
 
+                    // Exclude the cars that have schedules during the specified time period
+                    cars = cars.Where(c => !conflictingCarIds.Contains(c.Id));
+                }
             }
             var carDataModels = cars
                     .OrderBy(c => c.Id)
@@ -474,7 +518,6 @@ namespace CleanArchitecture.Application.Repository
             return carDataModels;
         }
 
-
         public ICollection<CarDataModel> GetCarsMaintenance(int page, int pageSize, out int count)
         {
             if (page < 1)
@@ -491,7 +534,6 @@ namespace CleanArchitecture.Application.Repository
             var cars = _contractContext.Cars
             .Include(c => c.CarStatus)
             .Include(c => c.CarFile)
-            .Where(c => c.CarMaintenanceInfos.Any(m => m.KmTraveled >= (c.PeriodicMaintenanceLimit * 0.9)))
             .Select(c => new CarDataModel
             {
                 Id = c.Id,
@@ -508,7 +550,8 @@ namespace CleanArchitecture.Application.Repository
                 FrontImg = c.CarFile.FrontImg,
                 PeriodicMaintenanceLimit = c.PeriodicMaintenanceLimit,
                 KmTraveled = c.CarMaintenanceInfos.OrderByDescending(m => m.Id).FirstOrDefault().KmTraveled
-            });
+            })
+            .Where(c => c.KmTraveled >= (c.PeriodicMaintenanceLimit * 0.9));
 
             count = cars.Count();
             var response = cars.Skip(skip).Take(pageSize).ToList();

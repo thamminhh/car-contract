@@ -17,6 +17,7 @@ public class ReceiveContractEndpoints
     public const string Create = Base + "/create";
     public const string Update = Base + "/update/{id}";
     public const string Delete = Base + "/delete/{id}";
+    public const string DeleteReceiveContractFile = Base + "/delete/{receiveContractFileId}";
     public const string UpdateContractStatus = Base + "/update-contract-status/{id}";
 
 

@@ -134,5 +134,19 @@ namespace CleanArchitecture.Application.Repository
 
         //}
 
+        public async Task<bool> DeleteCustomerFile(int id)
+        {
+            var customerFile = await _contractContext.CustomerFiles.FindAsync(id);
+
+            if (customerFile == null)
+            {
+                return false; // Object not found
+            }
+
+            _contractContext.CustomerFiles.Remove(customerFile);
+            await _contractContext.SaveChangesAsync();
+
+            return true; // Object deleted successfully
+        }
     }
 }

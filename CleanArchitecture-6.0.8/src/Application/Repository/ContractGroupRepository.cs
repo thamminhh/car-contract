@@ -267,11 +267,10 @@ namespace CleanArchitecture.Application.Repository
         }
         public void CreateContractGroup(ContractGroupCreateModel request)
         {
-            //Find customerinfo if exit, update
-            var customerInfoExits = _customerInfoRepository.GetCustomerInfoByCitizenIdentificationInfoNumber(request.CustomerCitizenIdentificationInfoNumber);
-            var customerInfo = _contractContext.CustomerInfos.Find(customerInfoExits.Id);
             var customerFiles = request.CustomerFiles;
-            if (customerInfoExits != null)
+            var customerInfo = _contractContext.CustomerInfos.Where(c => c.CitizenIdentificationInfoNumber == request.CustomerCitizenIdentificationInfoNumber).FirstOrDefault();
+            //Find customerinfo if exit, update
+            if (customerInfo != null)
             {
                 customerInfo.PhoneNumber = request.CustomerPhoneNumber;
                 customerInfo.CustomerName = request.CustomerName;
@@ -314,9 +313,10 @@ namespace CleanArchitecture.Application.Repository
                     _contractContext.SaveChanges();
                 }
             }
-            if (customerInfoExits == null)
+
+            if (customerInfo == null)
             {
-                var newCustomerInfo = new CustomerInfo
+                customerInfo = new CustomerInfo
                 {
                     PhoneNumber = request.CustomerPhoneNumber,
                     CustomerName = request.CustomerName,
@@ -332,7 +332,7 @@ namespace CleanArchitecture.Application.Repository
 
                 };
                 // Save the new ContractGroupGenerallInfos object to the database
-                _contractContext.CustomerInfos.Add(newCustomerInfo);
+                _contractContext.CustomerInfos.Add(customerInfo);
                 _contractContext.SaveChanges();
 
                 List<CustomerFile> customerFileList = new List<CustomerFile>();
@@ -359,7 +359,6 @@ namespace CleanArchitecture.Application.Repository
                     // Create new ContractGroup object and set its properties
                 }
             }
-
             int contractGroupIdDefault = Constant.ContractGroupConstant.ContractGroupNotExpertised;
             var contractGroup = new ContractGroup
             {
@@ -380,7 +379,6 @@ namespace CleanArchitecture.Application.Repository
             // Save the new ContractGroup to the database
             _contractContext.ContractGroups.Add(contractGroup);
             _contractContext.SaveChanges();
-
         }
 
         public void UpdateContractGroup(int id, ContractGroupUpdateModel request)

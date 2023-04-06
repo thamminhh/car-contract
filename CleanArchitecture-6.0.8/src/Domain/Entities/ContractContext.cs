@@ -238,7 +238,7 @@ namespace CleanArchitecture.Domain.Entities
 
                 entity.Property(e => e.RegistrationDeadline).HasColumnType("datetime");
 
-                entity.Property(e => e.RegistryInvoice).HasMaxLength(255);
+                entity.Property(e => e.RegistryAddress).HasMaxLength(255);
 
                 entity.HasOne(d => d.Car)
                     .WithMany(p => p.CarRegistryInfos)

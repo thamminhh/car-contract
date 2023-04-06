@@ -14,6 +14,9 @@ namespace CleanArchitecture.Domain.Interface
 
         void CreateTransferContractFile(TransferContractFileCreateModel request);
 
+        Task<bool> DeleteTransferContractFile(int transferContractFileId);
+
+
         //void UpdateTransferContractFile(int id, TransferContractFileUpdateModel request);
 
     }

@@ -5,6 +5,10 @@ namespace CleanArchitecture.Domain.Entities_SubModel.Car.SubModel
     public class CarFilter
     {
         [AllowNull]
+        public DateTime? DateStart { get; set; }
+        [AllowNull]
+        public DateTime? DateEnd { get; set; }
+        [AllowNull]
         public int? CarStatusId { get; set; }
 
         [AllowNull]

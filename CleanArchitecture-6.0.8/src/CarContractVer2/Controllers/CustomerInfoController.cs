@@ -11,11 +11,13 @@ namespace CarContractVer2.Controllers
     public class CustomerInfoController : ControllerBase
     {
         private readonly ICustomerInfoRepository _customerInfoController;
+        private readonly ICustomerFileRepository _customerFileRepository;
 
 
-        public CustomerInfoController(ICustomerInfoRepository customerInfoController)
+        public CustomerInfoController(ICustomerInfoRepository customerInfoController, ICustomerFileRepository customerFileRepository)
         {
             _customerInfoController = customerInfoController;
+            _customerFileRepository = customerFileRepository;   
         }
 
         [HttpGet]
@@ -98,7 +100,22 @@ namespace CarContractVer2.Controllers
                 ModelState.AddModelError("", "Something went wrong");
                 return StatusCode(500, ModelState);
             }
-            return NoContent();
+            return Ok("Update suscess");
+        }
+
+        [HttpDelete]
+        [Route(CustomerInfoEndpoints.DeleteCustomerFile)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> Delete(int customerFileId)
+        {
+            bool deleted = await _customerFileRepository.DeleteCustomerFile(customerFileId);
+
+            if (deleted)
+            {
+                return Ok("Deleted"); // Object deleted successfully
+            }
+            return NotFound(); // Object not found
         }
     }
 }

@@ -14,6 +14,9 @@ namespace CleanArchitecture.Domain.Interface
 
         void CreateReceiveContractFile(ReceiveContractFileCreateModel request);
 
+        Task<bool> DeleteReceiveContractFile(int receiveContractFileId);
+
+
         //void UpdateReceiveContractFile(int id, ReceiveContractFileUpdateModel request);
 
     }

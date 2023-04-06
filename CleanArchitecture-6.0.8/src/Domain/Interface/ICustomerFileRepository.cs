@@ -14,6 +14,8 @@ namespace CleanArchitecture.Domain.Interface
 
         void CreateCustomerFile(CustomerFileCreateModel request);
 
+        Task<bool> DeleteCustomerFile(int customerFileId);
+
         //void UpdateCustomerFile(int id, CustomerFileUpdateModel request);
 
     }

@@ -17,5 +17,6 @@ public class TransferContractEndpoints
     public const string Create = Base + "/create";
     public const string Update = Base + "/update/{id}";
     public const string Delete = Base + "/delete/{id}";
+    public const string DeleteTransferContractFile = Base + "/delete/{transferContractFileId}";
     public const string UpdateContractStatus = Base + "/update-contract-status/{id}";
 }

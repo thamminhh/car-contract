@@ -12,11 +12,12 @@ namespace CarContractVer2.Controllers
     public class TransferContractController : ControllerBase
     {
         private readonly ITransferContractRepository _transferContractRepository;
+        private readonly ITransferContractFileRepository _transferContractFileRepository;
 
-
-        public TransferContractController(ITransferContractRepository transferContractRepository)
+        public TransferContractController(ITransferContractRepository transferContractRepository, ITransferContractFileRepository transferContractFileRepository)
         {
             _transferContractRepository = transferContractRepository;
+            _transferContractFileRepository = transferContractFileRepository;   
         }
 
         [HttpGet]
@@ -84,6 +85,21 @@ namespace CarContractVer2.Controllers
                 return StatusCode(500, ModelState);
             }
             return NoContent();
+        }
+
+        [HttpDelete]
+        [Route(TransferContractEndpoints.DeleteTransferContractFile)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> Delete(int transferContractFileId)
+        {
+            bool deleted = await _transferContractFileRepository.DeleteTransferContractFile(transferContractFileId);
+
+            if (deleted)
+            {
+                return Ok("Deleted"); // Object deleted successfully
+            }
+            return NotFound(); // Object not found
         }
     }
 }

@@ -11,4 +11,6 @@ public class CarRegistryInfoCreateModel
     public DateTime? RegistrationDeadline { get; set; }
     public double? RegistryAmount { get; set; }
     public string? RegistryInvoice { get; set; }
+    public string? RegistryAddress { get; set; }
+    public string? CertificateRegistryDocument { get; set; }
 }

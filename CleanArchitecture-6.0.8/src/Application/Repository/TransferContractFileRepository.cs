@@ -133,5 +133,19 @@ namespace CleanArchitecture.Application.Repository
 
         //}
 
+        public async Task<bool> DeleteTransferContractFile(int transferContractFileId)
+        {
+            var transferContractFile = await _contractContext.TransferContractFiles.FindAsync(transferContractFileId);
+
+            if (transferContractFile == null)
+            {
+                return false; // Object not found
+            }
+
+            _contractContext.TransferContractFiles.Remove(transferContractFile);
+            await _contractContext.SaveChangesAsync();
+
+            return true; // Object deleted successfully
+        }
     }
 }

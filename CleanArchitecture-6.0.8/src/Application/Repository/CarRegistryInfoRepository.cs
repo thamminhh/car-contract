@@ -31,15 +31,16 @@ namespace CleanArchitecture.Application.Repository
                 RegistrationDeadline = carRegistryInfos.RegistrationDeadline,
                 RegistryAmount = carRegistryInfos.RegistryAmount,
                 RegistryInvoice = carRegistryInfos.RegistryInvoice,
-
+                RegistryAddress = carRegistryInfos.RegistryAddress,
+                CertificateRegistryDocument = carRegistryInfos.CertificateRegistryDocument,
             };
         }
 
-        public ICollection <CarRegistryInfo> GetCarRegistryInfoByCarId(int carId)
+        public ICollection<CarRegistryInfo> GetCarRegistryInfoByCarId(int carId)
         {
             var CarRegistryInfos = _contractContext.CarRegistryInfos.Where(c => c.CarId == carId).ToList();
             return CarRegistryInfos;
-         }
+        }
 
 
         public bool CarRegistryInfoExit(int id)
@@ -56,6 +57,8 @@ namespace CleanArchitecture.Application.Repository
                 RegistrationDeadline = request.RegistrationDeadline,
                 RegistryAmount = request.RegistryAmount,
                 RegistryInvoice = request.RegistryInvoice,
+                RegistryAddress = request.RegistryAddress,
+                CertificateRegistryDocument = request.CertificateRegistryDocument,
 
             };
             _contractContext.CarRegistryInfos.Add(carRegistryInfo);
@@ -66,10 +69,12 @@ namespace CleanArchitecture.Application.Repository
         {
             var carRegistryInfo = _contractContext.CarRegistryInfos.Find(id);
 
-                carRegistryInfo.CarId = request.CarId;
-                carRegistryInfo.RegistrationDeadline = request.RegistrationDeadline;
-                carRegistryInfo.RegistryAmount = request.RegistryAmount;
-                carRegistryInfo.RegistryInvoice = request.RegistryInvoice;
+            carRegistryInfo.CarId = request.CarId;
+            carRegistryInfo.RegistrationDeadline = request.RegistrationDeadline;
+            carRegistryInfo.RegistryAmount = request.RegistryAmount;
+            carRegistryInfo.RegistryInvoice = request.RegistryInvoice;
+            carRegistryInfo.RegistryAddress = request.RegistryAddress;
+            carRegistryInfo.CertificateRegistryDocument = request.CertificateRegistryDocument;
 
             _contractContext.CarRegistryInfos.Update(carRegistryInfo);
             _contractContext.SaveChanges();

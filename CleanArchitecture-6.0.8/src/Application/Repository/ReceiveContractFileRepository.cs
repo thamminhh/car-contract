@@ -78,6 +78,21 @@ namespace CleanArchitecture.Application.Repository
             }).ToList();
         }
 
+        public async Task<bool> DeleteReceiveContractFile(int receiveContractFileId)
+        {
+            var receiveContractFile = await _contractContext.ReceiveContractFiles.FindAsync(receiveContractFileId);
+
+            if (receiveContractFile == null)
+            {
+                return false; // Object not found
+            }
+
+            _contractContext.ReceiveContractFiles.Remove(receiveContractFile);
+            await _contractContext.SaveChangesAsync();
+
+            return true; // Object deleted successfully
+        }
+
         //public ICollection<ReceiveContractFileDataModel> GetReceiveContractFilesByCustomerInfoId(int customerInfoId)
         //{
 

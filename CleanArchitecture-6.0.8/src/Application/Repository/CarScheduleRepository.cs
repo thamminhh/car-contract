@@ -138,7 +138,6 @@ namespace CleanArchitecture.Application.Repository
             _contractContext.CarSchedules.Update(CarSchedule);
             _contractContext.SaveChanges();
 
-
         }
 
     }
