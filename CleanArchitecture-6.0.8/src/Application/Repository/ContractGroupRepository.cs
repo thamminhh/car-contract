@@ -195,6 +195,8 @@ namespace CleanArchitecture.Application.Repository
                     ContractGroupStatusId = c.ContractGroupStatusId,
                     ContractGroupStatusName = c.ContractGroupStatus.Name,
                     CitizenIdentificationInfoNumber = c.CustomerInfo.CitizenIdentificationInfoNumber,
+                    RentFrom= c.RentFrom,
+                    RentTo= c.RentTo,
                 })
                 .ToList();
             return contractGroupDataModels;
@@ -250,6 +252,8 @@ namespace CleanArchitecture.Application.Repository
                     ContractGroupStatusId = c.ContractGroupStatusId,
                     ContractGroupStatusName = c.ContractGroupStatus.Name,
                     CitizenIdentificationInfoNumber = c.CustomerInfo.CitizenIdentificationInfoNumber,
+                    RentFrom = c.RentFrom,
+                    RentTo = c.RentTo,
 
                 })
                 .ToList();

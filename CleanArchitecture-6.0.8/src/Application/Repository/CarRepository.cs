@@ -557,6 +557,46 @@ namespace CleanArchitecture.Application.Repository
             var response = cars.Skip(skip).Take(pageSize).ToList();
             return response;
         }
+        public ICollection<CarDataModel> GetCarsMaintenanceByParkingLotId(int page, int pageSize,int parkingLotId, out int count)
+        {
+            if (page < 1)
+            {
+                page = 1;
+            }
+
+            if (pageSize < 1)
+            {
+                pageSize = 10;
+            }
+            int skip = (page - 1) * pageSize;
+
+            var cars = _contractContext.Cars
+            .Include(c => c.CarStatus)
+            .Include(c => c.CarFile)
+            .Where(c => c.ParkingLotId == parkingLotId)
+            .Select(c => new CarDataModel
+            {
+                Id = c.Id,
+                CarStatusId = c.CarStatusId,
+                CarStatus = c.CarStatus.Name,
+                CarLicensePlates = c.CarLicensePlates,
+                SeatNumber = c.SeatNumber,
+                ModelYear = c.ModelYear,
+                CarModelId = c.CarModelId,
+                ModelName = c.CarModel.Name, // Set the ModelName property to the CarModel's Name property
+                IsDeleted = c.IsDeleted,
+                CarColor = c.CarColor,
+                CarFuel = c.CarFuel,
+                FrontImg = c.CarFile.FrontImg,
+                PeriodicMaintenanceLimit = c.PeriodicMaintenanceLimit,
+                KmTraveled = c.CarMaintenanceInfos.OrderByDescending(m => m.Id).FirstOrDefault().KmTraveled
+            })
+            .Where(c => c.KmTraveled >= (c.PeriodicMaintenanceLimit * 0.9));
+
+            count = cars.Count();
+            var response = cars.Skip(skip).Take(pageSize).ToList();
+            return response;
+        }
 
 
         //public ICollection<CarDataModel> GetCarsRegistry()
