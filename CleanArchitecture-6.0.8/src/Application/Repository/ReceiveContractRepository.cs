@@ -181,6 +181,7 @@ namespace CleanArchitecture.Application.Repository
                 DepositItemAsset = request.DepositItemAsset,
                 DepositItemDescription = request.DepositItemDescription,
                 DepositItemDownPayment = request.DepositItemDownPayment,
+                ReturnDepostiItem = request.ReturnDepostiItem,
                 OriginalCondition = request.OriginalCondition,
                 CurrentCarStateCarDamageDescription = request.CurrentCarStateCarDamageDescription,
                 DetectedViolations = request.DetectedViolations,

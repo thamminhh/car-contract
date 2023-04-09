@@ -61,11 +61,33 @@ namespace CarContractVer2.Controllers
         }
 
         [HttpGet]
+        [Route(CarEndpoints.GetCarsMaintenanceByParkingLotId)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
+        public IActionResult GetCarsMaintenanceByParkingLotId(int parkingLotId, int page = 1, int pageSize = 10)
+        {
+            var listCar = _carRepository.GetCarsMaintenanceByParkingLotId(page, pageSize, parkingLotId, out int count);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(new { cars = listCar, total = count });
+        }
+
+        [HttpGet]
         [Route(CarEndpoints.GetCarsRegistry)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
         public IActionResult GetCarsRegistry(int page = 1, int pageSize = 10)
         {
             var listCar = _carRepository.GetCarsRegistry(page, pageSize, out int count);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(new { cars = listCar, total = count });
+        }
+
+        [HttpGet]
+        [Route(CarEndpoints.GetCarsRegistryByParkingLotId)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
+        public IActionResult GetCarsRegistryByParkingLotId(int parkingLotId, int page = 1, int pageSize = 10)
+        {
+            var listCar = _carRepository.GetCarsRegistryByParkingLotId(page, pageSize,parkingLotId, out int count);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(new { cars = listCar, total = count });

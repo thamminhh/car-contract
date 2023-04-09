@@ -17,7 +17,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace CleanArchitecture.Application.Repository
 {
-    public class CarRepository : ICarRepository
+    public class CarRepository : ICarRepository 
     {
         private readonly ContractContext _contractContext;
         private readonly ICarMakeRepository _carMakeController;
@@ -440,8 +440,7 @@ namespace CleanArchitecture.Application.Repository
                 .Include(c => c.CarMake)
                 .Include(c => c.CarModel)
                 .Include(c => c.CarGeneration)
-                .AsQueryable(); ;
-
+                .AsQueryable(); 
 
             if (filter != null)
             {
@@ -531,12 +530,15 @@ namespace CleanArchitecture.Application.Repository
             }
             int skip = (page - 1) * pageSize;
 
-            var cars = _contractContext.Cars
+            var cars = _contractContext.Cars.Where(c => c.IsDeleted == false)
             .Include(c => c.CarStatus)
             .Include(c => c.CarFile)
+            .Include(c => c.ParkingLot)
             .Select(c => new CarDataModel
             {
                 Id = c.Id,
+                ParkingLotId = c.ParkingLotId,
+                ParkingLotName = c.ParkingLot.Name,
                 CarStatusId = c.CarStatusId,
                 CarStatus = c.CarStatus.Name,
                 CarLicensePlates = c.CarLicensePlates,
@@ -557,7 +559,7 @@ namespace CleanArchitecture.Application.Repository
             var response = cars.Skip(skip).Take(pageSize).ToList();
             return response;
         }
-        public ICollection<CarDataModel> GetCarsMaintenanceByParkingLotId(int page, int pageSize,int parkingLotId, out int count)
+        public ICollection<CarDataModel> GetCarsMaintenanceByParkingLotId(int page, int pageSize, int parkingLotId, out int count)
         {
             if (page < 1)
             {
@@ -570,13 +572,16 @@ namespace CleanArchitecture.Application.Repository
             }
             int skip = (page - 1) * pageSize;
 
-            var cars = _contractContext.Cars
+            var cars = _contractContext.Cars.Where(c => c.IsDeleted == false)
+            .Where(c => c.ParkingLotId == parkingLotId)
             .Include(c => c.CarStatus)
             .Include(c => c.CarFile)
-            .Where(c => c.ParkingLotId == parkingLotId)
+            .Include(c => c.ParkingLot)
             .Select(c => new CarDataModel
             {
                 Id = c.Id,
+                ParkingLotId = c.ParkingLotId,
+                ParkingLotName = c.ParkingLot.Name,
                 CarStatusId = c.CarStatusId,
                 CarStatus = c.CarStatus.Name,
                 CarLicensePlates = c.CarLicensePlates,
@@ -597,7 +602,6 @@ namespace CleanArchitecture.Application.Repository
             var response = cars.Skip(skip).Take(pageSize).ToList();
             return response;
         }
-
 
         //public ICollection<CarDataModel> GetCarsRegistry()
         //{
@@ -645,12 +649,15 @@ namespace CleanArchitecture.Application.Repository
 
             var currentDateTime = DateTime.Today;
 
-            var cars = _contractContext.Cars
+            var cars = _contractContext.Cars.Where(c => c.IsDeleted == false)
                 .Include(c => c.CarStatus)
                 .Include(c => c.CarFile)
+                .Include(c => c.ParkingLot)
                 .Select(c => new CarDataModel
                 {
                     Id = c.Id,
+                    ParkingLotId = c.ParkingLotId,
+                    ParkingLotName = c.ParkingLot.Name,
                     CarStatusId = c.CarStatusId,
                     CarStatus = c.CarStatus.Name,
                     CarLicensePlates = c.CarLicensePlates,
@@ -673,6 +680,54 @@ namespace CleanArchitecture.Application.Repository
             var response = cars.Skip(skip).Take(pageSize).ToList();
             return response;
         }
+        public ICollection<CarDataModel> GetCarsRegistryByParkingLotId(int page, int pageSize,int parkingLotId, out int count)
+        {
+            if (page < 1)
+            {
+                page = 1;
+            }
+
+            if (pageSize < 1)
+            {
+                pageSize = 10;
+            }
+            int skip = (page - 1) * pageSize;
+
+            var currentDateTime = DateTime.Today;
+
+            var cars = _contractContext.Cars.Where(c => c.IsDeleted == false)
+                .Where(c => c.ParkingLotId == parkingLotId)
+                .Include(c => c.CarStatus)
+                .Include(c => c.CarFile)
+                .Include(c => c.ParkingLot)
+                .Select(c => new CarDataModel
+                {
+                    Id = c.Id,
+                    ParkingLotId = c.ParkingLotId,
+                    ParkingLotName = c.ParkingLot.Name,
+                    CarStatusId = c.CarStatusId,
+                    CarStatus = c.CarStatus.Name,
+                    CarLicensePlates = c.CarLicensePlates,
+                    SeatNumber = c.SeatNumber,
+                    ModelYear = c.ModelYear,
+                    CarModelId = c.CarModelId,
+                    ModelName = c.CarModel.Name,
+                    IsDeleted = c.IsDeleted,
+                    CarColor = c.CarColor,
+                    CarFuel = c.CarFuel,
+                    FrontImg = c.CarFile.FrontImg,
+                    RegistrationDeadline = c.CarRegistryInfos
+                        .OrderByDescending(m => m.Id)
+                        .FirstOrDefault().RegistrationDeadline,
+                })
+                .Where(c => (EF.Functions.DateDiffDay(currentDateTime, c.RegistrationDeadline) <= 30))
+
+                .ToList();
+            count = cars.Count();
+            var response = cars.Skip(skip).Take(pageSize).ToList();
+            return response;
+        }
+
         public ICollection<Car> GetCarsByStatusId(int page, int pageSize, int carStatusId)
         {
             if (page < 1)
