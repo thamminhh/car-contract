@@ -87,13 +87,13 @@ namespace CleanArchitecture.Application.Repository
             var linkHost = parts[0];
 
             // Extract the hash
-            var hash = Convert.FromBase64String(parts[1]);
+            byte[] hash = Convert.FromBase64String(parts[1]);
 
             // Extract the ID
             var id = int.Parse(parts[2]);
-
+            
             // Extract the salt
-            var salt = Convert.FromBase64String(parts[3]);
+            byte[] salt = Convert.FromBase64String(parts[3]);
 
             // Extract the timestamp
             var timestamp = long.Parse(parts[4]);

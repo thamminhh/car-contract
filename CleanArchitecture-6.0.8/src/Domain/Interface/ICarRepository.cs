@@ -12,6 +12,7 @@ namespace CleanArchitecture.Domain.Interface
         ICollection<CarDataModel> GetCarsMaintenance(int page, int pageSize, out int count);
         ICollection<CarDataModel> GetCarsMaintenanceByParkingLotId(int page, int pageSize, int parkingLotId, out int count);
         ICollection<CarDataModel> GetCarsRegistry(int page, int pageSize, out int count);
+        ICollection<CarDataModel> GetCarsRegistryByParkingLotId(int page, int pageSize,int parkingLotId, out int count);
         ICollection<Car> GetCarsByStatusId(int page, int pageSize, int carStatus);
 
         ICollection<Car> GetCarsByCarMakeId(int page, int pageSize, int carMakeId);
