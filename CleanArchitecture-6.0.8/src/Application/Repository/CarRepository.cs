@@ -1061,7 +1061,6 @@ namespace CleanArchitecture.Application.Repository
 
     }
 
-
     //public CarDataModel GetCarById(int carId)
     //{
     //    CarDataModel car = (from c in _contractContext.Cars

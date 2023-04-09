@@ -48,12 +48,12 @@ namespace CleanArchitecture.Application.Repository
             //    }
             //}
             //var rentContract
-            byte[]? hash;
-            byte[]? salt;
+            //byte[]? hash;
+            //byte[]? salt;
 
-            _userRepository.EncodeId(mailRequest.RentContractId, out hash, out salt, out long timestamp);
+            //_userRepository.EncodeId(mailRequest.RentContractId, out hash, out salt, out long timestamp);
 
-            var body = mailRequest.LinkHost + Convert.ToBase64String(hash) + "/" + mailRequest.RentContractId + "/" + Convert.ToBase64String(salt) + "/" + timestamp;
+            var body = mailRequest.LinkHost + mailRequest.RentContractId;/*mailRequest.LinkHost + Convert.ToBase64String(hash) + "/" + mailRequest.RentContractId + "/" + Convert.ToBase64String(salt) + "/" + timestamp;*/
             builder.HtmlBody = body;
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();

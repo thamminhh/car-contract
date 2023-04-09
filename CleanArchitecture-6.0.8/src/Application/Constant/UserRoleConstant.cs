@@ -8,7 +8,7 @@ namespace CleanArchitecture.Application.Constant;
 public class UserRoleConstant
 {
     public const string Admin = "Admin";
-    public const string Expertise = "Expertise Staff";
-    public const string Sale = "Sale Staff";
-    public const string Operator = "Operator Staff";
+    public const string Expertise = "ExpertiseStaff";
+    public const string Sale = "SaleStaff";
+    public const string Operator = "OperatorStaff";
 }
