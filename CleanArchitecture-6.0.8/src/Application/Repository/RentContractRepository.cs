@@ -63,6 +63,7 @@ namespace CleanArchitecture.Application.Repository
                 RentTo = contractGroup.RentTo,
 
                 DeliveryAddress = rentContract.DeliveryAddress,
+                DeliveryFee = rentContract.DeliveryFee,
                 CarGeneralInfoAtRentPriceForNormalDay = rentContract.CarGeneralInfoAtRentPriceForNormalDay,
                 CarGeneralInfoAtRentPriceForWeekendDay = rentContract.CarGeneralInfoAtRentPriceForWeekendDay,
                 CarGeneralInfoAtRentPricePerKmExceed = rentContract.CarGeneralInfoAtRentPricePerKmExceed,
@@ -123,6 +124,7 @@ namespace CleanArchitecture.Application.Repository
                 RentTo = contractGroup.RentTo,
 
                 DeliveryAddress = rentContract.DeliveryAddress,
+                DeliveryFee = rentContract.DeliveryFee,
                 CarGeneralInfoAtRentPriceForNormalDay = rentContract.CarGeneralInfoAtRentPriceForNormalDay,
                 CarGeneralInfoAtRentPriceForWeekendDay = rentContract.CarGeneralInfoAtRentPriceForWeekendDay,
                 CarGeneralInfoAtRentPricePerKmExceed = rentContract.CarGeneralInfoAtRentPricePerKmExceed,
@@ -176,6 +178,7 @@ namespace CleanArchitecture.Application.Repository
                     RentTo = contractGroup.RentTo,
 
                     DeliveryAddress = c.DeliveryAddress,
+                    DeliveryFee = c.DeliveryFee,
                     CarGeneralInfoAtRentPriceForNormalDay = c.CarGeneralInfoAtRentPriceForNormalDay,
                     CarGeneralInfoAtRentPriceForWeekendDay = c.CarGeneralInfoAtRentPriceForWeekendDay,
                     CarGeneralInfoAtRentPricePerKmExceed = c.CarGeneralInfoAtRentPricePerKmExceed,
@@ -341,6 +344,8 @@ namespace CleanArchitecture.Application.Repository
             return Save();
         }
 
+
+
         public string CreateRentContractContent(RentContractCreateModel request)
         {
             var representer = _contractContext.Users.FirstOrDefault(c => c.Id == request.RepresentativeId);
@@ -352,16 +357,32 @@ namespace CleanArchitecture.Application.Repository
             .FirstOrDefault(c => c.Id == contractGroup.CarId);
             var appraisalRecord = _appraisalRecordRepository.GetLastAppraisalRecordByContractGroupId(request.ContractGroupId);
 
-            string htmlContent = "<h1 style= " + "color: blue; text - align:center;" + "> CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
-            htmlContent += "<h1 style= " + "color: blue; text - align:center;" + "> Độc lập – Tự do – Hạnh phúc</h1>";
-            htmlContent += "<h2>HỢP ĐỒNG CHO THUÊ XE </h2>";
+            string htmlContent = "<ul>";
+            htmlContent += "<table style='width: 100%;'>";
+            htmlContent += "<tr style='margin-left: 5px; list-style-type: none; width:50%;'>";
+            htmlContent += "<td>";
+            htmlContent += "<img src='https://amazingtech.vn/Content/amazingtech/assets/img/logo-color.png' style='height: 60px;'/>";
+            htmlContent += "<li>CÔNG TY CP CÔNG NGHỆ ATSHARE</li>";
+            htmlContent += "<li style='margin-left: 10px; margin-top: -15px;'>Số: " + request.ContractGroupId + "/Atshare</li>";
+            htmlContent+= "</td>";
+            htmlContent+= "<td style='height: 50px;'>";
+            htmlContent += "<li style='text-align: center; font-weight: 700; font-size: 16px;'>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</li>";
+            htmlContent += "<li style='text-align: center;  margin-top: -15px;'>Độc lập – Tự do – Hạnh phúc</li>";
+            htmlContent += "</td>";
+            htmlContent += "</tr>";
+            htmlContent += "</table>";
+            htmlContent += "</ul>";
+            htmlContent += "<h1 style='text-align: center;'>HỢP ĐỒNG CHO THUÊ XE </h1>";
             htmlContent += "<ul><li>Căn cứ Bộ Luật dân sự số 91/2015/QH13 nước CHXHCN Việt Nam ngày 01/01/2017</li>";
             htmlContent += "<li>Căn cứ Luật thương mại số 36/2005/QH11 nước CHXHCN Việt Nam ngày 26/06/2005</li>";
             htmlContent += "<li>Căn cứ vào khả năng cung cấp và nhu cầu của hai bên.</li></ul>";
             htmlContent += "<p>Hôm nay, ngày " + request.CreatedDate + ", chúng tôi gồm:</p>";
-            htmlContent += "<h2>BÊN CHO THUÊ XE (BÊN A): </h2>";
+
+            htmlContent += " <h2>BÊN CHO THUÊ XE (BÊN A): CÔNG TY CỔ PHẦN CÔNG NGHỆ ATSHARE</h2>";
             htmlContent += "<ul>";
-            htmlContent += "<li>Địa chỉ: " + representer.CurrentAddress + "</li>";
+            htmlContent += "<li>Địa chỉ: Park 2, Times City, 458 Minh Khai, Hai Bà Trưng, Hà Nội.</li>";
+            htmlContent += "<li>MST:0110032942</li> ";
+            htmlContent += "<li>STK:19035651301016 tại NH Kỹ Thương VN (Techcombank), CN Hai Bà Trưng</li>";
             htmlContent += "<li>Đại diện: " + representer.Name + "</li>";
             htmlContent += "<li>Điện thoại: " + representer.PhoneNumber + " </li>";
             htmlContent += "</ul>";
@@ -385,7 +406,7 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<ul>";
             htmlContent += "<li>Giới hạn hành trình: " + request.CarGeneralInfoAtRentLimitedKmForMonth + " Km/Ngày</li>";
             htmlContent += "<li>Đặt cọc giữ xe: " + appraisalRecord.DepositInfoCarRental + " VNĐ </li>";
-            htmlContent += "<li>Mô tả: " + request.DepositItemDescription+ " VNĐ </li>";
+            htmlContent += "<li>Mô tả: " + request.DepositItemDescription + " VNĐ </li>";
             htmlContent += "<li>Đặt cọc hợp đồng: " + appraisalRecord.DepositInfoDownPayment + " VNĐ </li>";
             htmlContent += "<li>Phí phát sinh Km: " + request.CarGeneralInfoAtRentPricePerKmExceed + "/Km</li>";
             htmlContent += "<li>Tổng tiền thuê xe: " + request.PaymentAmount + "</li>";
@@ -439,12 +460,73 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<li>2. Hợp đồng này được lập thành 02 bản có giá trị pháp lý như nhau và có hiệu lực kể từ ngày ký.</li>";
             htmlContent += "</ul>";
 
-            htmlContent += "<h3>&nbsp;&nbsp;&nbsp;&nbsp;BÊN A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
-                ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                "BÊN B</h3>";
+            htmlContent += "<table>";
+            htmlContent += "<tr>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td> <li>Bên A</li> </td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td></td>";
+            htmlContent += "<td><li>Bên B</li></td>";
+            htmlContent += "</tr>";
+            htmlContent += "</table>";
 
 
             return htmlContent;
@@ -462,16 +544,32 @@ namespace CleanArchitecture.Application.Repository
             .FirstOrDefault(c => c.Id == contractGroup.CarId);
             var appraisalRecord = _appraisalRecordRepository.GetLastAppraisalRecordByContractGroupId(request.ContractGroupId);
 
-            string htmlContent = "<h1 style= " + "color: blue; text - align:center;" + "> CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
-            htmlContent += "<h1 style= " + "color: blue; text - align:center;" + "> Độc lập – Tự do – Hạnh phúc</h1>";
-            htmlContent += "<h2>HỢP ĐỒNG CHO THUÊ XE </h2>";
+            string htmlContent = "<ul>";
+            htmlContent += "<table style='width: 100%;'>";
+            htmlContent += "<tr style='margin-left: 5px; list-style-type: none; width:50%;'>";
+            htmlContent += "<td>";
+            htmlContent += "<img src='https://amazingtech.vn/Content/amazingtech/assets/img/logo-color.png' style='height: 60px;'/>";
+            htmlContent += "<li>CÔNG TY CP CÔNG NGHỆ ATSHARE</li>";
+            htmlContent += "<li style='margin-left: 10px; margin-top: -15px;'>Số: " + request.ContractGroupId + "/Atshare</li>";
+            htmlContent += "</td>";
+            htmlContent += "<td style='height: 50px;'>";
+            htmlContent += "<li style='text-align: center; font-weight: 700; font-size: 16px;'>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</li>";
+            htmlContent += "<li style='text-align: center;  margin-top: -15px;'>Độc lập – Tự do – Hạnh phúc</li>";
+            htmlContent += "</td>";
+            htmlContent += "</tr>";
+            htmlContent += "</table>";
+            htmlContent += "</ul>";
+            htmlContent += "<h1 style='text-align: center;'>HỢP ĐỒNG CHO THUÊ XE </h1>";
             htmlContent += "<ul><li>Căn cứ Bộ Luật dân sự số 91/2015/QH13 nước CHXHCN Việt Nam ngày 01/01/2017</li>";
             htmlContent += "<li>Căn cứ Luật thương mại số 36/2005/QH11 nước CHXHCN Việt Nam ngày 26/06/2005</li>";
             htmlContent += "<li>Căn cứ vào khả năng cung cấp và nhu cầu của hai bên.</li></ul>";
             htmlContent += "<p>Hôm nay, ngày " + DateTime.Today + ", chúng tôi gồm:</p>";
-            htmlContent += "<h2>BÊN CHO THUÊ XE (BÊN A): </h2>";
+
+            htmlContent += " <h2>BÊN CHO THUÊ XE (BÊN A): CÔNG TY CỔ PHẦN CÔNG NGHỆ ATSHARE</h2>";
             htmlContent += "<ul>";
-            htmlContent += "<li>Địa chỉ: " + representer.CurrentAddress + "</li>";
+            htmlContent += "<li>Địa chỉ: Park 2, Times City, 458 Minh Khai, Hai Bà Trưng, Hà Nội.</li>";
+            htmlContent += "<li>MST:0110032942</li> ";
+            htmlContent += "<li>STK:19035651301016 tại NH Kỹ Thương VN (Techcombank), CN Hai Bà Trưng</li>";
             htmlContent += "<li>Đại diện: " + representer.Name + "</li>";
             htmlContent += "<li>Điện thoại: " + representer.PhoneNumber + " </li>";
             htmlContent += "</ul>";
@@ -559,6 +657,7 @@ namespace CleanArchitecture.Application.Repository
             if (request.StaffSignature != null)
             {
                 htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;<img style= 'width:100px; height:100%' src='" + request.StaffSignature + "' />";
+                htmlContent += "<li> " + representer.Name + "</li>";
             }
             if (request.CustomerSignature != null)
             {
@@ -568,6 +667,7 @@ namespace CleanArchitecture.Application.Repository
                ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
                 htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;<img style= 'width:100px; height:100%' src='" + request.CustomerSignature + "' />";
+                htmlContent += "<li> " + contractGroup.CustomerInfo.CustomerName + "</li>";
             }
 
             return htmlContent;
