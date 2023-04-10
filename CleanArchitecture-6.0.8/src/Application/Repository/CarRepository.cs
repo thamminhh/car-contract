@@ -17,7 +17,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace CleanArchitecture.Application.Repository
 {
-    public class CarRepository : ICarRepository 
+    public class CarRepository : ICarRepository
     {
         private readonly ContractContext _contractContext;
         private readonly ICarMakeRepository _carMakeController;
@@ -306,10 +306,10 @@ namespace CleanArchitecture.Application.Repository
                     cars = cars.Where(c => !conflictingCarIds.Contains(c.Id));
                 }
             }
-           
+
             return (from c in cars
                     join cstatus in _contractContext.CarStatuses on c.CarStatusId equals cstatus.Id
-                    join cf in _contractContext.CarFiles on c.Id equals cf.CarId into CarFile 
+                    join cf in _contractContext.CarFiles on c.Id equals cf.CarId into CarFile
                     from cf in CarFile.DefaultIfEmpty()
                     join cm in _contractContext.CarMakes on c.CarMakeId equals cm.Id
                     join cmo in _contractContext.CarModels on c.CarModelId equals cmo.Id
@@ -440,7 +440,7 @@ namespace CleanArchitecture.Application.Repository
                 .Include(c => c.CarMake)
                 .Include(c => c.CarModel)
                 .Include(c => c.CarGeneration)
-                .AsQueryable(); 
+                .AsQueryable();
 
             if (filter != null)
             {
@@ -517,7 +517,7 @@ namespace CleanArchitecture.Application.Repository
             return carDataModels;
         }
 
-        public ICollection<CarDataModel> GetCarsMaintenance(int page, int pageSize, out int count)
+        public ICollection<CarDataModel> GetCarsMaintenance(int page, int pageSize, int? parkingLotId, out int count)
         {
             if (page < 1)
             {
@@ -554,6 +554,11 @@ namespace CleanArchitecture.Application.Repository
                 KmTraveled = c.CarMaintenanceInfos.OrderByDescending(m => m.Id).FirstOrDefault().KmTraveled
             })
             .Where(c => c.KmTraveled >= (c.PeriodicMaintenanceLimit * 0.9));
+
+            if (parkingLotId.HasValue)
+            {
+                cars = cars.Where(c => c.ParkingLotId == parkingLotId);
+            }
 
             count = cars.Count();
             var response = cars.Skip(skip).Take(pageSize).ToList();
@@ -634,7 +639,7 @@ namespace CleanArchitecture.Application.Repository
         //    return cars;
         //}
 
-        public ICollection<CarDataModel> GetCarsRegistry(int page, int pageSize, out int count)
+        public ICollection<CarDataModel> GetCarsRegistry(int page, int pageSize, int? parkingLotId, out int count)
         {
             if (page < 1)
             {
@@ -671,16 +676,19 @@ namespace CleanArchitecture.Application.Repository
                     FrontImg = c.CarFile.FrontImg,
                     RegistrationDeadline = c.CarRegistryInfos
                         .OrderByDescending(m => m.Id)
-                        .FirstOrDefault().RegistrationDeadline,
+                        .FirstOrDefault().RegistrationDeadline
                 })
-                .Where(c => (EF.Functions.DateDiffDay(currentDateTime, c.RegistrationDeadline) <= 30))
+                .Where(c => (EF.Functions.DateDiffDay(currentDateTime, c.RegistrationDeadline) <= 30));
 
-                .ToList();
+            if (parkingLotId.HasValue)
+            {
+                cars = cars.Where(c => c.ParkingLotId == parkingLotId);
+            }
             count = cars.Count();
             var response = cars.Skip(skip).Take(pageSize).ToList();
             return response;
         }
-        public ICollection<CarDataModel> GetCarsRegistryByParkingLotId(int page, int pageSize,int parkingLotId, out int count)
+        public ICollection<CarDataModel> GetCarsRegistryByParkingLotId(int page, int pageSize, int parkingLotId, out int count)
         {
             if (page < 1)
             {
@@ -727,7 +735,6 @@ namespace CleanArchitecture.Application.Repository
             var response = cars.Skip(skip).Take(pageSize).ToList();
             return response;
         }
-
         public ICollection<Car> GetCarsByStatusId(int page, int pageSize, int carStatusId)
         {
             if (page < 1)
@@ -786,6 +793,161 @@ namespace CleanArchitecture.Application.Repository
                 CarSeriesId = request.CarSeriesId,
                 CarDescription = request.CarDescription,
                 CarTrimId = request.CarTrimId,
+                CreatedDate = request.CreatedDate,
+                IsDeleted = request.IsDeleted,
+                CarColor = request.CarColor,
+                CarFuel = request.CarFuel,
+                PeriodicMaintenanceLimit = request.PeriodicMaintenanceLimit
+
+            };
+
+            // Save the new car to the database
+            _contractContext.Cars.Add(car);
+            _contractContext.SaveChanges();
+
+            // Create new CarGenerallInfos object and set its properties
+            var carGenerallInfos = new CarGenerallInfo
+            {
+                CarId = car.Id,
+                PriceForNormalDay = request.PriceForNormalDay,
+                PriceForWeekendDay = request.PriceForWeekendDay,
+                PriceForMonth = request.PriceForMonth,
+                LimitedKmForMonth = request.LimitedKmForMonth,
+                OverLimitedMileage = request.OverLimitedMileage
+            };
+
+            // Save the new CarGenerallInfos object to the database
+            _contractContext.CarGenerallInfos.Add(carGenerallInfos);
+            _contractContext.SaveChanges();
+
+            // Create new CarStates object and set its properties
+            var carStates = new CarState
+            {
+                CarId = car.Id,
+                CarStatusDescription = request.CarStatusDescription,
+                CurrentEtcAmount = request.CurrentEtcAmount,
+                FuelPercent = request.FuelPercent,
+                SpeedometerNumber = request.SpeedometerNumber
+            };
+            // Save the new CarStates object to the database
+            _contractContext.CarStates.Add(carStates);
+            _contractContext.SaveChanges();
+
+            var carLoadnInfo = new CarLoanInfo
+            {
+                CarId = car.Id,
+                CarOwnerName = request.CarOwnerName,
+                RentalMethod = request.RentalMethod,
+                RentalDate = request.RentalDate,
+                SpeedometerNumberReceive = request.SpeedometerNumberReceive,
+                OwnerSlitRatio = request.OwnerSlitRatio,
+                PriceForDayReceive = request.PriceForDayReceive,
+                PriceForMonthReceive = request.PriceForMonthReceive,
+                Insurance = request.Insurance,
+                LimitedKmForMonthReceive = request.LimitedKmForMonthReceive,
+                OverLimitedMileageReceive = request.OverLimitedMileageReceive,
+            };
+
+            // Save the new CarLoanInfo object to the database
+            _contractContext.CarLoanInfos.Add(carLoadnInfo);
+            _contractContext.SaveChanges();
+
+            if (request.FrontImg != null)
+            {
+                var carFile = new CarFile
+                {
+                    CarId = car.Id,
+                    FrontImg = request.FrontImg,
+                    BackImg = request.BackImg,
+                    LeftImg = request.LeftImg,
+                    RightImg = request.RightImg,
+                    OrtherImg = request.OrtherImg,
+                };
+                // Save the new CarFile object to the database
+                _contractContext.CarFiles.Add(carFile);
+                _contractContext.SaveChanges();
+            }
+
+            var carMaintenanceInfo = new CarMaintenanceInfo
+            {
+                CarId = car.Id,
+                CarKmlastMaintenance = request.CarKmLastMaintenance,
+                KmTraveled = request.SpeedometerNumber - request.CarKmLastMaintenance,
+            };
+            _contractContext.CarMaintenanceInfos.Add(carMaintenanceInfo);
+            _contractContext.SaveChanges();
+
+            var carRegistryInfo = new CarRegistryInfo
+            {
+                CarId = car.Id,
+                RegistrationDeadline = request.RegistrationDeadline,
+            };
+            _contractContext.CarRegistryInfos.Add(carRegistryInfo);
+            _contractContext.SaveChanges();
+
+            var carTracking = new CarTracking
+            {
+                CarId = car.Id,
+                LinkTracking = request.LinkTracking,
+                TrackingUsername = request.TrackingUsername,
+                TrackingPassword = request.TrackingPassword,
+                Etcusername = request.Etcusername,
+                Etcpassword = request.Etcpassword
+            };
+            // Save the new CarTracking object to the database
+            _contractContext.CarTrackings.Add(carTracking);
+            _contractContext.SaveChanges();
+
+            return true;
+
+        }
+        public bool CreateCarByExcel(CarCreateExcelModel request, out string errorMessage)
+        {
+            errorMessage = string.Empty;
+
+            if (_contractContext.Cars.Any(u => u.CarLicensePlates == request.CarLicensePlates))
+            {
+                errorMessage = "Car with this license plates already exists";
+                return false;
+            }
+
+            int carMakeId = _carMakeController.GetCarMakeIdByName(request.CarMakeName);
+
+            int carModelId = _carModelController.GetCarModelIdByName(request.CarModelName);
+
+            int carGenerationId = (from carGeneration in _contractContext.CarGenerations
+                                   where carGeneration.Name.ToLower().Equals(request.CarGenerationName.ToLower())
+                                   select carGeneration.Id).FirstOrDefault();
+
+            int carSeriesId = (from carSeries in _contractContext.CarSeries
+                               where carSeries.CarModelId.Equals(carModelId)
+                               && carSeries.CarGenerationId.Equals(carGenerationId) && carSeries.Name.ToLower().Equals(request.CarSeriesName.ToLower())
+                               select carSeries.Id).FirstOrDefault();
+
+            int carTrimId = (from carTrim in _contractContext.CarTrims
+                             where carTrim.CarModelId.Equals(carModelId)
+                             && carTrim.CarSeriesId.Equals(carSeriesId)
+                             select carTrim.Id).FirstOrDefault();
+
+            int parkingLotId = (from carParkingLot in _contractContext.ParkingLots
+                                where carParkingLot.Name.ToLower().Equals(request.ParkingLotName.ToLower())
+                                select carParkingLot.Id).FirstOrDefault();
+
+            // Create new Car object and set its properties
+            int defaultCarSatusId = Constant.CarStatusConstants.Expertising;
+            var car = new Car
+            {
+                ParkingLotId = parkingLotId,
+                CarStatusId = defaultCarSatusId,
+                CarLicensePlates = request.CarLicensePlates,
+                ModelYear = request.ModelYear,
+                SeatNumber = request.SeatNumber,
+                CarMakeId = carMakeId,
+                CarModelId = carModelId,
+                CarGenerationId = carGenerationId,
+                CarSeriesId = carSeriesId,
+                CarTrimId = carTrimId,
+                CarDescription = request.CarDescription,
                 CreatedDate = request.CreatedDate,
                 IsDeleted = request.IsDeleted,
                 CarColor = request.CarColor,

@@ -52,9 +52,9 @@ namespace CarContractVer2.Controllers
         [HttpGet]
         [Route(CarEndpoints.GetCarsMaintenance)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
-        public IActionResult GetCarsMaintenance(int page = 1, int pageSize = 10)
+        public IActionResult GetCarsMaintenance(int? parkingLotId, int page = 1, int pageSize = 10)
         {
-            var listCar = _carRepository.GetCarsMaintenance(page, pageSize, out int count);
+            var listCar = _carRepository.GetCarsMaintenance(page, pageSize, parkingLotId, out int count);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return Ok(new { cars = listCar, total = count });
@@ -74,10 +74,10 @@ namespace CarContractVer2.Controllers
         [HttpGet]
         [Route(CarEndpoints.GetCarsRegistry)]
         [ProducesResponseType(200, Type = typeof(IEnumerable<Car>))]
-        public IActionResult GetCarsRegistry(int page = 1, int pageSize = 10)
+        public IActionResult GetCarsRegistry(int? parkingLotId, int page = 1, int pageSize = 10)
         {
-            var listCar = _carRepository.GetCarsRegistry(page, pageSize, out int count);
-            if (!ModelState.IsValid)
+            var listCar = _carRepository.GetCarsRegistry(page, pageSize, parkingLotId, out int count);
+            if (!ModelState.IsValid) 
                 return BadRequest(ModelState);
             return Ok(new { cars = listCar, total = count });
         }
@@ -133,7 +133,6 @@ namespace CarContractVer2.Controllers
             return Ok(car);
         }
 
-
         [HttpPost]
         [Route(CarEndpoints.Create)]
         public IActionResult CreateCar([FromBody] CarCreateModel request)
@@ -145,6 +144,24 @@ namespace CarContractVer2.Controllers
                 return BadRequest(ModelState);
             }
             if (!_carRepository.CreateCar(request, out string errorMessage))
+            {
+                ModelState.AddModelError("", errorMessage);
+                return StatusCode(422, ModelState);
+            }
+            return Ok("Successfully Added");
+        }
+
+        [HttpPost]
+        [Route(CarEndpoints.CreateByExcel)]
+        public IActionResult CreateCarByExcel([FromBody] CarCreateExcelModel request)
+        {
+            if (request == null)
+                return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!_carRepository.CreateCarByExcel(request, out string errorMessage))
             {
                 ModelState.AddModelError("", errorMessage);
                 return StatusCode(422, ModelState);

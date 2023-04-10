@@ -14,6 +14,7 @@ public class CarEndpoints
     public const string GetCarsRegistry = Base + "/need-registry";
     public const string GetCarsRegistryByParkingLotId = Base + "/need-registry/{parkingLotId}";
     public const string Create = Base + "/create";
+    public const string CreateByExcel = Base + "/createbyexcel";
     public const string Update = Base + "/update/{id}";
     public const string UpdateCarStatus = Base + "/update-status/{id}";
     public const string Delete = Base + "/delete/{id}";
