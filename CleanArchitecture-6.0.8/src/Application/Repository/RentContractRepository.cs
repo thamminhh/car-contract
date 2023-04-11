@@ -460,74 +460,12 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<li>2. Hợp đồng này được lập thành 02 bản có giá trị pháp lý như nhau và có hiệu lực kể từ ngày ký.</li>";
             htmlContent += "</ul>";
 
-            htmlContent += "<table>";
-            htmlContent += "<tr>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td> <li>Bên A</li> </td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td></td>";
-            htmlContent += "<td><li>Bên B</li></td>";
-            htmlContent += "</tr>";
-            htmlContent += "</table>";
-
+            htmlContent += "<h3>&nbsp;&nbsp;&nbsp;&nbsp;BÊN A &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
+                ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "BÊN B</h3>";
 
             return htmlContent;
         }
@@ -648,11 +586,11 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "</ul>";
 
             htmlContent += "<h3>&nbsp;&nbsp;&nbsp;&nbsp;BÊN A &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
-                ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-                "BÊN B</h3>";
+               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
+               ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+               "BÊN B</h3>";
 
             if (request.StaffSignature != null)
             {
@@ -662,12 +600,26 @@ namespace CleanArchitecture.Application.Repository
             if (request.CustomerSignature != null)
             {
                 htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
-               ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
+              ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
                 htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;<img style= 'width:100px; height:100%' src='" + request.CustomerSignature + "' />";
                 htmlContent += "<li> " + contractGroup.CustomerInfo.CustomerName + "</li>";
+                //htmlContent += "<table style='width: 100%;'>";
+                //htmlContent += " <tr style='margin-left: 5px; list-style-type: none; width:50%;'>";
+                //htmlContent += "<td >";
+                //htmlContent += "<li>Bên A</li>";
+                //htmlContent += "<img style='height: 100px; width: 100px;' src='" + request.StaffSignature + "'/>";
+                //htmlContent += "<li> " + contractGroup.CustomerInfo.CustomerName+"</li>";
+                //htmlContent += "</td>";
+                //htmlContent += " <td style='height: 50px;'>";
+                //htmlContent += "<li style='text-align: center; font-weight: 700; font-size: 16px;'>Bên B</li>";
+                //htmlContent += "<img style='height: 100px; width: 100px;' src='" + request.CustomerSignature+ "'/>";
+                //htmlContent += "<li style='text-align: center;  margin-top: -15px;'>" + contractGroup.CustomerInfo.CustomerName + "/li>";
+                //htmlContent += "</td>";
+                //htmlContent += "</tr>";
+                //htmlContent += "</table>";
             }
 
             return htmlContent;

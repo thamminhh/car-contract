@@ -5,7 +5,6 @@ namespace CleanArchitecture.Domain.Entities_SubModel.ContractGroup.SubModel
     public class ContractGroupCreateModel
     {
         public int? UserId { get; set; }
-        public int? CarId { get; set; }
         public string? RentPurpose { get; set; }
         public DateTime? RentFrom { get; set; }
         public DateTime? RentTo { get; set; }
