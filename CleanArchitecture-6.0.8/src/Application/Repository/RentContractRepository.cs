@@ -326,7 +326,7 @@ namespace CleanArchitecture.Application.Repository
                 var carScheduleCreateModel = new CarScheduleCreateModel();
                 carScheduleCreateModel.CarId = contractGroup.CarId;
                 carScheduleCreateModel.DateStart = contractGroup.RentFrom;
-                carScheduleCreateModel.DateStart = contractGroup.RentTo;
+                carScheduleCreateModel.DateEnd = contractGroup.RentTo;
                 carScheduleCreateModel.CarStatusId = carRentStatus;
                 
                 _carScheduleRepository.CreateCarSchedule(carScheduleCreateModel);

@@ -121,7 +121,6 @@ namespace CleanArchitecture.Application.Repository
             // Save the new CarSchedule to the database
             _contractContext.CarSchedules.Add(CarSchedule);
             _contractContext.SaveChanges();
-
         }
 
         public void UpdateCarSchedule(int id, CarScheduleUpdateModel request)
