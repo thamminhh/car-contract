@@ -22,7 +22,6 @@ public class RentContractUpdateModel
     public string? StaffSignature { get; set; }
     public bool? IsExported { get; set; }
     public double? PaymentAmount { get; set; }
-    public string? DepositItemDescription { get; set; }
     public string? CancelReason { get; set; }
     public int? ContractStatusId { get; set; }
 }

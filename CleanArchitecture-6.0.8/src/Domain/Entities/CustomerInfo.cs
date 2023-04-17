@@ -14,6 +14,7 @@ namespace CleanArchitecture.Domain.Entities
         public int Id { get; set; }
         public string? CustomerName { get; set; }
         public string? PhoneNumber { get; set; }
+        public string? CustomerEmail { get; set; }
         public string? CustomerAddress { get; set; }
         public string? CitizenIdentificationInfoNumber { get; set; }
         public string? CitizenIdentificationInfoAddress { get; set; }
@@ -22,7 +23,6 @@ namespace CleanArchitecture.Domain.Entities
         public string? CustomerSocialInfoFacebook { get; set; }
         public string? RelativeTel { get; set; }
         public string? CompanyInfo { get; set; }
-        public string? CustomerEmail { get; set; }
 
         public virtual ICollection<ContractGroup> ContractGroups { get; set; }
         public virtual ICollection<CustomerFile> CustomerFiles { get; set; }

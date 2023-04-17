@@ -23,8 +23,6 @@ namespace CleanArchitecture.Domain.Entities
         public string? FileWithSignsPath { get; set; }
         public bool? IsExported { get; set; }
         public double? PaymentAmount { get; set; }
-        public double? DepositInfoCarRental { get; set; }
-        public string? DepositItemDescription { get; set; }
         public double? DepositItemDownPayment { get; set; }
         public string? CancelReason { get; set; }
         public int? ContractStatusId { get; set; }

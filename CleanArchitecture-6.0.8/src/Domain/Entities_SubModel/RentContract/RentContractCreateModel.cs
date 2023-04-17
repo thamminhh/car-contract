@@ -19,5 +19,4 @@ public class RentContractCreateModel
     public double? DeliveryFee { get; set; }
     public DateTime? CreatedDate { get; set; }
     public double? PaymentAmount { get; set; }
-    public string? DepositItemDescription { get; set; }
 }

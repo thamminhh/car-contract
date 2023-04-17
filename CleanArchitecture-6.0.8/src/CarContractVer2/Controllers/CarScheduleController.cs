@@ -1,3 +1,4 @@
+using CleanArchitecture.Application.Repository;
 using CleanArchitecture.Domain.Endpoints;
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.Entities_SubModel.CarSchedules.SubModel;
@@ -90,6 +91,21 @@ namespace CarContractVer2.Controllers
             _carScheduleRepository.UpdateCarSchedule(id, request);
 
             return Ok();
+        }
+
+        [HttpDelete]
+        [Route(CarScheduleEndpoints.Delete)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> Delete(int carScheduleId)
+        {
+            bool deleted = await _carScheduleRepository.DeleteCarSchedule(carScheduleId);
+
+            if (deleted)
+            {
+                return Ok("Deleted"); // Object deleted successfully
+            }
+            return NotFound(); // Object not found
         }
 
     }

@@ -124,8 +124,6 @@ namespace CleanArchitecture.Application.Repository
                 CurrentCarStateCarStatusDescription = receiveContract.CurrentCarStateCarStatusDescription,
                 OriginalCondition = receiveContract.OriginalCondition,
 
-                DepositItemAsset = receiveContract.DepositItemAsset,
-                DepositItemDescription = receiveContract.DepositItemDescription,
                 DepositItemDownPayment = receiveContract.DepositItemDownPayment,
                 ReturnDepostiItem = receiveContract.ReturnDepostiItem,
                 CreatedDate = receiveContract.CreatedDate,
@@ -178,8 +176,6 @@ namespace CleanArchitecture.Application.Repository
                 CurrentCarStateFuelPercent = request.CurrentCarStateFuelPercent,
                 CurrentCarStateCurrentEtcAmount = request.CurrentCarStateCurrentEtcAmount,
                 CurrentCarStateCarStatusDescription = request.CurrentCarStateCarStatusDescription,
-                DepositItemAsset = request.DepositItemAsset,
-                DepositItemDescription = request.DepositItemDescription,
                 DepositItemDownPayment = request.DepositItemDownPayment,
                 ReturnDepostiItem = request.ReturnDepostiItem,
                 OriginalCondition = request.OriginalCondition,
@@ -251,8 +247,6 @@ namespace CleanArchitecture.Application.Repository
             receiveContract.CurrentCarStateCarStatusDescription = request.CurrentCarStateCarStatusDescription;
 
             receiveContract.OriginalCondition = request.OriginalCondition;
-            receiveContract.DepositItemAsset = request.DepositItemAsset;
-            receiveContract.DepositItemDescription = request.DepositItemDescription;
             receiveContract.DepositItemDownPayment = request.DepositItemDownPayment;
             receiveContract.ReturnDepostiItem = request.ReturnDepostiItem;
             if(request.ReturnDepostiItem == false)

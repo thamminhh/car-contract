@@ -17,8 +17,6 @@ public class TransferContractCreateModel
     public double? CurrentCarStateCurrentEtcAmount { get; set; }
     public string? CurrentCarStateCarStatusDescription { get; set; }
     public double? DepositItemDownPayment { get; set; }
-    public string? DepositItemAsset { get; set; }
-    public string? DepositItemDescription { get; set; }
     public DateTime? CreatedDate { get; set; }
     public ICollection<TransferContractFileCreateModel> TransferContractFileCreateModels { get; set; }
 }

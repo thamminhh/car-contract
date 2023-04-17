@@ -139,5 +139,20 @@ namespace CleanArchitecture.Application.Repository
 
         }
 
+        public async Task<bool> DeleteCarSchedule(int carScheduleId)
+        {
+            var carSchedule = await _contractContext.CarSchedules.FindAsync(carScheduleId);
+
+            if (carSchedule == null)
+            {
+                return false; // Object not found
+            }
+
+            _contractContext.CarSchedules.Remove(carSchedule);
+            await _contractContext.SaveChangesAsync();
+
+            return true; // Object deleted successfully
+        }
+
     }
 }

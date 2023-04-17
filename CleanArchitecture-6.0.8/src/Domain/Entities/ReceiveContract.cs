@@ -20,8 +20,6 @@ namespace CleanArchitecture.Domain.Entities
         public int? CurrentCarStateFuelPercent { get; set; }
         public double? CurrentCarStateCurrentEtcAmount { get; set; }
         public string? CurrentCarStateCarStatusDescription { get; set; }
-        public string? DepositItemAsset { get; set; }
-        public string? DepositItemDescription { get; set; }
         public double? DepositItemDownPayment { get; set; }
         public bool? ReturnDepostiItem { get; set; }
         public DateTime? CreatedDate { get; set; }
@@ -40,6 +38,7 @@ namespace CleanArchitecture.Domain.Entities
         public string? TrafficLightViolationDescription { get; set; }
         public string? OrtherViolation { get; set; }
         public double? ViolationMoney { get; set; }
+        public double? TotalPayment { get; set; }
 
         public virtual ContractGroup? ContractGroup { get; set; }
         public virtual ContractStatus? ContractStatus { get; set; }

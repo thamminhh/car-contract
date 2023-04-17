@@ -49,7 +49,6 @@ namespace CleanArchitecture.Application.Repository
                 ResultDescription = appraisalRecord.ResultDescription,
                 FilePath = host + appraisalRecord.FilePath,
                 DepositInfoDownPayment = appraisalRecord.DepositInfoDownPayment,
-                DepositInfoCarRental = appraisalRecord.DepositInfoCarRental,
             };
         }
 
@@ -84,7 +83,6 @@ namespace CleanArchitecture.Application.Repository
                 ResultDescription = lastRecord.ResultDescription,
                 FilePath = host + lastRecord.FilePath,
                 DepositInfoDownPayment = lastRecord.DepositInfoDownPayment,
-                DepositInfoCarRental = lastRecord.DepositInfoCarRental,
 
             };
 
@@ -115,7 +113,6 @@ namespace CleanArchitecture.Application.Repository
                     ResultDescription = c.ResultDescription,
                     FilePath = host + c.FilePath,
                     DepositInfoDownPayment = c.DepositInfoDownPayment,
-                    DepositInfoCarRental = c.DepositInfoCarRental,
 
                 }).ToList();
 
@@ -151,7 +148,6 @@ namespace CleanArchitecture.Application.Repository
                 ResultDescription = request.ResultDescription,
                 FilePath = filePath,
                 DepositInfoDownPayment = request.DepositInfoDownPayment,
-                DepositInfoCarRental = request.DepositInfoCarRental,
             };
             _contractContext.AppraisalRecords.Add(appraisalRecord);
             _contractContext.SaveChanges();
@@ -197,7 +193,6 @@ namespace CleanArchitecture.Application.Repository
                 ResultOfInfo = request.ResultOfInfo,
                 ResultOfCar = request.ResultOfCar,
                 ResultDescription = request.ResultDescription,
-                DepositInfoCarRental = request.DepositInfoCarRental,
                 DepositInfoDownPayment = request.DepositInfoDownPayment,
             };
             _contractContext.AppraisalRecords.Add(appraisalRecord);
@@ -269,7 +264,6 @@ namespace CleanArchitecture.Application.Repository
 
             htmlContent += "<p>Thông tin đặt cọc : </p>";
             htmlContent += "<ul>";
-            htmlContent += "<li>Số tiền đặt cọc thuê xe: " + request.DepositInfoCarRental + " VNĐ</li>";
             htmlContent += "<li>Số tiền đặt cọc: " + request.DepositInfoDownPayment + " VNĐ</li>";
             htmlContent += "</ul>";
 
@@ -316,7 +310,6 @@ namespace CleanArchitecture.Application.Repository
 
             htmlContent += "<p>Thông tin đặt cọc : </p>";
             htmlContent += "<ul>";
-            htmlContent += "<li>Số tiền đặt cọc thuê xe: " + request.DepositInfoCarRental + " VNĐ</li>";
             htmlContent += "<li>Số tiền đặt cọc: " + request.DepositInfoDownPayment + " VNĐ</li>";
             htmlContent += "</ul>";
 

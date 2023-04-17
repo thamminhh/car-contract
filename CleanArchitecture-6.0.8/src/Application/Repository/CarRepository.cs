@@ -203,6 +203,7 @@ namespace CleanArchitecture.Application.Repository
                 CarColor = car.CarColor,
                 CarFuel = car.CarFuel,
                 PeriodicMaintenanceLimit = car.PeriodicMaintenanceLimit,
+                TankCapacity = car.TankCapacity,
                 PriceForNormalDay = car.CarGenerallInfo.PriceForNormalDay,
                 PriceForWeekendDay = car.CarGenerallInfo.PriceForWeekendDay,
                 PriceForMonth = car.CarGenerallInfo.PriceForMonth,
@@ -797,7 +798,8 @@ namespace CleanArchitecture.Application.Repository
                 IsDeleted = request.IsDeleted,
                 CarColor = request.CarColor,
                 CarFuel = request.CarFuel,
-                PeriodicMaintenanceLimit = request.PeriodicMaintenanceLimit
+                PeriodicMaintenanceLimit = request.PeriodicMaintenanceLimit,
+                TankCapacity = request.TankCapacity,
 
             };
 
@@ -952,7 +954,9 @@ namespace CleanArchitecture.Application.Repository
                 IsDeleted = request.IsDeleted,
                 CarColor = request.CarColor,
                 CarFuel = request.CarFuel,
-                PeriodicMaintenanceLimit = request.PeriodicMaintenanceLimit
+                PeriodicMaintenanceLimit = request.PeriodicMaintenanceLimit,
+                TankCapacity = request.TankCapacity,
+
 
             };
 
@@ -1078,6 +1082,7 @@ namespace CleanArchitecture.Application.Repository
             car.CarColor = request.CarColor;
             car.CarFuel = request.CarFuel;
             car.PeriodicMaintenanceLimit = request.PeriodicMaintenanceLimit;
+            car.TankCapacity = request.TankCapacity;
 
             // Save the changes to the database
             _contractContext.Cars.Update(car);

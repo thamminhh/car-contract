@@ -20,8 +20,6 @@ public class ReceiveContractUpdateModel
     public int? CurrentCarStateFuelPercent { get; set; }
     public double? CurrentCarStateCurrentEtcAmount { get; set; }
     public string? CurrentCarStateCarStatusDescription { get; set; }
-    public string? DepositItemAsset { get; set; }
-    public string? DepositItemDescription { get; set; }
     public double? DepositItemDownPayment { get; set; }
     public bool? ReturnDepostiItem { get; set; }
     public string? StaffSignature { get; set; }
@@ -37,7 +35,6 @@ public class ReceiveContractUpdateModel
     public string? TrafficLightViolationDescription { get; set; }
     public string? OrtherViolation { get; set; }
     public double? ViolationMoney { get; set; }
-
     public ICollection<ReceiveContractFileDataModel> ReceiveContractFileDataModels { get; set; }
 
 }

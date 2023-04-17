@@ -30,13 +30,14 @@ namespace CleanArchitecture.Domain.Entities
         public DateTime? CreatedDate { get; set; }
         public bool? IsDeleted { get; set; }
         public int? ModelYear { get; set; }
+        public decimal? TankCapacity { get; set; }
 
-        public virtual CarModel? CarGeneration { get; set; }
-        public virtual CarModel? CarMake { get; set; }
+        public virtual CarGeneration? CarGeneration { get; set; }
+        public virtual CarMake? CarMake { get; set; }
         public virtual CarModel? CarModel { get; set; }
-        public virtual CarModel? CarSeries { get; set; }
+        public virtual CarSeries? CarSeries { get; set; }
         public virtual CarStatus? CarStatus { get; set; }
-        public virtual CarModel? CarTrim { get; set; }
+        public virtual CarTrim? CarTrim { get; set; }
         public virtual ParkingLot? ParkingLot { get; set; }
         public virtual CarFile? CarFile { get; set; }
         public virtual CarGenerallInfo? CarGenerallInfo { get; set; }

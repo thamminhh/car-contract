@@ -64,8 +64,6 @@ namespace CleanArchitecture.Application.Repository
                 CurrentCarStateFuelPercent = transferContract.CurrentCarStateFuelPercent,
                 CurrentCarStateCurrentEtcAmount = transferContract.CurrentCarStateCurrentEtcAmount,
                 CurrentCarStateCarStatusDescription = transferContract.CurrentCarStateCarStatusDescription,
-                DepositItemDescription = transferContract.DepositItemDescription,
-                DepositItemAsset = transferContract.DepositItemAsset,
                 DepositItemDownPayment = transferContract.DepositItemDownPayment,
                 IsExported = transferContract.IsExported,
                 CustomerSignature = transferContract.CustomerSignature,
@@ -117,8 +115,6 @@ namespace CleanArchitecture.Application.Repository
                 CurrentCarStateFuelPercent = transferContract.CurrentCarStateFuelPercent,
                 CurrentCarStateCurrentEtcAmount = transferContract.CurrentCarStateCurrentEtcAmount,
                 CurrentCarStateCarStatusDescription = transferContract.CurrentCarStateCarStatusDescription,
-                DepositItemDescription = transferContract.DepositItemDescription,
-                DepositItemAsset = transferContract.DepositItemAsset,
                 DepositItemDownPayment = transferContract.DepositItemDownPayment,
                 IsExported = transferContract.IsExported,
                 CustomerSignature = transferContract.CustomerSignature,
@@ -155,8 +151,6 @@ namespace CleanArchitecture.Application.Repository
                 CurrentCarStateCurrentEtcAmount = request.CurrentCarStateCurrentEtcAmount,
                 CurrentCarStateCarStatusDescription = request.CurrentCarStateCarStatusDescription,
 
-                DepositItemDescription = request.DepositItemDescription,
-                DepositItemAsset = request.DepositItemAsset,
                 DepositItemDownPayment = request.DepositItemDownPayment,
                 CreatedDate = request.CreatedDate,
                 ContractStatusId = defaultContractId,
@@ -213,8 +207,6 @@ namespace CleanArchitecture.Application.Repository
             transferContract.CurrentCarStateCarStatusDescription = request.CurrentCarStateCarStatusDescription;
 
             transferContract.DepositItemDownPayment = request.DepositItemDownPayment;
-            transferContract.DepositItemAsset = request.DepositItemAsset;
-            transferContract.DepositItemDescription = request.DepositItemDescription;
             transferContract.IsExported = request.IsExported;
             transferContract.CustomerSignature = request.CustomerSignature;
             transferContract.StaffSignature = request.StaffSignature;

@@ -18,6 +18,8 @@ namespace CleanArchitecture.Domain.Interface
 
         void UpdateCarSchedule(int id, CarScheduleUpdateModel request);
 
+        Task<bool> DeleteCarSchedule(int carScheduleId);
+
 
     }
 }

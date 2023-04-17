@@ -72,8 +72,6 @@ namespace CleanArchitecture.Application.Repository
                 CarGeneralInfoAtRentPriceForMonth = rentContract.CarGeneralInfoAtRentPriceForMonth,
                 CreatedDate = rentContract.CreatedDate,
                 PaymentAmount = rentContract.PaymentAmount,
-                DepositInfoCarRental = rentContract.DepositInfoCarRental,
-                DepositItemDescription = rentContract.DepositItemDescription,
                 DepositItemDownPayment = rentContract.DepositItemDownPayment,
 
                 FilePath = host + rentContract.FilePath,
@@ -133,8 +131,6 @@ namespace CleanArchitecture.Application.Repository
                 CarGeneralInfoAtRentPriceForMonth = rentContract.CarGeneralInfoAtRentPriceForMonth,
                 CreatedDate = rentContract.CreatedDate,
                 PaymentAmount = rentContract.PaymentAmount,
-                DepositInfoCarRental = rentContract.DepositInfoCarRental,
-                DepositItemDescription = rentContract.DepositItemDescription,
                 DepositItemDownPayment = rentContract.DepositItemDownPayment,
 
                 FilePath = host + rentContract.FilePath,
@@ -187,8 +183,6 @@ namespace CleanArchitecture.Application.Repository
                     CarGeneralInfoAtRentPriceForMonth = c.CarGeneralInfoAtRentPriceForMonth,
                     CreatedDate = c.CreatedDate,
                     PaymentAmount = c.PaymentAmount,
-                    DepositInfoCarRental = c.DepositInfoCarRental,
-                    DepositItemDescription = c.DepositItemDescription,
                     DepositItemDownPayment = c.DepositItemDownPayment,
 
                     FilePath = host + c.FilePath,
@@ -235,8 +229,6 @@ namespace CleanArchitecture.Application.Repository
                 DeliveryFee = request.DeliveryFee,
                 CreatedDate = request.CreatedDate,
                 PaymentAmount = request.PaymentAmount,
-                DepositInfoCarRental = appraisalRecord.DepositInfoCarRental,
-                DepositItemDescription = request.DepositItemDescription,
                 DepositItemDownPayment = appraisalRecord.DepositInfoDownPayment,
                 FilePath = filePath,
                 ContractStatusId = defaultContractId
@@ -295,7 +287,6 @@ namespace CleanArchitecture.Application.Repository
                 rentContract.ContractStatusId = Constant.ContractStatusConstant.ContractCancelled;
             }
             rentContract.FileWithSignsPath = filePath;
-            rentContract.DepositItemDescription = request.DepositItemDescription;
 
             _contractContext.RentContracts.Update(rentContract);
             _contractContext.SaveChanges();
@@ -405,8 +396,6 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<h2>Điều II: Thanh toán (giá chưa bao gồm VAT)</h2>";
             htmlContent += "<ul>";
             htmlContent += "<li>Giới hạn hành trình: " + request.CarGeneralInfoAtRentLimitedKmForMonth + " Km/Ngày</li>";
-            htmlContent += "<li>Đặt cọc giữ xe: " + appraisalRecord.DepositInfoCarRental + " VNĐ </li>";
-            htmlContent += "<li>Mô tả: " + request.DepositItemDescription + " VNĐ </li>";
             htmlContent += "<li>Đặt cọc hợp đồng: " + appraisalRecord.DepositInfoDownPayment + " VNĐ </li>";
             htmlContent += "<li>Phí phát sinh Km: " + request.CarGeneralInfoAtRentPricePerKmExceed + "/Km</li>";
             htmlContent += "<li>Tổng tiền thuê xe: " + request.PaymentAmount + "</li>";
@@ -530,8 +519,6 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<h2>Điều II: Thanh toán (giá chưa bao gồm VAT)</h2>";
             htmlContent += "<ul>";
             htmlContent += "<li>Giới hạn hành trình: " + request.CarGeneralInfoAtRentLimitedKmForMonth + " Km/Ngày</li>";
-            htmlContent += "<li>Đặt cọc giữ xe: " + appraisalRecord.DepositInfoCarRental + " VNĐ </li>";
-            htmlContent += "<li>Mô tả: " + request.DepositItemDescription + " VNĐ </li>";
             htmlContent += "<li>Đặt cọc hợp đồng: " + appraisalRecord.DepositInfoDownPayment + " VNĐ </li>";
             htmlContent += "<li>Phí phát sinh Km: " + request.CarGeneralInfoAtRentPricePerKmExceed + "/Km</li>";
             htmlContent += "<li>Tổng tiền thuê xe: " + request.PaymentAmount + "</li>";

@@ -15,7 +15,6 @@ public class AppraisalRecordDataModel
     public bool? ResultOfInfo { get; set; }
     public bool? ResultOfCar { get; set; }
     public string? ResultDescription { get; set; }
-    public double? DepositInfoCarRental { get; set; }
     public double? DepositInfoDownPayment { get; set; }
     public string? FilePath { get; set; }
 

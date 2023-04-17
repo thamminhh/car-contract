@@ -12,6 +12,7 @@ namespace CleanArchitecture.Domain.Entities
         public string? RegistryInvoice { get; set; }
         public string? RegistryAddress { get; set; }
         public string? CertificateRegistryDocument { get; set; }
+
         public virtual Car? Car { get; set; }
     }
 }

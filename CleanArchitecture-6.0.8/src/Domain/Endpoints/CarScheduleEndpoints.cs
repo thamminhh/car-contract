@@ -10,4 +10,5 @@ public class CarScheduleEndpoints
     public const string Update = Base + "/update/{id}";
     public const string GetByCarId = Base + "/carId/{carId}";
     public const string GetByCarStatusId = Base + "/{carStatusId}";
+    public const string Delete = Base + "/{carScheduleId}";
 }

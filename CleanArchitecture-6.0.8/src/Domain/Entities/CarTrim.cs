@@ -5,6 +5,11 @@ namespace CleanArchitecture.Domain.Entities
 {
     public partial class CarTrim
     {
+        public CarTrim()
+        {
+            Cars = new HashSet<Car>();
+        }
+
         public int Id { get; set; }
         public int? CarModelId { get; set; }
         public int? CarSeriesId { get; set; }
@@ -14,5 +19,6 @@ namespace CleanArchitecture.Domain.Entities
 
         public virtual CarModel? CarModel { get; set; }
         public virtual CarSeries? CarSeries { get; set; }
+        public virtual ICollection<Car> Cars { get; set; }
     }
 }
