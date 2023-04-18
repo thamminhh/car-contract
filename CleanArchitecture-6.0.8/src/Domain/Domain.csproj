@@ -22,8 +22,12 @@
 
     <ItemGroup>
       <None Remove="Entities_SubModel\Email\" />
+      <None Remove="Entities_SubModel\CarStatistic\" />
+      <None Remove="Entities_SubModel\CarStatistic\Sub_Model\" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Entities_SubModel\Email\" />
+      <Folder Include="Entities_SubModel\CarStatistic\" />
+      <Folder Include="Entities_SubModel\CarStatistic\Sub_Model\" />
     </ItemGroup>
 </Project>

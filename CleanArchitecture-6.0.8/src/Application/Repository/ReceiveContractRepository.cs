@@ -219,6 +219,8 @@ namespace CleanArchitecture.Application.Repository
             contractGroupUpdateStatusModel.Id = request.ContractGroupId;
             contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusReceiveNotSign;
             _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+
+
         }
 
         public void UpdateReceiveContract(int id, ReceiveContractUpdateModel request)
