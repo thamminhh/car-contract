@@ -419,8 +419,6 @@ namespace CleanArchitecture.Domain.Entities
 
             modelBuilder.Entity<ContractStatistic>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("ContractStatistic");
 
                 entity.Property(e => e.ContractGroupId).HasColumnName("ContractGroupID");
@@ -428,9 +426,9 @@ namespace CleanArchitecture.Domain.Entities
                 entity.Property(e => e.EtcmoneyUsing).HasColumnName("ETCMoneyUsing");
 
                 entity.HasOne(d => d.ContractGroup)
-                    .WithMany()
+                    .WithMany(p => p.ContractStatistics)
                     .HasForeignKey(d => d.ContractGroupId)
-                    .HasConstraintName("FK__ContractS__Contr__56E8E7AB");
+                    .HasConstraintName("FK__ContractS__Contr__5BAD9CC8");
             });
 
             modelBuilder.Entity<ContractStatus>(entity =>

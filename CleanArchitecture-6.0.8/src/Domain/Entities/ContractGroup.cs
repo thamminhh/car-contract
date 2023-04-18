@@ -8,6 +8,7 @@ namespace CleanArchitecture.Domain.Entities
         public ContractGroup()
         {
             AppraisalRecords = new HashSet<AppraisalRecord>();
+            ContractStatistics = new HashSet<ContractStatistic>();
             RentContracts = new HashSet<RentContract>();
         }
 
@@ -33,6 +34,7 @@ namespace CleanArchitecture.Domain.Entities
         public virtual ReceiveContract? ReceiveContract { get; set; }
         public virtual TransferContract? TransferContract { get; set; }
         public virtual ICollection<AppraisalRecord> AppraisalRecords { get; set; }
+        public virtual ICollection<ContractStatistic> ContractStatistics { get; set; }
         public virtual ICollection<RentContract> RentContracts { get; set; }
     }
 }

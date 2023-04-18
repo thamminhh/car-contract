@@ -67,6 +67,7 @@ builder.Services.AddScoped<ITransferContractFileRepository, TransferContractFile
 builder.Services.AddScoped<IReceiveContractFileRepository, ReceiveContractFileRepository>();
 builder.Services.AddScoped<ContractGroupHub>();
 builder.Services.AddScoped<IMailService, MailService>();
+builder.Services.AddScoped<IContractStatisticRepository, ContractStatisticRepository>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSwaggerGen(options =>

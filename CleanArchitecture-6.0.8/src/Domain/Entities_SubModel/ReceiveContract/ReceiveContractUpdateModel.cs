@@ -25,7 +25,6 @@ public class ReceiveContractUpdateModel
     public string? StaffSignature { get; set; }
     public string? CustomerSignature { get; set; }
     public int? ContractStatusId { get; set; }
-    public double? TotalKilometersTraveled { get; set; }
     public string? CurrentCarStateCarDamageDescription { get; set; }
     public double? InsuranceMoney { get; set; }
     public double? ExtraTime { get; set; }
@@ -35,6 +34,8 @@ public class ReceiveContractUpdateModel
     public string? TrafficLightViolationDescription { get; set; }
     public string? OrtherViolation { get; set; }
     public double? ViolationMoney { get; set; }
+
+    public double? CurrentFuelMoney { get; set; }
     public ICollection<ReceiveContractFileDataModel> ReceiveContractFileDataModels { get; set; }
 
 }

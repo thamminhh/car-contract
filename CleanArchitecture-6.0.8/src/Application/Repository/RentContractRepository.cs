@@ -3,6 +3,7 @@ using CleanArchitecture.Application.Constant;
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.Entities_SubModel.CarSchedules.SubModel;
 using CleanArchitecture.Domain.Entities_SubModel.ContractGroup.SubModel;
+using CleanArchitecture.Domain.Entities_SubModel.ContractStatistic.Sub_Model;
 using CleanArchitecture.Domain.Entities_SubModel.RentContract;
 using CleanArchitecture.Domain.Interface;
 using MediatR;
@@ -18,14 +19,17 @@ namespace CleanArchitecture.Application.Repository
         private readonly IContractGroupRepository _contractGroupRepository;
         private readonly IAppraisalRecordRepository _appraisalRecordRepository;
         private readonly ICarScheduleRepository _carScheduleRepository;
+        private readonly IContractStatisticRepository _contractStatisticRepository;
         public RentContractRepository(ContractContext contractContext, FileRepository fileRepository,
-            IContractGroupRepository contractGroupRepository, IAppraisalRecordRepository appraisalRecordRepository, ICarScheduleRepository carScheduleRepository)
+            IContractGroupRepository contractGroupRepository, IAppraisalRecordRepository appraisalRecordRepository, ICarScheduleRepository carScheduleRepository,
+            IContractStatisticRepository contractStatisticRepository)
         {
             _contractContext = contractContext;
             _fileRepository = fileRepository;
             _contractGroupRepository = contractGroupRepository;
             _appraisalRecordRepository = appraisalRecordRepository;
             _carScheduleRepository = carScheduleRepository;
+            _contractStatisticRepository = contractStatisticRepository;
         }
 
         public RentContractDataModel GetRentContractById(int id)
@@ -242,6 +246,16 @@ namespace CleanArchitecture.Application.Repository
             contractGroupUpdateStatusModel.Id = request.ContractGroupId;
             contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusExpertised;
             _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+
+            //Create ContractStatistic 
+            var contractStatistic = new ContractStatisticCreateModel();
+            contractStatistic.ContractGroupId = request.ContractGroupId;
+            contractStatistic.EtcmoneyUsing = 0;
+            contractStatistic.FuelMoneyUsing = 0;
+            contractStatistic.ExtraTimeMoney = 0;
+            contractStatistic.ExtraKmMoney = 0;
+            contractStatistic.PaymentAmount = request.PaymentAmount;
+            _contractStatisticRepository.CreateContractStatistic(contractStatistic);
 
         }
 

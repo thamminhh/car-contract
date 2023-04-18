@@ -7,6 +7,7 @@ using CleanArchitecture.Domain.Interface;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Plugins;
 using CleanArchitecture.Domain.Entities_SubModel.Car.SubModel;
+using CleanArchitecture.Domain.Entities_SubModel.ContractStatistic.Sub_Model;
 
 namespace CleanArchitecture.Application.Repository
 {
@@ -17,15 +18,18 @@ namespace CleanArchitecture.Application.Repository
         private readonly FileRepository _fileRepository;
         private readonly IReceiveContractFileRepository _receiveContractFileRepository;
         private readonly ICarRepository _carRepository;
+        private readonly IContractStatisticRepository _contractStatisticRepository; 
 
         public ReceiveContractRepository(ContractContext contractContext, IContractGroupRepository contractGroupRepository,
-            FileRepository fileRepository, IReceiveContractFileRepository receiveContractFileRepository, ICarRepository carRepository)
+            FileRepository fileRepository, IReceiveContractFileRepository receiveContractFileRepository, ICarRepository carRepository,
+            IContractStatisticRepository contractStatisticRepository)
         {
             _contractContext = contractContext;
             _contractGroupRepository = contractGroupRepository;
             _fileRepository = fileRepository;
             _receiveContractFileRepository = receiveContractFileRepository;
             _carRepository = carRepository;
+            _contractStatisticRepository= contractStatisticRepository;
         }
 
         //public ReceiveContractDataModel GetReceiveContractById(int id)
@@ -220,7 +224,6 @@ namespace CleanArchitecture.Application.Repository
             contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusReceiveNotSign;
             _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
 
-
         }
 
         public void UpdateReceiveContract(int id, ReceiveContractUpdateModel request)
@@ -294,7 +297,6 @@ namespace CleanArchitecture.Application.Repository
                     }
                 }
             }
-
             receiveContract.TotalKilometersTraveled = totalKilometersTraveled;
             receiveContract.CurrentCarStateCarDamageDescription = request.CurrentCarStateCarDamageDescription;
             receiveContract.InsuranceMoney = request.InsuranceMoney;
@@ -343,10 +345,55 @@ namespace CleanArchitecture.Application.Repository
                     .OrderByDescending(c => c.Id)
                     .FirstOrDefault();
 
-                carMaintenanceInfo.KmTraveled = carMaintenanceInfo.KmTraveled + request.TotalKilometersTraveled;
+                carMaintenanceInfo.KmTraveled = carMaintenanceInfo.KmTraveled + totalKilometersTraveled;
                 _contractContext.CarMaintenanceInfos.Update(carMaintenanceInfo);
                 _contractContext.SaveChanges();
+
+                //find Car 
+                var car = _contractContext.Cars.Find(contractGroup.CarId);
+
+                //find rentContract 
+                var rentContract = _contractContext.RentContracts.Where(c => c.ContractGroupId == contractGroup.Id).OrderByDescending(c => c.Id).FirstOrDefault();
+
+                //cal fuelPercent have using
+                int? fuelPercent = transferContract.CurrentCarStateFuelPercent - request.CurrentCarStateFuelPercent;
+
+                // cal etc using
+                double? etcMoney = transferContract.CurrentCarStateCurrentEtcAmount - request.CurrentCarStateCurrentEtcAmount;
+
+                //cal extraKm
+                double? overKm = totalKilometersTraveled - car.CarGenerallInfo.LimitedKmForMonth;
+                double? extraKmMoney;
+                if (overKm > 0)
+                {
+                    extraKmMoney = overKm * car.CarGenerallInfo.OverLimitedMileage;
+                }
+                else
+                {
+                    overKm = 0;
+                     extraKmMoney = 0;
+                }
+
+                //Update ContractStatistic
+                var contractStatistic = _contractContext.ContractStatistics
+                    .Where(c => c.ContractGroupId == contractGroup.Id).FirstOrDefault();
+
+                var contractStatisticUpdateModel = new ContractStatisticUpdateModel();
+                contractStatisticUpdateModel.Id = contractStatistic.Id;
+                contractStatisticUpdateModel.ContractGroupId = contractStatistic.ContractGroupId;
+                contractStatisticUpdateModel.FuelMoneyUsing = calFuelMoney(car.TankCapacity, fuelPercent, request.CurrentFuelMoney);
+                contractStatisticUpdateModel.EtcmoneyUsing = etcMoney;
+                contractStatisticUpdateModel.ExtraTimeMoney = request.ExtraTime * rentContract.CarGeneralInfoAtRentPricePerHourExceed;
+                contractStatisticUpdateModel.ExtraKmMoney = extraKmMoney;
+                contractStatisticUpdateModel.PaymentAmount = contractStatistic.PaymentAmount;
+                _contractStatisticRepository.UpdateContractStatistic(contractStatisticUpdateModel);
             }
+        }
+        private double? calFuelMoney(decimal? tankCapacity, int? fuelPercent, double? currentFuelMoney)
+        {
+            double? carFuelMoney;
+            double? dTankCapacity = Decimal.ToDouble((decimal)tankCapacity);
+            return carFuelMoney = (dTankCapacity * fuelPercent/100) * currentFuelMoney;
         }
 
         public bool UpdateReceiveContractStatus(int id, ReceiveContractUpdateStatusModel request)
@@ -368,7 +415,7 @@ namespace CleanArchitecture.Application.Repository
         public string CreateReceiveContractContent(ReceiveContractCreateModel request)
         {
             var receiveer = _contractContext.Users.FirstOrDefault(c => c.Id == request.ReceiverId);
-            //var transferContract = _contractContext.TransferContracts.FirstOrDefault(c => c.Id == request.TransferContractId);
+            var transferContract = _contractContext.TransferContracts.FirstOrDefault(c => c.Id == request.TransferContractId);
 
             var contractGroup = _contractContext.ContractGroups
                             .Include(c => c.CustomerInfo)
@@ -378,8 +425,8 @@ namespace CleanArchitecture.Application.Repository
                 .Include(c => c.CarGenerallInfo)
                 .FirstOrDefault(c => c.Id == contractGroup.CarId);
             var rentContract = _contractContext.RentContracts.FirstOrDefault(c => c.ContractGroupId == request.ContractGroupId);
-            //double? totalKilometersTraveled = request.CurrentCarStateSpeedometerNumber - transferContract.CurrentCarStateSpeedometerNumber;
-            //double? overKm = totalKilometersTraveled - car.CarGenerallInfo.LimitedKmForMonth;
+            double? totalKilometersTraveled = request.CurrentCarStateSpeedometerNumber - transferContract.CurrentCarStateSpeedometerNumber;
+            double? overKm = totalKilometersTraveled - car.CarGenerallInfo.LimitedKmForMonth;
             double? extraTimeMoney = request.ExtraTime * rentContract.CarGeneralInfoAtRentPricePerHourExceed;
 
             string htmlContent = "<h1 style='text-align:center;'>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>";
@@ -422,18 +469,18 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<li>Số công tơ mét: " + request.CurrentCarStateSpeedometerNumber + " Km</li>";
             //htmlContent += "<li>Tổng số km đã đi: " + totalKilometersTraveled + " Km</li>";
             htmlContent += "<li>Nằm trong giới hạn km: " + car.CarGenerallInfo.LimitedKmForMonth + " Km</li>";
-            //if (overKm > 0)
-            //{
-            //    htmlContent += "<li>Vượt số giới hạn km, số km vượt: " + overKm + " Km</li>";
-            //    htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
+            if (overKm > 0)
+            {
+                htmlContent += "<li>Vượt số giới hạn km, số km vượt: " + overKm + " Km</li>";
+                htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
 
-            //}
-            //else
-            //{
-            //    overKm = 0;
-            //    htmlContent += "<li>Vượt số giới hạn km, số km vượt: " + overKm + " Km</li>";
-            //    htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
-            //}
+            }
+            else
+            {
+                overKm = 0;
+                htmlContent += "<li>Vượt số giới hạn km, số km vượt: " + overKm + " Km</li>";
+                htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
+            }
             htmlContent += "<li>Đồng hồ xăng/dầu: " + request.CurrentCarStateFuelPercent + " %</li>";
             htmlContent += "<li>Thời gian phụ trội so với hợp đồng: " + request.ExtraTime + " giờ, phụ phí phát sinh: " + extraTimeMoney + " VNĐ</li>";
             //htmlContent += "<li>Vé cầu đường phát sinh chưa thanh toán: " + request.UnpaidTicketMoney + "</li>";
