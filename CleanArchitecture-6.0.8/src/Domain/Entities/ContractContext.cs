@@ -18,6 +18,7 @@ namespace CleanArchitecture.Domain.Entities
 
         public virtual DbSet<AppraisalRecord> AppraisalRecords { get; set; } = null!;
         public virtual DbSet<Car> Cars { get; set; } = null!;
+        public virtual DbSet<CarExpense> CarExpenses { get; set; } = null!;
         public virtual DbSet<CarFile> CarFiles { get; set; } = null!;
         public virtual DbSet<CarGenerallInfo> CarGenerallInfos { get; set; } = null!;
         public virtual DbSet<CarGeneration> CarGenerations { get; set; } = null!;
@@ -131,6 +132,22 @@ namespace CleanArchitecture.Domain.Entities
                     .WithMany(p => p.Cars)
                     .HasForeignKey(d => d.ParkingLotId)
                     .HasConstraintName("FK__Car__ParkingLotI__7C4F7684");
+            });
+
+            modelBuilder.Entity<CarExpense>(entity =>
+            {
+                entity.ToTable("CarExpense");
+
+                entity.Property(e => e.Day).HasColumnType("datetime");
+
+                entity.Property(e => e.Title)
+                    .HasMaxLength(255)
+                    .HasColumnName("Title ");
+
+                entity.HasOne(d => d.Car)
+                    .WithMany(p => p.CarExpenses)
+                    .HasForeignKey(d => d.CarId)
+                    .HasConstraintName("FK__CarExpens__CarId__5E8A0973");
             });
 
             modelBuilder.Entity<CarFile>(entity =>

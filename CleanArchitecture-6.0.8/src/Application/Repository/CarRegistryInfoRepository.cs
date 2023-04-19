@@ -8,16 +8,19 @@ using PdfSharpCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using CleanArchitecture.Domain.Entities_SubModel.CarRegistryInfo.SubModel;
+using CleanArchitecture.Domain.Entities_SubModel.CarExpense.Sub_Model;
 
 namespace CleanArchitecture.Application.Repository
 {
     public class CarRegistryInfoRepository : ICarRegistryInfoRepository
     {
         private readonly ContractContext _contractContext;
+        private readonly ICarExpenseRepository _carExpenseRepository;
 
-        public CarRegistryInfoRepository(ContractContext contractContext)
+        public CarRegistryInfoRepository(ContractContext contractContext, ICarExpenseRepository carExpenseRepository)
         {
             _contractContext = contractContext;
+            _carExpenseRepository = carExpenseRepository;
         }
 
         public CarRegistryInfo GetCarRegistryInfoById(int id)
@@ -63,6 +66,14 @@ namespace CleanArchitecture.Application.Repository
             };
             _contractContext.CarRegistryInfos.Add(carRegistryInfo);
             _contractContext.SaveChanges();
+
+            //Create CarExpense 
+            var carExpense = new CarExpenseCreateModel();
+            carExpense.CarId = request.CarId;
+            carExpense.Title = "Đăng kiểm";
+            carExpense.Day = DateTime.Today;
+            carExpense.Amount = request.RegistryAmount;
+            _carExpenseRepository.CreateCarExpense(carExpense);
         }
 
         public void UpdateCarRegistryInfo(int id, CarRegistryInfo request)

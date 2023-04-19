@@ -24,6 +24,7 @@ namespace CleanArchitecture.Domain.Interface
         public int GetNumberOfCars(CarFilter filter);
         public int GetNumberOfCarsActive(CarFilter filter);
         public int GetNumberOfCarsByStatusId(int carStatus);
+        ICollection<CarStatistic> GetCarStatistic(DateTime from, DateTime to);
 
     }
 }

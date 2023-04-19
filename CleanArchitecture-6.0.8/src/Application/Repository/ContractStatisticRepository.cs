@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Domain.Entities_SubModel.Car.SubModel;
 using CleanArchitecture.Domain.Entities_SubModel.ContractStatistic.Sub_Model;
 using CleanArchitecture.Domain.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -62,6 +63,26 @@ namespace CleanArchitecture.Application.Repository
                     FuelMoneyUsing = c.FuelMoneyUsing,
                     ExtraKmMoney = c.ExtraKmMoney,
                     PaymentAmount = c.PaymentAmount,
+                    Total = c.Total,
+                }).ToList();
+            return contractStatisticDataModel;
+        }
+
+        public ICollection<CarRevenue> GetContractStatisticForCar(DateTime from, DateTime to, int carId)
+        {
+            IQueryable<ContractStatistic> contractStatistics = _contractContext.ContractStatistics
+                .Include(c => c.ContractGroup)
+                .Where(c => c.ContractGroup.ContractGroupStatusId == Constant.ContractGroupConstant.ReceiveContractSigned)
+                .Where(c => c.ContractGroup.CarId == carId)
+                .AsQueryable();
+
+            contractStatistics = contractStatistics.Where(c => c.ContractGroup.RentFrom < to && c.ContractGroup.RentTo > from);
+            var contractStatisticDataModel = contractStatistics
+                .OrderBy(c => c.Id)
+                .Select(c => new CarRevenue
+                {
+                    Id = c.Id,
+                    ContractGroupId = c.ContractGroupId,
                     Total = c.Total,
                 }).ToList();
             return contractStatisticDataModel;

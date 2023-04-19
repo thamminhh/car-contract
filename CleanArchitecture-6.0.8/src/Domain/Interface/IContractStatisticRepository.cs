@@ -10,6 +10,8 @@ namespace CleanArchitecture.Domain.Interface;
 public interface IContractStatisticRepository
 {
     ICollection<ContractStatisticDataModel> GetContractStatistic(DateTime from, DateTime to);
+
+    ICollection<CarRevenue> GetContractStatisticForCar(DateTime from, DateTime to, int carId);
     void CreateContractStatistic(ContractStatisticCreateModel request);
 
     void UpdateContractStatistic(ContractStatisticUpdateModel request);

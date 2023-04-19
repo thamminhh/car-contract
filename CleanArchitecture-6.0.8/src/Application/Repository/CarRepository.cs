@@ -10,6 +10,7 @@ using PdfSharpCore;
 using PdfSharpCore.Pdf.Filters;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Reflection.Metadata;
@@ -23,16 +24,21 @@ namespace CleanArchitecture.Application.Repository
         private readonly ICarMakeRepository _carMakeController;
         private readonly ICarModelRepository _carModelController;
         private readonly ICarScheduleRepository _carScheduleRepository;
+        private readonly ICarExpenseRepository _carExpenseRepository;
+        private readonly IContractStatisticRepository _contractStatisticRepository;
 
 
 
         public CarRepository(ContractContext contractContext,
-            ICarMakeRepository carMakeController, ICarScheduleRepository carScheduleRepository, ICarModelRepository carModelRepository)
+            ICarMakeRepository carMakeController, ICarScheduleRepository carScheduleRepository, ICarModelRepository carModelRepository,
+            ICarExpenseRepository carExpenseRepository, IContractStatisticRepository contractStatisticRepository)
         {
             _contractContext = contractContext;
             _carMakeController = carMakeController;
             _carScheduleRepository = carScheduleRepository;
             _carModelController = carModelRepository;
+            _carExpenseRepository = carExpenseRepository;
+            _contractStatisticRepository = contractStatisticRepository;
         }
 
         public int GetNumberOfCars(CarFilter filter)
@@ -170,7 +176,7 @@ namespace CleanArchitecture.Application.Repository
             var series = _contractContext.CarSeries.Where(c => c.Id == car.CarSeriesId).FirstOrDefault();
             var trim = _contractContext.CarTrims.Where(c => c.Id == car.CarTrimId).FirstOrDefault();
             var carSchedule = _carScheduleRepository.GetCarSchedulesByCarId(car.Id);
-            var carMaintenanceInfo = _contractContext.CarMaintenanceInfos.Where(c => c.CarId == car.Id).OrderByDescending(c => c.Id).LastOrDefault();
+            var carMaintenanceInfo = _contractContext.CarMaintenanceInfos.Where(c => c.CarId == car.Id).OrderByDescending(c => c.Id).FirstOrDefault();
             var carRegistryInfo = _contractContext.CarRegistryInfos.Where(c => c.CarId == car.Id).OrderByDescending(c => c.Id).LastOrDefault();
 
             return new CarDataModel
@@ -1226,6 +1232,52 @@ namespace CleanArchitecture.Application.Repository
                 .ToList();
         }
 
+        public ICollection<CarStatistic> GetCarStatistic(DateTime from, DateTime to)
+        {
+            IQueryable<Car> cars = _contractContext.Cars.Where(c => c.IsDeleted == false)
+                .AsQueryable();
+
+            // Find the car ids that have revenue during the specified time period
+            //var carIdHaveRevenues = _contractContext.ContractGroups
+            //    .Where(s => s.RentFrom < to && s.RentTo > from)
+            //    .Select(s => s.CarId)
+            //    .Distinct();
+            //// take cars have revenue the specified time period
+            //cars = cars.Where(c => carIdHaveRevenues.Contains(c.Id));
+
+            //// Find the car ids that have expense during the specified time period
+            //var carIdHaveExpense = _contractContext.CarExpenses
+            //    .Where(s => s.Day < to && s.Day > from)
+            //    .Select(s => s.CarId)
+            //    .Distinct();
+            //// take cars have expense the specified time period
+            //cars = cars.Where(c => carIdHaveExpense.Contains(c.Id));
+
+            var carIdsWithRevenueOrExpense = _contractContext.ContractGroups
+                .Where(s => s.RentFrom < to && s.RentTo > from)
+                .Select(s => s.CarId)
+                .Concat(_contractContext.CarExpenses
+                    .Where(s => s.Day < to && s.Day > from)
+                    .Select(s => s.CarId))
+                .Distinct();
+
+            // Filter cars to only those with revenue or expense during the specified time period
+            cars = cars.Where(c => carIdsWithRevenueOrExpense.Contains(c.Id));
+
+            var carStatistic = cars
+                    .OrderBy(c => c.Id)
+                    .Select(c => new CarStatistic
+                    {
+                        CarId = c.Id,
+                        ParkingLotId = c.ParkingLotId,
+                        CarLicensePlates = c.CarLicensePlates,
+                        CarExpenses = _carExpenseRepository.GetCarExpensesByCarId(c.Id),
+                        CarRevenues = _contractStatisticRepository.GetContractStatisticForCar(from, to, c.Id),
+
+                    }).ToList();
+            return carStatistic;
+
+        }
     }
 
     //public CarDataModel GetCarById(int carId)

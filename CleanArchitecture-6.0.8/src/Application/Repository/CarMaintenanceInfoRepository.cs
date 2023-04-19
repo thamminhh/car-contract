@@ -8,6 +8,7 @@ using PdfSharpCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using CleanArchitecture.Domain.Entities_SubModel.CarMaintenanceInfo.SubModel;
+using CleanArchitecture.Domain.Entities_SubModel.CarExpense.Sub_Model;
 
 namespace CleanArchitecture.Application.Repository
 {
@@ -16,12 +17,15 @@ namespace CleanArchitecture.Application.Repository
         private readonly ContractContext _contractContext;
         private readonly IContractGroupRepository _contractGroupController;
         private readonly FileRepository _fileRepository;
+        private readonly ICarExpenseRepository _carExpenseRepository;
 
-        public CarMaintenanceInfoRepository(ContractContext contractContext, IContractGroupRepository contractGroupController, FileRepository fileRepository)
+        public CarMaintenanceInfoRepository(ContractContext contractContext, IContractGroupRepository contractGroupController, FileRepository fileRepository,
+            ICarExpenseRepository carExpenseRepository)
         {
             _contractContext = contractContext;
             _contractGroupController = contractGroupController;
             _fileRepository = fileRepository;
+            _carExpenseRepository = carExpenseRepository;
         }
 
         public CarMaintenanceInfo GetCarMaintenanceInfoById(int id)
@@ -73,6 +77,15 @@ namespace CleanArchitecture.Application.Repository
             carState.SpeedometerNumber = request.CarKmlastMaintenance;
             _contractContext.CarStates.Update(carState);
             _contractContext.SaveChanges();
+
+            //Create CarExpense 
+            var carExpense = new CarExpenseCreateModel();
+            carExpense.CarId = request.CarId;
+            carExpense.Title = "Bảo dưỡng";
+            carExpense.Day = request.MaintenanceDate;
+            carExpense.Amount= request.MaintenanceAmount;
+            _carExpenseRepository.CreateCarExpense(carExpense);
+
         }
 
         public void UpdateCarMaintenanceInfo(int id, CarMaintenanceInfo request)
@@ -94,6 +107,8 @@ namespace CleanArchitecture.Application.Repository
             carState.SpeedometerNumber = request.CarKmlastMaintenance;
             _contractContext.CarStates.Update(carState);
             _contractContext.SaveChanges();
+
+
         }
 
         public bool Save()
