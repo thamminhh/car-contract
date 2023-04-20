@@ -13,6 +13,9 @@ using Swashbuckle.AspNetCore.Filters;
 using CleanArchitecture.Application.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using CleanArchitecture.Domain.Entities_SubModel.Email;
+using CarContractVer2.Controllers;
+using Twilio;
+using Twilio.Clients;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -69,6 +72,19 @@ builder.Services.AddScoped<ContractGroupHub>();
 builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IContractStatisticRepository, ContractStatisticRepository>();
 builder.Services.AddScoped<ICarExpenseRepository, CarExpenseRepository>();
+builder.Services.AddScoped<TwilioRestClient>(s =>
+{
+    var accountSid = builder.Configuration["Twilio:AccountSid"];
+    var authToken = builder.Configuration["Twilio:AuthToken"];
+    return new TwilioRestClient(accountSid, authToken);
+});
+//builder.Services.AddSession(options =>
+//{
+//    options.IdleTimeout = TimeSpan.FromSeconds(30); // Set the session timeout
+//    options.Cookie.HttpOnly = true;
+//    options.Cookie.IsEssential = true;
+//});
+
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSwaggerGen(options =>
@@ -120,6 +136,8 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
         app.UseAuthentication();
 
         app.UseHttpsRedirection();
+
+        //app.UseSession();
 
         app.UseAuthorization();
 
