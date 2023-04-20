@@ -26,7 +26,7 @@ namespace CarContractVer2.Controllers
         [HttpPost("sendOTP/{phoneNumber}")]
         public async Task<IActionResult> SendOtp(string phoneNumber)
         {
-            TwilioClient.Init("ACfa7081671b843b3749287265d284f43a", "185bb388d22974460a32b2e13b8903f1");
+            TwilioClient.Init("ACfa7081671b843b3749287265d284f43a", "6804ac27cb1456b5505546b861cd691e");
             var otp = GenerateOtp(); // Generate a random OTP code
             var message = $"Your OTP code is: {otp}";
 
@@ -67,7 +67,7 @@ namespace CarContractVer2.Controllers
         [NonAction]
         private bool checkVerifyOtp(string phoneNumber, string otp)
         {
-            TwilioClient.Init("ACfa7081671b843b3749287265d284f43a", "185bb388d22974460a32b2e13b8903f1");
+            TwilioClient.Init("ACfa7081671b843b3749287265d284f43a", "6804ac27cb1456b5505546b861cd691e");
             try
             {
                 //var messages = MessageResource.Read(
