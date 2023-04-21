@@ -69,6 +69,7 @@ builder.Services.AddScoped<ICustomerFileRepository, CustomerFileRepository>();
 builder.Services.AddScoped<ITransferContractFileRepository, TransferContractFileRepository>();
 builder.Services.AddScoped<IReceiveContractFileRepository, ReceiveContractFileRepository>();
 builder.Services.AddScoped<ContractGroupHub>();
+builder.Services.AddScoped<SMSService>();
 builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IContractStatisticRepository, ContractStatisticRepository>();
 builder.Services.AddScoped<ICarExpenseRepository, CarExpenseRepository>();
