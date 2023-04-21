@@ -29,16 +29,17 @@ namespace CarContractVer2.Controllers
             TwilioClient.Init("ACfa7081671b843b3749287265d284f43a", "6804ac27cb1456b5505546b861cd691e");
             var otp = GenerateOtp(); // Generate a random OTP code
             var message = $"Your OTP code is: {otp}";
+            phoneNumber = "+84" + phoneNumber;
 
             try
             {
                 var result = await MessageResource.CreateAsync(
                     body: message,
-                    from: new Twilio.Types.PhoneNumber("+1 620 269 1166"),
+                    from: new Twilio.Types.PhoneNumber("+16202691166"),
                     to: new Twilio.Types.PhoneNumber(phoneNumber)
                 );
-                HttpContext.Session.SetString("OtpCode", otp.ToString());
-                HttpContext.Session.SetString("PhoneNumber", phoneNumber.ToString());
+                //HttpContext.Session.SetString("OtpCode", otp.ToString());
+                //HttpContext.Session.SetString("PhoneNumber", phoneNumber.ToString());
                 return Ok();
             }
             catch (Exception ex)
@@ -50,12 +51,12 @@ namespace CarContractVer2.Controllers
         [HttpPost("verifyOTP/{phoneNumber}/{otp}")]
         public IActionResult VerifyOtp(string phoneNumber, string otp)
         {
-            //bool isOtpValid = checkVerifyOtp(phoneNumber, otp);
-            var storedPhoneNumber = HttpContext.Session.GetString("PhoneNumber");
+            bool isOtpValid = checkVerifyOtp(phoneNumber, otp);
+            //var storedPhoneNumber = HttpContext.Session.GetString("PhoneNumber");
 
-            var storedOtpCode = HttpContext.Session.GetString("OtpCode");
+            //var storedOtpCode = HttpContext.Session.GetString("OtpCode");
 
-            if (otp == storedOtpCode)
+            if (isOtpValid)
             {
                 return Ok("OTP verified successfully.");
             }
@@ -68,13 +69,14 @@ namespace CarContractVer2.Controllers
         private bool checkVerifyOtp(string phoneNumber, string otp)
         {
             TwilioClient.Init("ACfa7081671b843b3749287265d284f43a", "6804ac27cb1456b5505546b861cd691e");
+            //phoneNumber = "+84" + phoneNumber;
             try
             {
-                //var messages = MessageResource.Read(
-                //    to: new Twilio.Types.PhoneNumber(phoneNumber),
-                //    limit: 1);
-                //phoneNumber = "+84" + phoneNumber;
-               var messages = MessageResource.Read(to: new Twilio.Types.PhoneNumber(phoneNumber));
+                var messages = MessageResource.Read(
+                    from: new Twilio.Types.PhoneNumber("+16202691166"),
+                    to: new Twilio.Types.PhoneNumber(phoneNumber),
+                    limit: 1);
+                //var messages = MessageResource.Read(to: new Twilio.Types.PhoneNumber(phoneNumber));
 
                 foreach (var message in messages)
                     if (message.Body.Contains(otp))
