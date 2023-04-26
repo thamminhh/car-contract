@@ -45,7 +45,6 @@ public class ReceiveContractDataModel
     public string? TrafficLightViolationDescription { get; set; }
     public string? OrtherViolation { get; set; }
     public double? ViolationMoney { get; set; }
-
     public double? TotalPayment { get; set; }
     public ICollection<ReceiveContractFileDataModel> ReceiveContractFileDataModels { get; set; }
 

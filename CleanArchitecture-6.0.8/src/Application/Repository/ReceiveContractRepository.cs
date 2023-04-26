@@ -217,12 +217,25 @@ namespace CleanArchitecture.Application.Repository
                 _contractContext.ReceiveContractFiles.AddRange(receiveContractFileList);
                 _contractContext.SaveChanges();
             }
-            //Update ContractGroupStatus
-            var contractGroupStatusReceiveNotSign = Constant.ContractGroupConstant.ReceiveContractNotSign;
-            var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
-            contractGroupUpdateStatusModel.Id = request.ContractGroupId;
-            contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusReceiveNotSign;
-            _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+
+            //if (request.OriginalCondition == false || request.ReturnDepostiItem == false)
+            //{
+            //    var contractGroupStatusInspecting = Constant.ContractGroupConstant.ContractInspecting;
+            //    var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+            //    contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+            //    contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusInspecting;
+            //    _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+
+            //}
+            //else
+            //{
+                //Update ContractGroupStatus
+                var contractGroupStatusReceiveNotSign = Constant.ContractGroupConstant.ReceiveContractNotSign;
+                var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+                contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+                contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusReceiveNotSign;
+                _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+            //}
 
         }
 
@@ -254,7 +267,7 @@ namespace CleanArchitecture.Application.Repository
             receiveContract.OriginalCondition = request.OriginalCondition;
             receiveContract.DepositItemDownPayment = request.DepositItemDownPayment;
             receiveContract.ReturnDepostiItem = request.ReturnDepostiItem;
-            if(request.ReturnDepostiItem == false)
+            if(request.ReturnDepostiItem == false || request.OriginalCondition == false)
             {
                 var contractGroupStatusInspecting = Constant.ContractGroupConstant.ContractInspecting;
                 var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
@@ -387,6 +400,7 @@ namespace CleanArchitecture.Application.Repository
                 contractStatisticUpdateModel.ExtraKmMoney = extraKmMoney;
                 contractStatisticUpdateModel.PaymentAmount = contractStatistic.PaymentAmount;
                 _contractStatisticRepository.UpdateContractStatistic(contractStatisticUpdateModel);
+
             }
         }
         private double? calFuelMoney(decimal? tankCapacity, int? fuelPercent, double? currentFuelMoney)
