@@ -19,9 +19,9 @@ public class SMSService
 
     public SMSService(TwilioRestClient twilioClient)
     {
-        _accountSid = "ACfa7081671b843b3749287265d284f43a";
-        _authToken = "6804ac27cb1456b5505546b861cd691e";
-        _twilioPhoneNumber = "+1 620 445 8446";
+        _accountSid = "ACbbb8eb3959efc1e26fa4d64feb2b3e3f";
+        _authToken = "e904e6dfd4f9e8324ea258ad81b6d05c";
+        _twilioPhoneNumber = "+16205089053";
         _twilioClient = twilioClient;
     }
     public int GenerateOtp()
