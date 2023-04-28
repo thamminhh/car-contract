@@ -16,7 +16,7 @@ namespace CleanArchitecture.Domain.Interface
 
         void UpdateRentContract(int id, RentContractUpdateModel request);
         bool UpdateRentContractStatus(int id, RentContractUpdateStatusModel request);
-
+        bool UpdateRentContractSigned(int id, RentContractUpdateSignedModel request);
         bool RentContractExit(int id);  
 
     }

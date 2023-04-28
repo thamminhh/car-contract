@@ -83,9 +83,10 @@ namespace CarContractVer2.Controllers
             return Ok();
         }
 
+
         [HttpPut]
         [Route(RentContractEndpoints.UpdateContractStatus)]
-        public IActionResult UpdateCarStatus([FromRoute] int id, [FromBody] RentContractUpdateStatusModel request)
+        public IActionResult UpdateContractStatus([FromRoute] int id, [FromBody] RentContractUpdateStatusModel request)
         {
             if (request == null || id != request.Id)
                 return BadRequest();
@@ -94,6 +95,23 @@ namespace CarContractVer2.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             if (!_rentContractRepository.UpdateRentContractStatus(id, request))
+            {
+                ModelState.AddModelError("", "Something went wrong");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent();
+        }
+        [HttpPut]
+        [Route(RentContractEndpoints.UpdateContractSigned)]
+        public IActionResult UpdateContractSigned([FromRoute] int id, [FromBody] RentContractUpdateSignedModel request)
+        {
+            if (request == null || id != request.Id)
+                return BadRequest();
+            if (!_rentContractRepository.RentContractExit(id))
+                return NotFound();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            if (!_rentContractRepository.UpdateRentContractSigned(id, request))
             {
                 ModelState.AddModelError("", "Something went wrong");
                 return StatusCode(500, ModelState);

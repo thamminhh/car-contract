@@ -82,7 +82,7 @@ namespace CleanArchitecture.Application.Repository
                 ContractStatusId = rentContract.ContractStatusId,
                 StaffSignature = rentContract.StaffSignature,
                 CustomerSignature = rentContract.CustomerSignature,
-                FileWithSignsPath = host + rentContract.FileWithSignsPath,
+                FileWithSignsPath = rentContract.FileWithSignsPath,
                 IsExported = rentContract.IsExported,
                 CancelReason = rentContract.CancelReason,
 
@@ -141,7 +141,7 @@ namespace CleanArchitecture.Application.Repository
                 ContractStatusId = rentContract.ContractStatusId,
                 StaffSignature = rentContract.StaffSignature,
                 CustomerSignature = rentContract.CustomerSignature,
-                FileWithSignsPath = host + rentContract.FileWithSignsPath,
+                FileWithSignsPath = rentContract.FileWithSignsPath,
                 IsExported = rentContract.IsExported,
                 CancelReason = rentContract.CancelReason,
             };
@@ -193,7 +193,7 @@ namespace CleanArchitecture.Application.Repository
                     ContractStatusId = c.ContractStatusId,
                     StaffSignature = c.StaffSignature,
                     CustomerSignature = c.CustomerSignature,
-                    FileWithSignsPath = host + c.FileWithSignsPath,
+                    FileWithSignsPath = c.FileWithSignsPath,
                     IsExported = c.IsExported,
                     CancelReason = c.CancelReason,
 
@@ -348,8 +348,16 @@ namespace CleanArchitecture.Application.Repository
             rentContract.ContractStatusId = request.ContractStatusId;
             return Save();
         }
+        public bool UpdateRentContractSigned(int id, RentContractUpdateSignedModel request)
+        {
+            var rentContract = _contractContext.RentContracts.Where(c => c.Id == id).FirstOrDefault();
 
+            if (rentContract == null)
+                return false;
 
+            rentContract.FileWithSignsPath = request.FileWithSignPath;
+            return Save();
+        }
 
         public string CreateRentContractContent(RentContractCreateModel request)
         {

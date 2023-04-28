@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CleanArchitecture.Domain.Entities_SubModel.RentContract;
-public class RentContractUpdateStatusModel
+public class RentContractUpdateSignedModel
 {
     public int Id { get; set; }
-    public int? ContractStatusId { get; set; }
+    public string? FileWithSignPath { get; set; }
 }

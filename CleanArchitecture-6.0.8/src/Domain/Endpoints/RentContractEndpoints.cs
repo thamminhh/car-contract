@@ -18,4 +18,5 @@ public class RentContractEndpoints
     public const string Update = Base + "/update/{id}";
     public const string Delete = Base + "/delete/{id}";
     public const string UpdateContractStatus = Base + "/update-contract-status/{id}";
+    public const string UpdateContractSigned = Base + "/update-contract-signed/{id}";
 }
