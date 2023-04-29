@@ -8,6 +8,8 @@ using CleanArchitecture.Domain.Interface;
 using Microsoft.AspNetCore.Mvc;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf.IO;
+using CleanArchitecture.Domain.Entities_SubModel.RentContractFile.Sub_Model;
+using NuGet.Protocol.Core.Types;
 
 namespace CarContractVer2.Controllers
 {
@@ -16,11 +18,13 @@ namespace CarContractVer2.Controllers
     public class RentContractController : ControllerBase
     {
         private readonly IRentContractRepository _rentContractRepository;
+        private readonly IRentContractFileRepository _rentContractFileRepository;
 
 
-        public RentContractController(IRentContractRepository rentContractRepository)
+        public RentContractController(IRentContractRepository rentContractRepository, IRentContractFileRepository rentContractFileRepository)
         {
             _rentContractRepository = rentContractRepository;
+            _rentContractFileRepository = rentContractFileRepository;
         }
 
         [HttpGet]
@@ -58,11 +62,31 @@ namespace CarContractVer2.Controllers
             return Ok(rentContract);
         }
 
+        [HttpGet]
+        [Route(RentContractEndpoints.GetRentContractFilesByContractId)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<RentContract>))]
+        public IActionResult GetRentContractFilesByContractId(int rentContractId)
+        {
+            var rentContractFiles = _rentContractFileRepository.GetRentContractFilesByRentContractId(rentContractId);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(rentContractFiles);
+        }
+
         [HttpPost]
         [Route(RentContractEndpoints.Create)]
         public IActionResult CreaterentContract([FromBody] RentContractCreateModel request)
         {
             _rentContractRepository.CreateRentContract(request);
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route(RentContractEndpoints.CreateRentContractFile)]
+        public async Task<IActionResult> CreateRentContractFiles(List<RentContractFileCreateModel> rentContractFiles)
+        {
+            await _rentContractFileRepository.CreateRentContractFiles(rentContractFiles);
+
             return Ok();
         }
 
@@ -83,7 +107,6 @@ namespace CarContractVer2.Controllers
             return Ok();
         }
 
-
         [HttpPut]
         [Route(RentContractEndpoints.UpdateContractStatus)]
         public IActionResult UpdateContractStatus([FromRoute] int id, [FromBody] RentContractUpdateStatusModel request)
@@ -101,23 +124,47 @@ namespace CarContractVer2.Controllers
             }
             return NoContent();
         }
+
         [HttpPut]
-        [Route(RentContractEndpoints.UpdateContractSigned)]
-        public IActionResult UpdateContractSigned([FromRoute] int id, [FromBody] RentContractUpdateSignedModel request)
+        [Route(RentContractEndpoints.UpdateRentContractFile)]
+        public async Task<IActionResult> UpdateRentContractFiles(List<RentContractFileUpdateModel> rentContractFiles)
         {
-            if (request == null || id != request.Id)
-                return BadRequest();
-            if (!_rentContractRepository.RentContractExit(id))
-                return NotFound();
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            if (!_rentContractRepository.UpdateRentContractSigned(id, request))
-            {
-                ModelState.AddModelError("", "Something went wrong");
-                return StatusCode(500, ModelState);
-            }
-            return NoContent();
+            await _rentContractFileRepository.UpdateRentContractFiles(rentContractFiles);
+
+            return Ok();
         }
+
+        [HttpDelete]
+        [Route(RentContractEndpoints.DeleteRentContractFile)]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> Delete(int rentContractFileId)
+        {
+            bool deleted = await _rentContractFileRepository.DeleteRentContractFile(rentContractFileId);
+
+            if (deleted)
+            {
+                return Ok("Deleted"); // Object deleted successfully
+            }
+            return NotFound(); // Object not found
+        }
+        //[HttpPut]
+        //[Route(RentContractEndpoints.UpdateContractSigned)]
+        //public IActionResult UpdateContractSigned([FromRoute] int id, [FromBody] RentContractUpdateSignedModel request)
+        //{
+        //    if (request == null || id != request.Id)
+        //        return BadRequest();
+        //    if (!_rentContractRepository.RentContractExit(id))
+        //        return NotFound();
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
+        //    if (!_rentContractRepository.UpdateRentContractSigned(id, request))
+        //    {
+        //        ModelState.AddModelError("", "Something went wrong");
+        //        return StatusCode(500, ModelState);
+        //    }
+        //    return NoContent();
+        //}
 
         //[HttpPost("addimage")]
         //public async Task<IActionResult> AddImageToPdf(string imageUrl, IFormFile pdfFile)

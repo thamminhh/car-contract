@@ -54,7 +54,7 @@ namespace CleanArchitecture.Application.Repository
             //_userRepository.EncodeId(mailRequest.RentContractId, out hash, out salt, out long timestamp);
 
             //var body = mailRequest.LinkHost + mailRequest.RentContractId;/*mailRequest.LinkHost + Convert.ToBase64String(hash) + "/" + mailRequest.RentContractId + "/" + Convert.ToBase64String(salt) + "/" + timestamp;*/
-            
+            builder.HtmlBody = mailRequest.Body;
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
             smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);

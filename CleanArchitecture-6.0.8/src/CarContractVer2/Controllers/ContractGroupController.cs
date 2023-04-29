@@ -45,6 +45,16 @@ namespace CarContractVer2.Controllers
                 return BadRequest(ModelState);
             return Ok(new { contracts = listContractGroup, total = count });
         }
+        [HttpGet]
+        [Route(ContractGroupEndpoints.GetByCitizenNumber)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ContractGroup>))]
+        public IActionResult GetContractGroupByCitizenNumber(string citizenNumber)
+        {
+            var listContractGroup = _contractGroupRepository.GetContractGroupsCustomerHistory(citizenNumber, out int count);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(new { contracts = listContractGroup, total = count });
+        }
         //[HttpGet]
         //[Route(ContractGroupEndpoints.GetSingle)]
         //[ProducesResponseType(200, Type = typeof(IEnumerable<ContractGroup>))]

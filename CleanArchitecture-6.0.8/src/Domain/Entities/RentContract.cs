@@ -5,6 +5,11 @@ namespace CleanArchitecture.Domain.Entities
 {
     public partial class RentContract
     {
+        public RentContract()
+        {
+            RentContractFiles = new HashSet<RentContractFile>();
+        }
+
         public int Id { get; set; }
         public int? ContractGroupId { get; set; }
         public int? RepresentativeId { get; set; }
@@ -30,5 +35,6 @@ namespace CleanArchitecture.Domain.Entities
         public virtual ContractGroup? ContractGroup { get; set; }
         public virtual ContractStatus? ContractStatus { get; set; }
         public virtual User? Representative { get; set; }
+        public virtual ICollection<RentContractFile> RentContractFiles { get; set; }
     }
 }

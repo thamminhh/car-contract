@@ -7,6 +7,7 @@ using CleanArchitecture.Domain.Interface;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using PdfSharpCore;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
@@ -201,6 +202,29 @@ namespace CleanArchitecture.Application.Repository
                 .ToList();
             return contractGroupDataModels;
         }
+        public ICollection<ContractGroupCustomerHistoryModel> GetContractGroupsCustomerHistory(string citizenIdentificationInfoNumber, out int count)
+        {
+            IQueryable<ContractGroup> contractGroups = _contractContext.ContractGroups
+               .Include(c => c.ContractGroupStatus)
+               .Where(c => c.CustomerInfo.CitizenIdentificationInfoNumber == citizenIdentificationInfoNumber)
+               .AsQueryable();
+
+            var contractGroupDataModels = contractGroups
+                .OrderByDescending(c => c.Id)
+                .Select(c => new ContractGroupCustomerHistoryModel
+                {
+                    Id = c.Id,
+                    ContractGroupStatusId = c.ContractGroupStatusId,
+                    ContractGroupStatusName = c.ContractGroupStatus.Name,
+                    RentFrom = c.RentFrom,
+                    RentTo = c.RentTo,
+
+                })
+                .ToList();
+            count = contractGroupDataModels.Count();
+            return contractGroupDataModels;
+        }
+
         public ICollection<ContractGroupDataModel> GetContractGroupsByParkingLotId(int page, int pageSize, int parkingLotId, ContractFilter filter)
 
         {

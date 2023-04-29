@@ -44,6 +44,7 @@ namespace CleanArchitecture.Domain.Entities
         public virtual DbSet<ReceiveContract> ReceiveContracts { get; set; } = null!;
         public virtual DbSet<ReceiveContractFile> ReceiveContractFiles { get; set; } = null!;
         public virtual DbSet<RentContract> RentContracts { get; set; } = null!;
+        public virtual DbSet<RentContractFile> RentContractFiles { get; set; } = null!;
         public virtual DbSet<TransferContract> TransferContracts { get; set; } = null!;
         public virtual DbSet<TransferContractFile> TransferContractFiles { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
@@ -665,6 +666,20 @@ namespace CleanArchitecture.Domain.Entities
                     .WithMany(p => p.RentContracts)
                     .HasForeignKey(d => d.RepresentativeId)
                     .HasConstraintName("FK__RentContr__Repre__3493CFA7");
+            });
+
+            modelBuilder.Entity<RentContractFile>(entity =>
+            {
+                entity.ToTable("RentContractFile");
+
+                entity.Property(e => e.Title)
+                    .HasMaxLength(255)
+                    .HasColumnName("Title ");
+
+                entity.HasOne(d => d.RentContract)
+                    .WithMany(p => p.RentContractFiles)
+                    .HasForeignKey(d => d.RentContractId)
+                    .HasConstraintName("FK__RentContr__RentC__6EC0713C");
             });
 
             modelBuilder.Entity<TransferContract>(entity =>

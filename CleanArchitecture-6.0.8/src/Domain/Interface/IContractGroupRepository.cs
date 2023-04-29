@@ -29,5 +29,7 @@ namespace CleanArchitecture.Domain.Interface
         int GetNumberOfContracts(ContractFilter filter);
         int GetContractGroupsByParkingLotId(int parkingLotId, ContractFilter filter);
 
+        ICollection<ContractGroupCustomerHistoryModel> GetContractGroupsCustomerHistory(string citizenIdentificationInfoNumber, out int count);
+
     }
 }

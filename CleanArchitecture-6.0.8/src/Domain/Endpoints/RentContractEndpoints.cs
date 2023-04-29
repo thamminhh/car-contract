@@ -14,9 +14,12 @@ public class RentContractEndpoints
     public const string GetSingle = Base + "/{id}";
     public const string GetLastByContractGroupId = Base + "/last/contractGroupId/{contractGroupId}";
     public const string GetByContractGroupId = Base + "/get-by-contractGroupId/{contractGroupId}";
+    public const string GetRentContractFilesByContractId = Base + "/get-files-by-rentContracId/{rentContractId}";
     public const string Create = Base + "/create";
+    public const string CreateRentContractFile = Base + "/create-rent-contract-file";
     public const string Update = Base + "/update/{id}";
-    public const string Delete = Base + "/delete/{id}";
+    public const string DeleteRentContractFile = Base + "/delete/{rentContractFileId}";
     public const string UpdateContractStatus = Base + "/update-contract-status/{id}";
-    public const string UpdateContractSigned = Base + "/update-contract-signed/{id}";
+    //public const string UpdateContractSigned = Base + "/update-contract-signed/{id}";
+    public const string UpdateRentContractFile = Base + "/update-rent-contract-files";
 }

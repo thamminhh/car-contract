@@ -73,6 +73,7 @@ builder.Services.AddScoped<SMSService>();
 builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IContractStatisticRepository, ContractStatisticRepository>();
 builder.Services.AddScoped<ICarExpenseRepository, CarExpenseRepository>();
+builder.Services.AddScoped<IRentContractFileRepository, RentContractFileRepository>();
 builder.Services.AddScoped<TwilioRestClient>(s =>
 {
     var accountSid = builder.Configuration["Twilio:AccountSid"];

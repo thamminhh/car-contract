@@ -82,7 +82,7 @@ namespace CleanArchitecture.Application.Repository
                 ContractStatusId = rentContract.ContractStatusId,
                 StaffSignature = rentContract.StaffSignature,
                 CustomerSignature = rentContract.CustomerSignature,
-                FileWithSignsPath = rentContract.FileWithSignsPath,
+                FileWithSignsPath = host + rentContract.FileWithSignsPath,
                 IsExported = rentContract.IsExported,
                 CancelReason = rentContract.CancelReason,
 
@@ -141,7 +141,7 @@ namespace CleanArchitecture.Application.Repository
                 ContractStatusId = rentContract.ContractStatusId,
                 StaffSignature = rentContract.StaffSignature,
                 CustomerSignature = rentContract.CustomerSignature,
-                FileWithSignsPath = rentContract.FileWithSignsPath,
+                FileWithSignsPath = host + rentContract.FileWithSignsPath,
                 IsExported = rentContract.IsExported,
                 CancelReason = rentContract.CancelReason,
             };
@@ -193,7 +193,7 @@ namespace CleanArchitecture.Application.Repository
                     ContractStatusId = c.ContractStatusId,
                     StaffSignature = c.StaffSignature,
                     CustomerSignature = c.CustomerSignature,
-                    FileWithSignsPath = c.FileWithSignsPath,
+                    FileWithSignsPath = host + c.FileWithSignsPath,
                     IsExported = c.IsExported,
                     CancelReason = c.CancelReason,
 
@@ -288,7 +288,7 @@ namespace CleanArchitecture.Application.Repository
             rentContract.CustomerSignature = request.CustomerSignature;
             rentContract.StaffSignature = request.StaffSignature;
 
-            if (request.CustomerSignature != null && request.StaffSignature != null)
+            if (request.StaffSignature != null)
             {
                 rentContract.ContractStatusId = Constant.ContractStatusConstant.ContractExported;
             }
