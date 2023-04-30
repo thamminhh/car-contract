@@ -30,18 +30,20 @@ namespace CleanArchitecture.Application.Repository
                 FuelMoneyUsing = request.FuelMoneyUsing,
                 ExtraTimeMoney = request.ExtraTimeMoney,
                 ExtraKmMoney = request.ExtraKmMoney,
+                InsuranceMoney = request.InsuranceMoney,
+                ViolationMoney = request.ViolationMoney,
                 PaymentAmount = request.PaymentAmount,
 
-                Total = calTotal(request.EtcmoneyUsing, request.FuelMoneyUsing, request.ExtraTimeMoney, request.ExtraKmMoney, request.PaymentAmount),
+                Total = calTotal(request.EtcmoneyUsing, request.FuelMoneyUsing, request.ExtraTimeMoney, request.ExtraKmMoney,request.InsuranceMoney, request.ViolationMoney, request.PaymentAmount),
             };
             _contractContext.ContractStatistics.Add(contractStatistic);
             _contractContext.SaveChanges();
 
         }
-        private double? calTotal(double? etc, double? fuel, double? extraTime,double? extraKm, double? paymentAmount)
+        private double? calTotal(double? etc, double? fuel, double? extraTime,double? extraKm,double? insuranceMoney, double? violationMoney, double? paymentAmount)
         {
             double? total;
-            return total = etc + fuel + extraTime + extraKm + paymentAmount;  
+            return total = etc + fuel + extraTime + extraKm + insuranceMoney + violationMoney + paymentAmount;  
         }
 
         public ICollection<ContractStatisticDataModel> GetContractStatistic(DateTime from, DateTime to)
@@ -58,10 +60,13 @@ namespace CleanArchitecture.Application.Repository
                 { 
                     Id = c.Id,
                     ContractGroupId = c.ContractGroupId,
+                    CreatedDate = c.ContractGroup.RentFrom,
                     ExtraTimeMoney= c.ExtraTimeMoney,
                     EtcmoneyUsing = c.EtcmoneyUsing,
                     FuelMoneyUsing = c.FuelMoneyUsing,
                     ExtraKmMoney = c.ExtraKmMoney,
+                    InsuranceMoney = c.InsuranceMoney,
+                    ViolationMoney = c.ViolationMoney,
                     PaymentAmount = c.PaymentAmount,
                     Total = c.Total,
                 }).ToList();
@@ -96,8 +101,10 @@ namespace CleanArchitecture.Application.Repository
             contractStatistc.EtcmoneyUsing = request.EtcmoneyUsing;
             contractStatistc.FuelMoneyUsing = request.FuelMoneyUsing;
             contractStatistc.ExtraKmMoney = request.ExtraKmMoney;
+            contractStatistc.InsuranceMoney = request.InsuranceMoney;
+            contractStatistc.ViolationMoney = request.ViolationMoney;
             contractStatistc.PaymentAmount = request.PaymentAmount;
-            contractStatistc.Total = calTotal(request.EtcmoneyUsing, request.FuelMoneyUsing, request.ExtraTimeMoney, request.ExtraKmMoney, request.PaymentAmount);
+            contractStatistc.Total = calTotal(request.EtcmoneyUsing, request.FuelMoneyUsing, request.ExtraTimeMoney, request.ExtraKmMoney,request.InsuranceMoney, request.ViolationMoney, request.PaymentAmount);
 
             //save update 
             _contractContext.ContractStatistics.Update(contractStatistc);

@@ -177,7 +177,7 @@ namespace CleanArchitecture.Application.Repository
             var trim = _contractContext.CarTrims.Where(c => c.Id == car.CarTrimId).FirstOrDefault();
             var carSchedule = _carScheduleRepository.GetCarSchedulesByCarId(car.Id);
             var carMaintenanceInfo = _contractContext.CarMaintenanceInfos.Where(c => c.CarId == car.Id).OrderByDescending(c => c.Id).FirstOrDefault();
-            var carRegistryInfo = _contractContext.CarRegistryInfos.Where(c => c.CarId == car.Id).OrderByDescending(c => c.Id).LastOrDefault();
+            var carRegistryInfo = _contractContext.CarRegistryInfos.Where(c => c.CarId == car.Id).OrderByDescending(c => c.Id).FirstOrDefault();
 
             return new CarDataModel
             {
@@ -806,7 +806,6 @@ namespace CleanArchitecture.Application.Repository
                 CarFuel = request.CarFuel,
                 PeriodicMaintenanceLimit = request.PeriodicMaintenanceLimit,
                 TankCapacity = request.TankCapacity,
-
             };
 
             // Save the new car to the database
@@ -962,7 +961,6 @@ namespace CleanArchitecture.Application.Repository
                 CarFuel = request.CarFuel,
                 PeriodicMaintenanceLimit = request.PeriodicMaintenanceLimit,
                 TankCapacity = request.TankCapacity,
-
 
             };
 

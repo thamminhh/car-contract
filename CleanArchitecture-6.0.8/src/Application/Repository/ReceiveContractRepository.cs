@@ -161,12 +161,211 @@ namespace CleanArchitecture.Application.Repository
         public void CreateReceiveContract(ReceiveContractCreateModel request)
         {
             //Create PDF 
-            string htmlContent = CreateReceiveContractContent(request);
+            //string htmlContent = CreateReceiveContractContent(request);
+
+            var receiveer = _contractContext.Users.FirstOrDefault(c => c.Id == request.ReceiverId);
+            var transferContract = _contractContext.TransferContracts.FirstOrDefault(c => c.Id == request.TransferContractId);
+
+            var contractGroup = _contractContext.ContractGroups
+                            .Include(c => c.CustomerInfo)
+                            .FirstOrDefault(c => c.Id == request.ContractGroupId);
+            var car = _contractContext.Cars
+                .Include(c => c.CarModel)
+                .Include(c => c.CarGenerallInfo)
+                .FirstOrDefault(c => c.Id == contractGroup.CarId);
+            var parkingLot = _contractContext.ParkingLots.FirstOrDefault(c => c.Id == car.ParkingLotId);
+            var rentContract = _contractContext.RentContracts.Where(c => c.ContractGroupId == contractGroup.Id).OrderByDescending(c => c.Id).FirstOrDefault();
+            double? totalKilometersTraveled = request.CurrentCarStateSpeedometerNumber - transferContract.CurrentCarStateSpeedometerNumber;
+            double? overKm = totalKilometersTraveled - car.CarGenerallInfo.LimitedKmForMonth;
+            double? extraTimeMoney = request.ExtraTime * rentContract.CarGeneralInfoAtRentPricePerHourExceed;
+            //cal fuelPercent have using
+            int? fuelPercent = transferContract.CurrentCarStateFuelPercent - request.CurrentCarStateFuelPercent;
+            double? fuelMoney = calFuelMoney(car.TankCapacity, fuelPercent, request.CurrentFuelMoney);
+            // cal etc using
+            double? etcMoney = transferContract.CurrentCarStateCurrentEtcAmount - request.CurrentCarStateCurrentEtcAmount;
+            //cal extraKm
+            double? extraKmMoney;
+            if (overKm > 0)
+            {
+                extraKmMoney = overKm * car.CarGenerallInfo.OverLimitedMileage;
+            }
+            else
+            {
+                overKm = 0;
+                extraKmMoney = 0;
+            }
+            double? deposit = request.DepositItemDownPayment - etcMoney - fuelMoney - extraTimeMoney - extraKmMoney - request.InsuranceMoney - request.ViolationMoney;
+
+            string htmlContent = "<ul>";
+            htmlContent += "<table style='width: 100%;'>";
+            htmlContent += "<tr style='margin-left: 5px; list-style-type: none; width:50%;'>";
+            htmlContent += "<td>";
+            htmlContent += "<img src='https://amazingtech.vn/Content/amazingtech/assets/img/logo-color.png' style='height: 60px;'/>";
+            htmlContent += "<li>CÔNG TY CP CÔNG NGHỆ ATSHARE</li>";
+            htmlContent += "<li style='margin-left: 10px; margin-top: -15px;'>Số: " + request.ContractGroupId + "/Atshare</li>";
+            htmlContent += "</td>";
+            htmlContent += "<td style='height: 50px;'>";
+            htmlContent += "<li style='text-align: center; font-weight: 700; font-size: 16px;'>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</li>";
+            htmlContent += "<li style='text-align: center;  margin-top: -15px;'>Độc lập – Tự do – Hạnh phúc</li>";
+            htmlContent += "</td>";
+            htmlContent += "</tr>";
+            htmlContent += "</table>";
+            htmlContent += "</ul>";
+
+            htmlContent += "<h2 style='text-align: center;'>BIÊN BẢN NHẬN XE</h2>";
+
+            htmlContent += "<p>Trước và sau khi cho thuê, kèm theo hợp đồng thuê xe số " + request.ContractGroupId + "</p>";
+            htmlContent += "<p>Hôm nay, ngày " + request.DateReceive + ", chúng tôi gồm:</p>";
+            htmlContent += " <h2>BÊN CHO THUÊ XE (BÊN A): CÔNG TY CỔ PHẦN CÔNG NGHỆ ATSHARE</h2>";
+            htmlContent += "<ul>";
+            htmlContent += "<li>Địa chỉ: " + parkingLot.Address + "</li>";
+            htmlContent += "<li>MST:0110032942</li> ";
+            htmlContent += "<li>STK:19035651301016 tại NH Kỹ Thương VN (Techcombank), CN Hai Bà Trưng</li>";
+            htmlContent += "<li>Đại diện: " + receiveer.Name + "</li>";
+            htmlContent += "<li>Điện thoại: " + receiveer.PhoneNumber + " </li>";
+            htmlContent += "</ul>";
+
+            htmlContent += "<h2>BÊN THUÊ XE (BÊN B): " + contractGroup.CustomerInfo.CustomerName + "</h2>";
+            htmlContent += "<ul>";
+            htmlContent += "<li>Số điện thoại: " + contractGroup.CustomerInfo.PhoneNumber + "</li>";
+            htmlContent += "<li>CCCD/ CMND số: " + contractGroup.CustomerInfo.CitizenIdentificationInfoNumber + " </li>";
+            htmlContent += "<li>Ngày cấp: " + contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive + " </li>";
+            htmlContent += "<li>Địa chỉ: " + contractGroup.CustomerInfo.CitizenIdentificationInfoAddress + " </li>";
+            htmlContent += "<li>Điện thoại người thân:(chỉ dùng trong trường hợp khẩn khi không liên lạc được với bên B): " + contractGroup.CustomerInfo.RelativeTel + "</li>";
+            htmlContent += "</ul>";
+
+            htmlContent += "<h3>A. Tình trạng xe khi nhận lại xe </h3>";
+            htmlContent += "<p>Tình trạng nội thất, ngoại thất và máy móc xe: </p>";
+            htmlContent += "<ul>";
+            if (request.OriginalCondition == true)
+            {
+                htmlContent += "<li>Giống tình trạng ban đầu (nội thất, ngoại thất, máy móc, giấy tờ, đồ dự phòng).</li>";
+            }
+            if (request.OriginalCondition == false)
+            {
+                htmlContent += "<li>Khác tình trạng ban đầu, các hư hỏng và mất mát sau: " + request.CurrentCarStateCarDamageDescription + "</li>";
+                htmlContent += "<li>Chi phí khắc phục: đang cập nhật </li>";
+            }
+            htmlContent += "</ul>";
+
+            htmlContent += "<ul>";
+            htmlContent += "<li>Số công tơ mét: " + request.CurrentCarStateSpeedometerNumber + " Km</li>";
+            htmlContent += "<li>Tổng số km đã đi: " + totalKilometersTraveled + " Km</li>";
+            htmlContent += "<li>Nằm trong giới hạn km: " + car.CarGenerallInfo.LimitedKmForMonth + " Km</li>";
+            if (overKm > 0)
+            {
+                htmlContent += "<li>Vượt số giới hạn km, số km vượt: " + overKm + " Km</li>";
+                htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
+            }
+            else
+            {
+                overKm = 0;
+                htmlContent += "<li>Vượt số giới hạn km, số km vượt: " + overKm + " Km</li>";
+                htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
+            }
+            htmlContent += "<li>Đồng hồ xăng/dầu: " + request.CurrentCarStateFuelPercent + " %</li>";
+            htmlContent += "<li>Thời gian phụ trội so với hợp đồng: " + request.ExtraTime + " giờ, phụ phí phát sinh: " + extraTimeMoney + " VNĐ</li>";
+            if (etcMoney > 0)
+            {
+                htmlContent += "<li>Vé cầu đường phát sinh chưa thanh toán: " + etcMoney + " VNĐ</li>";
+            }
+            else
+            {
+                htmlContent += "<li>Vé cầu đường phát sinh chưa thanh toán: " + etcMoney + " VNĐ</li>";
+            }
+            htmlContent += "</ul>";
+
+            htmlContent += "<h3>B. Tình trạng pháp lí: </h3>";
+            if (request.DetectedViolations == true)
+            {
+                htmlContent += "<p>Các lỗi ghi nhận được trong quá trình thuê: </p>";
+                htmlContent += "<ul>";
+                htmlContent += "<li>Vượt tốc độ: " + request.SpeedingViolationDescription + "</li>";
+                htmlContent += "<li>Vào đường cấm: " + request.ForbiddenRoadViolationDescription + "</li>";
+                htmlContent += "<li>Vượt đèn đỏ: " + request.TrafficLightViolationDescription + "</li>";
+                htmlContent += "<li>Các lỗi khác(nếu có): " + request.OrtherViolation + "</li>";
+                htmlContent += "<li>Tổng tiền vi phạm: " + request.ViolationMoney + " VNĐ</li>";
+                htmlContent += "</ul>";
+            }
+            else
+            {
+                htmlContent += "<p>Chưa phát hiện lỗi gì</p>";
+            }
+            //double? totalCostsIsncurred = request.CarInsuranceMoney + overKm * car.CarGenerallInfo.OverLimitedMileage + extraTimeMoney + request.UnpaidTicketMoney;
+            //htmlContent += "<p>Tổng chi phí phát sinh so với hợp đồng: " + totalCostsIsncurred + "</p>";
+            htmlContent += "<h3>C. Tổng chi phí phát sinh so với hợp đồng: </h3>";
+            htmlContent += "<ul>";
+            if (request.ReturnDepostiItem == true)
+            {
+                htmlContent += "<li>Số tiền đặt cọc đã thu: " + request.DepositItemDownPayment + " VNĐ</li>";
+
+                htmlContent += "<li>Số tiền phải trả: " + request.DepositItemDownPayment + " VNĐ</li>";
+            }
+            else
+            {
+                htmlContent += "<li>Số tiền đặt cọc đã thu: " + request.DepositItemDownPayment + " VNĐ</li>";
+                if (etcMoney > 0)
+                {
+                    htmlContent += "<li>Vé cầu đường phát sinh chưa thanh toán: " + etcMoney + " VNĐ</li>";
+                }
+                else
+                {
+                    htmlContent += "<li>Vé cầu đường phát sinh chưa thanh toán: " + etcMoney + " VNĐ</li>";
+                }
+                htmlContent += "<li>Tiền xăng đã sử dụng: " + fuelMoney + " VNĐ/li>";
+                htmlContent += "<li>Thời gian phụ trội so với hợp đồng: " + request.ExtraTime + " giờ, phụ phí phát sinh: " + extraTimeMoney + " VNĐ</li>";
+                if (overKm > 0)
+                {
+                    htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
+                }
+                else
+                {
+                    overKm = 0;
+                    htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
+                }
+                if (request.OriginalCondition == true)
+                {
+                    htmlContent += "<li>Chi phí bảo hiểm: " + request.InsuranceMoney + "  VNĐ</li>";
+                }
+                if (request.OriginalCondition == false)
+                {
+                    htmlContent += "<li>Chi phí bảo hiểm: đang cập nhật </li>";
+                }
+                if (request.DetectedViolations == true)
+                {
+                    htmlContent += "<li>Tổng tiền vi phạm: " + request.ViolationMoney + " VNĐ</li>";
+                }
+                else
+                {
+                    htmlContent += "<li>Tổng tiền vi phạm: đang cập nhật </li>";
+                }
+                if(deposit >= 0)
+                {
+                    htmlContent += "<li>Số tiền cọc trả lại cho khách: " + deposit + " VNĐ</li>";
+                }
+                if(deposit < 0)
+                {
+                    htmlContent += "<li>Số tiền phải thu thêm từ khách: " + deposit * (-1) + " VNĐ</li>";
+                }
+
+            }
+
+            htmlContent += "<li>Cam kết của Khách thuê và Chủ xe: </li>";
+            htmlContent += "<li>Trong trường hợp phát sinh các khoản phạt nguội, bằng chứng do camera giám sát của Cục CSGT - Bộ Công An " +
+                "ghi nhận được trong thời gian Bên B sử dụng xe ô tô thuê của Bên A.</li>";
+            htmlContent += "<li>Bên A có trách nhiệm cung cấp các bằng chứng liên quan cho bên B ngay khi nhận được thông tin.</li>";
+            htmlContent += "<li>Bên B cam kết chịu hoàn toàn trách nhiệm và bồi thường toàn bộ các chi phí liên quan cho Bên A. </li>";
+            htmlContent += "</ul>";
+
+            htmlContent += "<h3>&nbsp;&nbsp;&nbsp;&nbsp;BÊN A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
+                ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "BÊN B</h3>";
+
             var file = _fileRepository.GeneratePdfAsync(htmlContent);
             var filePath = _fileRepository.SaveFileToFolder(file, request.ContractGroupId.ToString());
-            //get TransferContract
-            var transferContract = _contractContext.TransferContracts.FirstOrDefault(c => c.Id == request.TransferContractId);
-            double? totalKilometersTraveled = request.CurrentCarStateSpeedometerNumber - transferContract.CurrentCarStateSpeedometerNumber; // count totalKMTraveled
             //Create ReceiveContract
             var defaultContractId = ContractStatusConstant.ContractExporting;
 
@@ -194,6 +393,9 @@ namespace CleanArchitecture.Application.Repository
                 CreatedDate = request.CreatedDate,
                 ContractStatusId = defaultContractId,
                 FilePath = filePath,
+                ViolationMoney = request.ViolationMoney,
+                InsuranceMoney = request.InsuranceMoney,
+                
             };
             _contractContext.ReceiveContracts.Add(receiveContract);
             _contractContext.SaveChanges();
@@ -218,37 +420,249 @@ namespace CleanArchitecture.Application.Repository
                 _contractContext.SaveChanges();
             }
 
-            //if (request.OriginalCondition == false || request.ReturnDepostiItem == false)
-            //{
-            //    var contractGroupStatusInspecting = Constant.ContractGroupConstant.ContractInspecting;
-            //    var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
-            //    contractGroupUpdateStatusModel.Id = request.ContractGroupId;
-            //    contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusInspecting;
-            //    _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+            if (request.OriginalCondition == false || request.ReturnDepostiItem == false)
+            {
+                var contractGroupStatusInspecting = Constant.ContractGroupConstant.ContractInspecting;
+                var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+                contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+                contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusInspecting;
+                _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
 
-            //}
-            //else
-            //{
+            }
+            else
+            {
                 //Update ContractGroupStatus
                 var contractGroupStatusReceiveNotSign = Constant.ContractGroupConstant.ReceiveContractNotSign;
                 var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
                 contractGroupUpdateStatusModel.Id = request.ContractGroupId;
                 contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusReceiveNotSign;
                 _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
-            //}
-
         }
+
+    }
 
         public void UpdateReceiveContract(int id, ReceiveContractUpdateModel request)
         {
 
-            string htmlContent = UpdateReceiveContractContent(request);
+            var receiveer = _contractContext.Users.FirstOrDefault(c => c.Id == request.ReceiverId);
+            var transferContract = _contractContext.TransferContracts.FirstOrDefault(c => c.Id == request.TransferContractId);
+
+            var contractGroup = _contractContext.ContractGroups
+                            .Include(c => c.CustomerInfo)
+                            .FirstOrDefault(c => c.Id == request.ContractGroupId);
+            var car = _contractContext.Cars
+                .Include(c => c.CarModel)
+                .Include(c => c.CarGenerallInfo)
+                .FirstOrDefault(c => c.Id == contractGroup.CarId);
+
+            var parkingLot = _contractContext.ParkingLots.FirstOrDefault(c => c.Id == car.ParkingLotId);
+            var rentContract = _contractContext.RentContracts.Where(c => c.ContractGroupId == contractGroup.Id).OrderByDescending(c => c.Id).FirstOrDefault();
+            double? totalKilometersTraveled = request.CurrentCarStateSpeedometerNumber - transferContract.CurrentCarStateSpeedometerNumber;
+            double? overKm = totalKilometersTraveled - car.CarGenerallInfo.LimitedKmForMonth;
+            double? extraTimeMoney = request.ExtraTime * rentContract.CarGeneralInfoAtRentPricePerHourExceed;
+            //cal fuelPercent have using
+            int? fuelPercent = transferContract.CurrentCarStateFuelPercent - request.CurrentCarStateFuelPercent;
+            double? fuelMoney = calFuelMoney(car.TankCapacity, fuelPercent, request.CurrentFuelMoney);
+            // cal etc using
+            double? etcMoney = transferContract.CurrentCarStateCurrentEtcAmount - request.CurrentCarStateCurrentEtcAmount;
+            //cal extraKm
+            double? extraKmMoney;
+            if (overKm > 0)
+            {
+                extraKmMoney = overKm * car.CarGenerallInfo.OverLimitedMileage;
+            }
+            else
+            {
+                overKm = 0;
+                extraKmMoney = 0;
+            }
+            double? deposit = request.DepositItemDownPayment - etcMoney - fuelMoney - extraTimeMoney - extraKmMoney - request.InsuranceMoney - request.ViolationMoney;
+
+            string htmlContent = "<ul>";
+            htmlContent += "<table style='width: 100%;'>";
+            htmlContent += "<tr style='margin-left: 5px; list-style-type: none; width:50%;'>";
+            htmlContent += "<td>";
+            htmlContent += "<img src='https://amazingtech.vn/Content/amazingtech/assets/img/logo-color.png' style='height: 60px;'/>";
+            htmlContent += "<li>CÔNG TY CP CÔNG NGHỆ ATSHARE</li>";
+            htmlContent += "<li style='margin-left: 10px; margin-top: -15px;'>Số: " + request.ContractGroupId + "/Atshare</li>";
+            htmlContent += "</td>";
+            htmlContent += "<td style='height: 50px;'>";
+            htmlContent += "<li style='text-align: center; font-weight: 700; font-size: 16px;'>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</li>";
+            htmlContent += "<li style='text-align: center;  margin-top: -15px;'>Độc lập – Tự do – Hạnh phúc</li>";
+            htmlContent += "</td>";
+            htmlContent += "</tr>";
+            htmlContent += "</table>";
+            htmlContent += "</ul>";
+
+            htmlContent += "<h2 style='text-align: center;'>BIÊN BẢN NHẬN XE</h2>";
+
+            htmlContent += "<p>Trước và sau khi cho thuê, kèm theo hợp đồng thuê xe số " + request.ContractGroupId + "</p>";
+            htmlContent += "<p>Hôm nay, ngày " + request.DateReceive + ", chúng tôi gồm:</p>";
+            htmlContent += " <h2>BÊN CHO THUÊ XE (BÊN A): CÔNG TY CỔ PHẦN CÔNG NGHỆ ATSHARE</h2>";
+            htmlContent += "<ul>";
+            htmlContent += "<li>Địa chỉ: " + parkingLot.Address + "</li>";
+            htmlContent += "<li>MST:0110032942</li> ";
+            htmlContent += "<li>STK:19035651301016 tại NH Kỹ Thương VN (Techcombank), CN Hai Bà Trưng</li>";
+            htmlContent += "<li>Đại diện: " + receiveer.Name + "</li>";
+            htmlContent += "<li>Điện thoại: " + receiveer.PhoneNumber + " </li>";
+            htmlContent += "</ul>";
+
+            htmlContent += "<h2>BÊN THUÊ XE (BÊN B): " + contractGroup.CustomerInfo.CustomerName + "</h2>";
+            htmlContent += "<ul>";
+            htmlContent += "<li>Số điện thoại: " + contractGroup.CustomerInfo.PhoneNumber + "</li>";
+            htmlContent += "<li>CCCD/ CMND số: " + contractGroup.CustomerInfo.CitizenIdentificationInfoNumber + " </li>";
+            htmlContent += "<li>Ngày cấp: " + contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive + " </li>";
+            htmlContent += "<li>Địa chỉ: " + contractGroup.CustomerInfo.CitizenIdentificationInfoAddress + " </li>";
+            htmlContent += "<li>Điện thoại người thân:(chỉ dùng trong trường hợp khẩn khi không liên lạc được với bên B): " + contractGroup.CustomerInfo.RelativeTel + "</li>";
+            htmlContent += "</ul>";
+
+            htmlContent += "<h3>A. Tình trạng xe khi nhận lại xe </h3>";
+            htmlContent += "<p>Tình trạng nội thất, ngoại thất và máy móc xe: </p>";
+            htmlContent += "<ul>";
+            if (request.OriginalCondition == true)
+            {
+                htmlContent += "<li>Giống tình trạng ban đầu (nội thất, ngoại thất, máy móc, giấy tờ, đồ dự phòng).</li>";
+            }
+            if (request.OriginalCondition == false)
+            {
+                htmlContent += "<li>Khác tình trạng ban đầu, các hư hỏng và mất mát sau: " + request.CurrentCarStateCarDamageDescription + "</li>";
+                htmlContent += "<li>Chi phí khắc phục: đang cập nhật </li>";
+            }
+            htmlContent += "</ul>";
+
+            htmlContent += "<ul>";
+            htmlContent += "<li>Số công tơ mét: " + request.CurrentCarStateSpeedometerNumber + " Km</li>";
+            htmlContent += "<li>Tổng số km đã đi: " + totalKilometersTraveled + " Km</li>";
+            htmlContent += "<li>Nằm trong giới hạn km: " + car.CarGenerallInfo.LimitedKmForMonth + " Km</li>";
+            if (overKm > 0)
+            {
+                htmlContent += "<li>Vượt số giới hạn km, số km vượt: " + overKm + " Km</li>";
+                htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
+            }
+            else
+            {
+                overKm = 0;
+                htmlContent += "<li>Vượt số giới hạn km, số km vượt: " + overKm + " Km</li>";
+                htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
+            }
+            htmlContent += "<li>Đồng hồ xăng/dầu: " + request.CurrentCarStateFuelPercent + " %</li>";
+            htmlContent += "<li>Thời gian phụ trội so với hợp đồng: " + request.ExtraTime + " giờ, phụ phí phát sinh: " + extraTimeMoney + " VNĐ</li>";
+            if (etcMoney > 0)
+            {
+                htmlContent += "<li>Vé cầu đường phát sinh chưa thanh toán: " + etcMoney + " VNĐ</li>";
+            }
+            else
+            {
+                htmlContent += "<li>Vé cầu đường phát sinh chưa thanh toán: " + etcMoney + " VNĐ</li>";
+            }
+            htmlContent += "</ul>";
+
+            htmlContent += "<h3>B. Tình trạng pháp lí: </h3>";
+            if (request.DetectedViolations == true)
+            {
+                htmlContent += "<p>Các lỗi ghi nhận được trong quá trình thuê: </p>";
+                htmlContent += "<ul>";
+                htmlContent += "<li>Vượt tốc độ: " + request.SpeedingViolationDescription + "</li>";
+                htmlContent += "<li>Vào đường cấm: " + request.ForbiddenRoadViolationDescription + "</li>";
+                htmlContent += "<li>Vượt đèn đỏ: " + request.TrafficLightViolationDescription + "</li>";
+                htmlContent += "<li>Các lỗi khác(nếu có): " + request.OrtherViolation + "</li>";
+                htmlContent += "<li>Tổng tiền vi phạm: " + request.ViolationMoney + " VNĐ</li>";
+                htmlContent += "</ul>";
+            }
+            else
+            {
+                htmlContent += "<p>Chưa phát hiện lỗi gì</p>";
+            }
+            //double? totalCostsIsncurred = request.CarInsuranceMoney + overKm * car.CarGenerallInfo.OverLimitedMileage + extraTimeMoney + request.UnpaidTicketMoney;
+            //htmlContent += "<p>Tổng chi phí phát sinh so với hợp đồng: " + totalCostsIsncurred + "</p>";
+            htmlContent += "<h3>C. Tổng chi phí phát sinh so với hợp đồng: </h3>";
+            htmlContent += "<ul>";
+            if (request.ReturnDepostiItem == true)
+            {
+                htmlContent += "<li>Số tiền đặt cọc đã thu: " + request.DepositItemDownPayment + " VNĐ</li>";
+
+                htmlContent += "<li>Số tiền phải trả: " + request.DepositItemDownPayment + " VNĐ</li>";
+            }
+            else
+            {
+                htmlContent += "<li>Số tiền đặt cọc đã thu: " + request.DepositItemDownPayment + " VNĐ</li>";
+                if (etcMoney > 0)
+                {
+                    htmlContent += "<li>Vé cầu đường phát sinh chưa thanh toán: " + etcMoney + " VNĐ</li>";
+                }
+                else
+                {
+                    htmlContent += "<li>Vé cầu đường phát sinh chưa thanh toán: " + etcMoney + " VNĐ</li>";
+                }
+                htmlContent += "<li>Tiền xăng đã sử dụng: " + fuelMoney + " VNĐ/li>";
+                htmlContent += "<li>Thời gian phụ trội so với hợp đồng: " + request.ExtraTime + " giờ, phụ phí phát sinh: " + extraTimeMoney + " VNĐ</li>";
+                if (overKm > 0)
+                {
+                    htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
+                }
+                else
+                {
+                    overKm = 0;
+                    htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
+                }
+                if (request.OriginalCondition == true)
+                {
+                    htmlContent += "<li>Chi phí bảo hiểm: " + request.InsuranceMoney + "  VNĐ</li>";
+                }
+                if (request.OriginalCondition == false)
+                {
+                    htmlContent += "<li>Chi phí bảo hiểm: đang cập nhật </li>";
+                }
+                if (request.DetectedViolations == false)
+                {
+                    htmlContent += "<li>Tổng tiền vi phạm: " + request.ViolationMoney + " VNĐ</li>";
+                }
+                else
+                {
+                    htmlContent += "<li>Tổng tiền vi phạm: đang cập nhật </li>";
+                }
+                if (deposit >= 0)
+                {
+                    htmlContent += "<li>Số tiền cọc trả lại cho khách: " + deposit + " VNĐ</li>";
+                }
+                if (deposit < 0)
+                {
+                    htmlContent += "<li>Số tiền phải thu thêm từ khách: " + deposit * (-1) + " VNĐ</li>";
+                }
+
+            }
+
+            htmlContent += "<li>Cam kết của Khách thuê và Chủ xe: </li>";
+            htmlContent += "<li>Trong trường hợp phát sinh các khoản phạt nguội, bằng chứng do camera giám sát của Cục CSGT - Bộ Công An " +
+                "ghi nhận được trong thời gian Bên B sử dụng xe ô tô thuê của Bên A.</li>";
+            htmlContent += "<li>Bên A có trách nhiệm cung cấp các bằng chứng liên quan cho bên B ngay khi nhận được thông tin.</li>";
+            htmlContent += "<li>Bên B cam kết chịu hoàn toàn trách nhiệm và bồi thường toàn bộ các chi phí liên quan cho Bên A. </li>";
+            htmlContent += "</ul>";
+
+            htmlContent += "<h3>&nbsp;&nbsp;&nbsp;&nbsp;BÊN A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
+                ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "BÊN B</h3>";
+
+            if (request.StaffSignature != null)
+            {
+                htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;<img style= 'width:100px; height:100%' src='" + request.StaffSignature + "' />";
+            }
+            if (request.CustomerSignature != null)
+            {
+                htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
+              ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;<img style= 'width:100px; height:100%' src='" + request.CustomerSignature + "' />";
+            }
             var file = _fileRepository.GeneratePdfAsync(htmlContent);
             var filePath = _fileRepository.SaveFileToFolder(file, request.ContractGroupId.ToString());
 
-            //get TransferContract
-            var transferContract = _contractContext.TransferContracts.FirstOrDefault(c => c.Id == request.TransferContractId);
-            double? totalKilometersTraveled = request.CurrentCarStateSpeedometerNumber - transferContract.CurrentCarStateSpeedometerNumber; // count totalKMTraveled
+          
             //UpdateContract
             var receiveContractFiles = request.ReceiveContractFileDataModels;
 
@@ -333,8 +747,7 @@ namespace CleanArchitecture.Application.Repository
                 contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusReceiveSigned;
                 _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
 
-                var contractGroup = _contractContext.ContractGroups
-                .FirstOrDefault(c => c.Id == request.ContractGroupId);
+                
 
                 //Update CarStatus 
                 var carAvailableStatus = Constant.CarStatusConstants.Available;
@@ -362,30 +775,6 @@ namespace CleanArchitecture.Application.Repository
                 _contractContext.CarMaintenanceInfos.Update(carMaintenanceInfo);
                 _contractContext.SaveChanges();
 
-                //find Car 
-                var car = _contractContext.Cars.Find(contractGroup.CarId);
-
-                //find rentContract 
-                var rentContract = _contractContext.RentContracts.Where(c => c.ContractGroupId == contractGroup.Id).OrderByDescending(c => c.Id).FirstOrDefault();
-
-                //cal fuelPercent have using
-                int? fuelPercent = transferContract.CurrentCarStateFuelPercent - request.CurrentCarStateFuelPercent;
-
-                // cal etc using
-                double? etcMoney = transferContract.CurrentCarStateCurrentEtcAmount - request.CurrentCarStateCurrentEtcAmount;
-
-                //cal extraKm
-                double? overKm = totalKilometersTraveled - car.CarGenerallInfo.LimitedKmForMonth;
-                double? extraKmMoney;
-                if (overKm > 0)
-                {
-                    extraKmMoney = overKm * car.CarGenerallInfo.OverLimitedMileage;
-                }
-                else
-                {
-                    overKm = 0;
-                     extraKmMoney = 0;
-                }
 
                 //Update ContractStatistic
                 var contractStatistic = _contractContext.ContractStatistics
@@ -398,6 +787,8 @@ namespace CleanArchitecture.Application.Repository
                 contractStatisticUpdateModel.EtcmoneyUsing = etcMoney;
                 contractStatisticUpdateModel.ExtraTimeMoney = request.ExtraTime * rentContract.CarGeneralInfoAtRentPricePerHourExceed;
                 contractStatisticUpdateModel.ExtraKmMoney = extraKmMoney;
+                contractStatisticUpdateModel.InsuranceMoney = request.InsuranceMoney;
+                contractStatisticUpdateModel.ViolationMoney = request.ViolationMoney;
                 contractStatisticUpdateModel.PaymentAmount = contractStatistic.PaymentAmount;
                 _contractStatisticRepository.UpdateContractStatistic(contractStatisticUpdateModel);
 

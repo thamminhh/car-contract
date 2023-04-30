@@ -88,7 +88,6 @@ namespace CleanArchitecture.Application.Repository
 
             };
         }
-
         public RentContractDataModel GetLastRentContractByContractGroupId(int contractGroupId)
         {
             RentContract rentContract = _contractContext.RentContracts
@@ -254,9 +253,12 @@ namespace CleanArchitecture.Application.Repository
             contractStatistic.FuelMoneyUsing = 0;
             contractStatistic.ExtraTimeMoney = 0;
             contractStatistic.ExtraKmMoney = 0;
+            contractStatistic.InsuranceMoney = 0;
+            contractStatistic.ViolationMoney = 0;
             contractStatistic.PaymentAmount = request.PaymentAmount;
             _contractStatisticRepository.CreateContractStatistic(contractStatistic);
 
+            //Create 
         }
 
         public void UpdateRentContract(int id, RentContractUpdateModel request)
@@ -290,7 +292,7 @@ namespace CleanArchitecture.Application.Repository
 
             if (request.StaffSignature != null)
             {
-                rentContract.ContractStatusId = Constant.ContractStatusConstant.ContractExported;
+                rentContract.ContractStatusId = Constant.ContractStatusConstant.ContractExporting;
             }
             else
             {
@@ -305,6 +307,7 @@ namespace CleanArchitecture.Application.Repository
             _contractContext.RentContracts.Update(rentContract);
             _contractContext.SaveChanges();
 
+
             if (request.CancelReason != null)
             {
                 var contractGroupStatusRentCancel = Constant.ContractGroupConstant.RentContractCancel;
@@ -313,13 +316,13 @@ namespace CleanArchitecture.Application.Repository
                 contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusRentCancel;
                 _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
             }
-            if (request.CustomerSignature != null && request.StaffSignature != null)
+            if (request.StaffSignature != null)
             {
                 //Update ContractGroupStatus
-                var contractGroupStatusRentSigned = Constant.ContractGroupConstant.RentContractSigned;
+                var contractGroupStatusRentNotSign = Constant.ContractGroupConstant.RentContractNotSign;
                 var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
                 contractGroupUpdateStatusModel.Id = request.ContractGroupId;
-                contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusRentSigned;
+                contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusRentNotSign;
                 _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
 
                 //get ContractGroup 
@@ -369,6 +372,8 @@ namespace CleanArchitecture.Application.Repository
             .Include(c => c.CarModel)
             .FirstOrDefault(c => c.Id == contractGroup.CarId);
             var appraisalRecord = _appraisalRecordRepository.GetLastAppraisalRecordByContractGroupId(request.ContractGroupId);
+            var parkingLot = _contractContext.ParkingLots.FirstOrDefault(c => c.Id == car.ParkingLotId);
+            double? total = request.PaymentAmount + appraisalRecord.DepositInfoDownPayment + request.DeliveryFee;
 
             string htmlContent = "<ul>";
             htmlContent += "<table style='width: 100%;'>";
@@ -393,19 +398,21 @@ namespace CleanArchitecture.Application.Repository
 
             htmlContent += " <h2>BÊN CHO THUÊ XE (BÊN A): CÔNG TY CỔ PHẦN CÔNG NGHỆ ATSHARE</h2>";
             htmlContent += "<ul>";
-            htmlContent += "<li>Địa chỉ: Park 2, Times City, 458 Minh Khai, Hai Bà Trưng, Hà Nội.</li>";
+            htmlContent += "<li>Địa chỉ: "+ parkingLot.Address + "</li>";
             htmlContent += "<li>MST:0110032942</li> ";
             htmlContent += "<li>STK:19035651301016 tại NH Kỹ Thương VN (Techcombank), CN Hai Bà Trưng</li>";
             htmlContent += "<li>Đại diện: " + representer.Name + "</li>";
             htmlContent += "<li>Điện thoại: " + representer.PhoneNumber + " </li>";
             htmlContent += "</ul>";
-            htmlContent += "<h2>BÊN THUÊ XE (BÊN B):</h2>";
+
+            htmlContent += "<h2>BÊN THUÊ XE (BÊN B): " + contractGroup.CustomerInfo.CustomerName + "</h2>";
             htmlContent += "<ul>";
             htmlContent += "<li>Địa chỉ hiện tại: " + contractGroup.CustomerInfo.CustomerAddress + "</li>";
             htmlContent += "<li>Số điện thoại: " + contractGroup.CustomerInfo.PhoneNumber + "</li>";
             htmlContent += "<li>CCCD/ CMND số: " + contractGroup.CustomerInfo.CitizenIdentificationInfoNumber + "</li>";
             htmlContent += "<li>Cấp ngày: " + contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive + "</li>";
             htmlContent += "</ul>";
+
             htmlContent += "<p>Sau khi bàn bạc, thỏa thuận, hai bên cùng nhất trí ký hợp đồng thuê xe với các điều khoản sau:</p>";
             htmlContent += "<h2>Điều I: Nội dung hợp đồng</h2>";
             htmlContent += "<p>Bên A đồng ý cho Bên B thuê xác xe ô tô để phục vụ mục đích đi lại:</p>";
@@ -420,9 +427,12 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<li>Giới hạn hành trình: " + request.CarGeneralInfoAtRentLimitedKmForMonth + " Km/Ngày</li>";
             htmlContent += "<li>Đặt cọc hợp đồng: " + appraisalRecord.DepositInfoDownPayment + " VNĐ </li>";
             htmlContent += "<li>Phí phát sinh Km: " + request.CarGeneralInfoAtRentPricePerKmExceed + "/Km</li>";
-            htmlContent += "<li>Tổng tiền thuê xe: " + request.PaymentAmount + "</li>";
-            htmlContent += "<li>Phí phát sinh thời gian: " + request.CarGeneralInfoAtRentPricePerHourExceed + "/giờ </li>";
+            htmlContent += "<li>Phí phát sinh thời gian: " + request.CarGeneralInfoAtRentPricePerHourExceed + " VNĐ/giờ </li>";
+            htmlContent += "<li>Phí giao xe " + request.DeliveryFee + "đ/giờ </li>";
+            htmlContent += "<li>Tiền thuê xe: " + request.PaymentAmount + " VNĐ </li>";
+            htmlContent += "<li>Thanh toán khi nhận xe: " + total + " VNĐ</li>";
             htmlContent += "</ul>";
+
             htmlContent += "<h2>Điều III: Quyền hạn trách nhiệm của Bên A</h2>";
             htmlContent += "<ul>";
             htmlContent += "<li>1. Bên A có trách nhiệm giao xe cho bên B đúng chủng loại, hoạt động bình thường, địa điểm đã thỏa thuận và cung cấp thông tin cần thiết để sử dụng phương tiện. Trường hợp bất khả kháng, xe xảy ra sự cố thì bên A sẽ thay thế xe có giá trị tương đương để bên B sử dụng.</li>";
@@ -438,14 +448,15 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<ul>";
             htmlContent += "<li>1. Khi xảy ra sự cố và va quệt làm hư hỏng xe, bên B phải thông báo và bồi thường theo hiện trạng cũ mà nơi sửa chữa do bên A quy định. Khi sửa chữa, bên B có trách nhiệm bồi thường thiệt hại về tiền cho bên A khi xe không lưu hành được theo đơn giá của ngày thuê xe. (Số ngày xe sửa chữa x Đơn giá thuê).\r\n</li>";
             htmlContent += "<li>2. Nếu Bên B trả xe mà không có hoặc làm mất giấy tờ xe (được quy định tại điều III, khoản 2) hoặc vi phạm luật an toàn giao thông đường bộ dẫn đến bị thu xe thì Bên B vẫn phải thanh toán tiền thuê xe bình thường cho đến khi trao trả giấy tờ xe và xe đầy đủ.\r\n</li>";
-            htmlContent += "<li>3. Nếu trong trường hợp bên B làm mất xe thì bên B phải chịu bồi thường 100% giá trị ban đầu của xe cho bên A.</li>";
-            htmlContent += "<li>4. Trong quá trình sử dụng xe bên B chịu hoàn toàn trách nhiệm dân sự, hình sự, và luật lệ an toàn giao thông trước pháp luật nếu có phát sinh bất cứ chi phí phạt nào tại thời điểm bên B thuê xe, bên B vẫn chịu chi phí đó mặc dù hợp đồng đã thanh lý. Bên B tuân thủ đi đúng hành trình đã cam kết với bên A, nếu có thay đổi phải báo cho bên A biết. Nếu không bên A có quyền đơn phương chấm dứt hợp đồng, lấy xe về trước thời hạn.</li>";
-            htmlContent += "<li>5. Hết hạn hợp đồng bên B trả xe ngay cho bên A (như tình trạng xe khi bàn giao). Thời gian Bên A nhận xe từ Bên B không muộn hơn giờ quy định ở trên, nếu trả xe sau giờ quy định Bên A sẽ tính phí phát sinh : 100.000 vnđ /1 giờ. Trường hợp Bên B trả xe sau 22h00 bên A sẽ tính chi phí phát sinh là 1 ngày.\r\n</li>";
-            htmlContent += "<li>6. Trường hợp xe phát sinh : Khi phát sinh trả trước hạn hợp đồng bên B phải báo bên A trước 24h. Trường hợp Bên B không báo trước, bên A sẽ thu phí theo giá trị Hợp Đồng và không hoàn trả tiền thừa. Khi phát sinh trả sau hạn hợp đồng, Bên B đi thêm, Bên B phải báo bên A trước 8 tiếng so với thời gian hết hạn. Trường hợp Bên B báo muộn sau 8 tiếng chi phí phát sinh cho ngày mới tăng 30% giá thuê.</li>";
-            htmlContent += "<li>7. Bên B không giao xe cho người khác sử dụng dưới bất kì hình thức nào hoặc chuyên chở các loại vũ khí, chất cháy nổ, hàng quốc cấm cũng như các đồ hải sản, đồ ăn, nước chấm, mắm hoặc hàng nặng mùi. Nếu vi phạm sẽ bị phạt từ 1.000.000 vnđ đến 5.000.000 vnđ cũng như toàn bộ chi phí khắc phục và giá trị ngày xe không khai thác kinh doanh được.\r\n</li>";
-            htmlContent += "<li>8. Theo nghị định mới của Bộ GTVT về việc theo dõi hiện trường giao thông bằng Camera: Bên B sử dụng vi phạm luật GTĐB, gây tai nạn cho người tham gia giao thông, bỏ trốn khỏi hiện trường, vì lý do thực tế chưa xử lý ngay được, sau một thời gian bị phát hiện hoặc Cơ quan Pháp luật điều tra được thì vẫn phải chịu trách nhiệm trước Bên A và cơ quan pháp luật mặc dù hợp đồng kết thúc, Bên B đã trả xe.</li>";
-            htmlContent += "<li>9. Mọi sự cố do Bên B gây ra, không thể tự giải quyết được phải nhờ đến Bên A trực tiếp giải quyết giúp, thì tất cả chi phí đi lại, ăn, nghỉ của Bên A do Bên B thanh toán.</li>";
-            htmlContent += "<li>10. Không sử dụng chất kích thích khi lái xe, nếu vi phạm bên B sẽ chịu toàn bộ trách nhiệm trước pháp luật và sẽ chịu toàn bộ thiệt hại liên quan đến ngày nằm chờ gián đoạn kinh doanh, chi phí phát sinh nếu có.</li>";
+            htmlContent += "<li>3. Bên B vui lòng trả xe tại bãi xe của công ty.\r\n</li>";
+            htmlContent += "<li>4. Nếu trong trường hợp bên B làm mất xe thì bên B phải chịu bồi thường 100% giá trị ban đầu của xe cho bên A.</li>";
+            htmlContent += "<li>5. Trong quá trình sử dụng xe bên B chịu hoàn toàn trách nhiệm dân sự, hình sự, và luật lệ an toàn giao thông trước pháp luật nếu có phát sinh bất cứ chi phí phạt nào tại thời điểm bên B thuê xe, bên B vẫn chịu chi phí đó mặc dù hợp đồng đã thanh lý. Bên B tuân thủ đi đúng hành trình đã cam kết với bên A, nếu có thay đổi phải báo cho bên A biết. Nếu không bên A có quyền đơn phương chấm dứt hợp đồng, lấy xe về trước thời hạn.</li>";
+            htmlContent += "<li>6. Hết hạn hợp đồng bên B trả xe ngay cho bên A (như tình trạng xe khi bàn giao). Thời gian Bên A nhận xe từ Bên B không muộn hơn giờ quy định ở trên, nếu trả xe sau giờ quy định Bên A sẽ tính phí phát sinh : 100.000 vnđ /1 giờ. Trường hợp Bên B trả xe sau 22h00 bên A sẽ tính chi phí phát sinh là 1 ngày.\r\n</li>";
+            htmlContent += "<li>7. Trường hợp xe phát sinh : Khi phát sinh trả trước hạn hợp đồng bên B phải báo bên A trước 24h. Trường hợp Bên B không báo trước, bên A sẽ thu phí theo giá trị Hợp Đồng và không hoàn trả tiền thừa. Khi phát sinh trả sau hạn hợp đồng, Bên B đi thêm, Bên B phải báo bên A trước 8 tiếng so với thời gian hết hạn. Trường hợp Bên B báo muộn sau 8 tiếng chi phí phát sinh cho ngày mới tăng 30% giá thuê.</li>";
+            htmlContent += "<li>8. Bên B không giao xe cho người khác sử dụng dưới bất kì hình thức nào hoặc chuyên chở các loại vũ khí, chất cháy nổ, hàng quốc cấm cũng như các đồ hải sản, đồ ăn, nước chấm, mắm hoặc hàng nặng mùi. Nếu vi phạm sẽ bị phạt từ 1.000.000 vnđ đến 5.000.000 vnđ cũng như toàn bộ chi phí khắc phục và giá trị ngày xe không khai thác kinh doanh được.\r\n</li>";
+            htmlContent += "<li>9. Theo nghị định mới của Bộ GTVT về việc theo dõi hiện trường giao thông bằng Camera: Bên B sử dụng vi phạm luật GTĐB, gây tai nạn cho người tham gia giao thông, bỏ trốn khỏi hiện trường, vì lý do thực tế chưa xử lý ngay được, sau một thời gian bị phát hiện hoặc Cơ quan Pháp luật điều tra được thì vẫn phải chịu trách nhiệm trước Bên A và cơ quan pháp luật mặc dù hợp đồng kết thúc, Bên B đã trả xe.</li>";
+            htmlContent += "<li>10. Mọi sự cố do Bên B gây ra, không thể tự giải quyết được phải nhờ đến Bên A trực tiếp giải quyết giúp, thì tất cả chi phí đi lại, ăn, nghỉ của Bên A do Bên B thanh toán.</li>";
+            htmlContent += "<li>11. Không sử dụng chất kích thích khi lái xe, nếu vi phạm bên B sẽ chịu toàn bộ trách nhiệm trước pháp luật và sẽ chịu toàn bộ thiệt hại liên quan đến ngày nằm chờ gián đoạn kinh doanh, chi phí phát sinh nếu có.</li>";
             htmlContent += "</ul>";
 
             htmlContent += "<h2>Điều V: Các thỏa thuận đặc biệt: </h2>";
@@ -492,6 +503,8 @@ namespace CleanArchitecture.Application.Repository
             .Include(c => c.CarModel)
             .FirstOrDefault(c => c.Id == contractGroup.CarId);
             var appraisalRecord = _appraisalRecordRepository.GetLastAppraisalRecordByContractGroupId(request.ContractGroupId);
+            var parkingLot = _contractContext.ParkingLots.FirstOrDefault(c => c.Id == car.ParkingLotId);
+            double? total = request.PaymentAmount + appraisalRecord.DepositInfoDownPayment + request.DeliveryFee;
 
             string htmlContent = "<ul>";
             htmlContent += "<table style='width: 100%;'>";
@@ -516,19 +529,21 @@ namespace CleanArchitecture.Application.Repository
 
             htmlContent += " <h2>BÊN CHO THUÊ XE (BÊN A): CÔNG TY CỔ PHẦN CÔNG NGHỆ ATSHARE</h2>";
             htmlContent += "<ul>";
-            htmlContent += "<li>Địa chỉ: Park 2, Times City, 458 Minh Khai, Hai Bà Trưng, Hà Nội.</li>";
+            htmlContent += "<li>Địa chỉ: " + parkingLot.Address + "</li>";
             htmlContent += "<li>MST:0110032942</li> ";
             htmlContent += "<li>STK:19035651301016 tại NH Kỹ Thương VN (Techcombank), CN Hai Bà Trưng</li>";
             htmlContent += "<li>Đại diện: " + representer.Name + "</li>";
             htmlContent += "<li>Điện thoại: " + representer.PhoneNumber + " </li>";
             htmlContent += "</ul>";
-            htmlContent += "<h2>BÊN THUÊ XE (BÊN B):</h2>";
+
+            htmlContent += "<h2>BÊN THUÊ XE (BÊN B): " + contractGroup.CustomerInfo.CustomerName + "</h2>";
             htmlContent += "<ul>";
             htmlContent += "<li>Địa chỉ hiện tại: " + contractGroup.CustomerInfo.CustomerAddress + "</li>";
             htmlContent += "<li>Số điện thoại: " + contractGroup.CustomerInfo.PhoneNumber + "</li>";
             htmlContent += "<li>CCCD/ CMND số: " + contractGroup.CustomerInfo.CitizenIdentificationInfoNumber + "</li>";
             htmlContent += "<li>Cấp ngày: " + contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive + "</li>";
             htmlContent += "</ul>";
+
             htmlContent += "<p>Sau khi bàn bạc, thỏa thuận, hai bên cùng nhất trí ký hợp đồng thuê xe với các điều khoản sau:</p>";
             htmlContent += "<h2>Điều I: Nội dung hợp đồng</h2>";
             htmlContent += "<p>Bên A đồng ý cho Bên B thuê xác xe ô tô để phục vụ mục đích đi lại:</p>";
@@ -543,9 +558,12 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<li>Giới hạn hành trình: " + request.CarGeneralInfoAtRentLimitedKmForMonth + " Km/Ngày</li>";
             htmlContent += "<li>Đặt cọc hợp đồng: " + appraisalRecord.DepositInfoDownPayment + " VNĐ </li>";
             htmlContent += "<li>Phí phát sinh Km: " + request.CarGeneralInfoAtRentPricePerKmExceed + "/Km</li>";
-            htmlContent += "<li>Tổng tiền thuê xe: " + request.PaymentAmount + "</li>";
-            htmlContent += "<li>Phí phát sinh thời gian: " + request.CarGeneralInfoAtRentPricePerHourExceed + "/giờ </li>";
+            htmlContent += "<li>Phí phát sinh thời gian: " + request.CarGeneralInfoAtRentPricePerHourExceed + " VNĐ/giờ </li>";
+            htmlContent += "<li>Phí giao xe: " + request.DeliveryFee + "đ/giờ </li>";
+            htmlContent += "<li>Tiền thuê xe: " + request.PaymentAmount + " VNĐ </li>";
+            htmlContent += "<li>Thanh toán khi nhận xe: " + total + " VNĐ</li>";
             htmlContent += "</ul>";
+
             htmlContent += "<h2>Điều III: Quyền hạn trách nhiệm của Bên A</h2>";
             htmlContent += "<ul>";
             htmlContent += "<li>1. Bên A có trách nhiệm giao xe cho bên B đúng chủng loại, hoạt động bình thường, địa điểm đã thỏa thuận và cung cấp thông tin cần thiết để sử dụng phương tiện. Trường hợp bất khả kháng, xe xảy ra sự cố thì bên A sẽ thay thế xe có giá trị tương đương để bên B sử dụng.</li>";
@@ -561,14 +579,15 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "<ul>";
             htmlContent += "<li>1. Khi xảy ra sự cố và va quệt làm hư hỏng xe, bên B phải thông báo và bồi thường theo hiện trạng cũ mà nơi sửa chữa do bên A quy định. Khi sửa chữa, bên B có trách nhiệm bồi thường thiệt hại về tiền cho bên A khi xe không lưu hành được theo đơn giá của ngày thuê xe. (Số ngày xe sửa chữa x Đơn giá thuê).\r\n</li>";
             htmlContent += "<li>2. Nếu Bên B trả xe mà không có hoặc làm mất giấy tờ xe (được quy định tại điều III, khoản 2) hoặc vi phạm luật an toàn giao thông đường bộ dẫn đến bị thu xe thì Bên B vẫn phải thanh toán tiền thuê xe bình thường cho đến khi trao trả giấy tờ xe và xe đầy đủ.\r\n</li>";
-            htmlContent += "<li>3. Nếu trong trường hợp bên B làm mất xe thì bên B phải chịu bồi thường 100% giá trị ban đầu của xe cho bên A.</li>";
-            htmlContent += "<li>4. Trong quá trình sử dụng xe bên B chịu hoàn toàn trách nhiệm dân sự, hình sự, và luật lệ an toàn giao thông trước pháp luật nếu có phát sinh bất cứ chi phí phạt nào tại thời điểm bên B thuê xe, bên B vẫn chịu chi phí đó mặc dù hợp đồng đã thanh lý. Bên B tuân thủ đi đúng hành trình đã cam kết với bên A, nếu có thay đổi phải báo cho bên A biết. Nếu không bên A có quyền đơn phương chấm dứt hợp đồng, lấy xe về trước thời hạn.</li>";
-            htmlContent += "<li>5. Hết hạn hợp đồng bên B trả xe ngay cho bên A (như tình trạng xe khi bàn giao). Thời gian Bên A nhận xe từ Bên B không muộn hơn giờ quy định ở trên, nếu trả xe sau giờ quy định Bên A sẽ tính phí phát sinh : 100.000 vnđ /1 giờ. Trường hợp Bên B trả xe sau 22h00 bên A sẽ tính chi phí phát sinh là 1 ngày.\r\n</li>";
-            htmlContent += "<li>6. Trường hợp xe phát sinh : Khi phát sinh trả trước hạn hợp đồng bên B phải báo bên A trước 24h. Trường hợp Bên B không báo trước, bên A sẽ thu phí theo giá trị Hợp Đồng và không hoàn trả tiền thừa. Khi phát sinh trả sau hạn hợp đồng, Bên B đi thêm, Bên B phải báo bên A trước 8 tiếng so với thời gian hết hạn. Trường hợp Bên B báo muộn sau 8 tiếng chi phí phát sinh cho ngày mới tăng 30% giá thuê.</li>";
-            htmlContent += "<li>7. Bên B không giao xe cho người khác sử dụng dưới bất kì hình thức nào hoặc chuyên chở các loại vũ khí, chất cháy nổ, hàng quốc cấm cũng như các đồ hải sản, đồ ăn, nước chấm, mắm hoặc hàng nặng mùi. Nếu vi phạm sẽ bị phạt từ 1.000.000 vnđ đến 5.000.000 vnđ cũng như toàn bộ chi phí khắc phục và giá trị ngày xe không khai thác kinh doanh được.\r\n</li>";
-            htmlContent += "<li>8. Theo nghị định mới của Bộ GTVT về việc theo dõi hiện trường giao thông bằng Camera: Bên B sử dụng vi phạm luật GTĐB, gây tai nạn cho người tham gia giao thông, bỏ trốn khỏi hiện trường, vì lý do thực tế chưa xử lý ngay được, sau một thời gian bị phát hiện hoặc Cơ quan Pháp luật điều tra được thì vẫn phải chịu trách nhiệm trước Bên A và cơ quan pháp luật mặc dù hợp đồng kết thúc, Bên B đã trả xe.</li>";
-            htmlContent += "<li>9. Mọi sự cố do Bên B gây ra, không thể tự giải quyết được phải nhờ đến Bên A trực tiếp giải quyết giúp, thì tất cả chi phí đi lại, ăn, nghỉ của Bên A do Bên B thanh toán.</li>";
-            htmlContent += "<li>10. Không sử dụng chất kích thích khi lái xe, nếu vi phạm bên B sẽ chịu toàn bộ trách nhiệm trước pháp luật và sẽ chịu toàn bộ thiệt hại liên quan đến ngày nằm chờ gián đoạn kinh doanh, chi phí phát sinh nếu có.</li>";
+            htmlContent += "<li>3. Bên B vui lòng trả xe tại bãi xe của công ty.\r\n</li>";
+            htmlContent += "<li>4. Nếu trong trường hợp bên B làm mất xe thì bên B phải chịu bồi thường 100% giá trị ban đầu của xe cho bên A.</li>";
+            htmlContent += "<li>5. Trong quá trình sử dụng xe bên B chịu hoàn toàn trách nhiệm dân sự, hình sự, và luật lệ an toàn giao thông trước pháp luật nếu có phát sinh bất cứ chi phí phạt nào tại thời điểm bên B thuê xe, bên B vẫn chịu chi phí đó mặc dù hợp đồng đã thanh lý. Bên B tuân thủ đi đúng hành trình đã cam kết với bên A, nếu có thay đổi phải báo cho bên A biết. Nếu không bên A có quyền đơn phương chấm dứt hợp đồng, lấy xe về trước thời hạn.</li>";
+            htmlContent += "<li>6. Hết hạn hợp đồng bên B trả xe ngay cho bên A (như tình trạng xe khi bàn giao). Thời gian Bên A nhận xe từ Bên B không muộn hơn giờ quy định ở trên, nếu trả xe sau giờ quy định Bên A sẽ tính phí phát sinh : 100.000 vnđ /1 giờ. Trường hợp Bên B trả xe sau 22h00 bên A sẽ tính chi phí phát sinh là 1 ngày.\r\n</li>";
+            htmlContent += "<li>7. Trường hợp xe phát sinh : Khi phát sinh trả trước hạn hợp đồng bên B phải báo bên A trước 24h. Trường hợp Bên B không báo trước, bên A sẽ thu phí theo giá trị Hợp Đồng và không hoàn trả tiền thừa. Khi phát sinh trả sau hạn hợp đồng, Bên B đi thêm, Bên B phải báo bên A trước 8 tiếng so với thời gian hết hạn. Trường hợp Bên B báo muộn sau 8 tiếng chi phí phát sinh cho ngày mới tăng 30% giá thuê.</li>";
+            htmlContent += "<li>8. Bên B không giao xe cho người khác sử dụng dưới bất kì hình thức nào hoặc chuyên chở các loại vũ khí, chất cháy nổ, hàng quốc cấm cũng như các đồ hải sản, đồ ăn, nước chấm, mắm hoặc hàng nặng mùi. Nếu vi phạm sẽ bị phạt từ 1.000.000 vnđ đến 5.000.000 vnđ cũng như toàn bộ chi phí khắc phục và giá trị ngày xe không khai thác kinh doanh được.\r\n</li>";
+            htmlContent += "<li>9. Theo nghị định mới của Bộ GTVT về việc theo dõi hiện trường giao thông bằng Camera: Bên B sử dụng vi phạm luật GTĐB, gây tai nạn cho người tham gia giao thông, bỏ trốn khỏi hiện trường, vì lý do thực tế chưa xử lý ngay được, sau một thời gian bị phát hiện hoặc Cơ quan Pháp luật điều tra được thì vẫn phải chịu trách nhiệm trước Bên A và cơ quan pháp luật mặc dù hợp đồng kết thúc, Bên B đã trả xe.</li>";
+            htmlContent += "<li>10. Mọi sự cố do Bên B gây ra, không thể tự giải quyết được phải nhờ đến Bên A trực tiếp giải quyết giúp, thì tất cả chi phí đi lại, ăn, nghỉ của Bên A do Bên B thanh toán.</li>";
+            htmlContent += "<li>11. Không sử dụng chất kích thích khi lái xe, nếu vi phạm bên B sẽ chịu toàn bộ trách nhiệm trước pháp luật và sẽ chịu toàn bộ thiệt hại liên quan đến ngày nằm chờ gián đoạn kinh doanh, chi phí phát sinh nếu có.</li>";
             htmlContent += "</ul>";
 
             htmlContent += "<h2>Điều V: Các thỏa thuận đặc biệt: </h2>";
@@ -595,40 +614,16 @@ namespace CleanArchitecture.Application.Repository
             htmlContent += "</ul>";
 
             htmlContent += "<h3>&nbsp;&nbsp;&nbsp;&nbsp;BÊN A &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
-               ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-               "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-               "BÊN B</h3>";
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
+                ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                "BÊN B</h3>";
 
             if (request.StaffSignature != null)
             {
                 htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;<img style= 'width:100px; height:100%' src='" + request.StaffSignature + "' />";
                 htmlContent += "<li> " + representer.Name + "</li>";
-            }
-            if (request.CustomerSignature != null)
-            {
-                htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp" +
-              ";&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
-              "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                htmlContent += "&nbsp;&nbsp;&nbsp;&nbsp;<img style= 'width:100px; height:100%' src='" + request.CustomerSignature + "' />";
-                htmlContent += "<li> " + contractGroup.CustomerInfo.CustomerName + "</li>";
-                //htmlContent += "<table style='width: 100%;'>";
-                //htmlContent += " <tr style='margin-left: 5px; list-style-type: none; width:50%;'>";
-                //htmlContent += "<td >";
-                //htmlContent += "<li>Bên A</li>";
-                //htmlContent += "<img style='height: 100px; width: 100px;' src='" + request.StaffSignature + "'/>";
-                //htmlContent += "<li> " + contractGroup.CustomerInfo.CustomerName+"</li>";
-                //htmlContent += "</td>";
-                //htmlContent += " <td style='height: 50px;'>";
-                //htmlContent += "<li style='text-align: center; font-weight: 700; font-size: 16px;'>Bên B</li>";
-                //htmlContent += "<img style='height: 100px; width: 100px;' src='" + request.CustomerSignature+ "'/>";
-                //htmlContent += "<li style='text-align: center;  margin-top: -15px;'>" + contractGroup.CustomerInfo.CustomerName + "/li>";
-                //htmlContent += "</td>";
-                //htmlContent += "</tr>";
-                //htmlContent += "</table>";
             }
 
             return htmlContent;

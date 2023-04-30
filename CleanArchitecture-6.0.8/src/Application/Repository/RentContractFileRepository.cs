@@ -35,6 +35,8 @@ namespace CleanArchitecture.Application.Repository
 
             await _contractContext.RentContractFiles.AddRangeAsync(rentContractFilesToCreate);
             await _contractContext.SaveChangesAsync();
+
+
         }
 
         //    public RentContractFileDataModel GetRentContractFileById(int RentContractFileId)
