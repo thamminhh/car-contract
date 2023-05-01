@@ -7,7 +7,11 @@ using System.Threading;
 using CleanArchitecture.Application.Repository;
 using CleanArchitecture.Domain.Entities_SubModel.Email;
 using CleanArchitecture.Domain.Interface;
+using Microsoft.AspNetCore.Cors;
 
+[ApiController]
+[Route("api/[controller]")]
+[EnableCors]
 public class MailController : ControllerBase
 {
     private readonly IMailService mailService;
@@ -30,33 +34,33 @@ public class MailController : ControllerBase
             throw;
         }
     }
-    [HttpPost("encodeId")]
-    public async Task<IActionResult> EncodeId(int id)
-    {
-        if(id != null)
-        {
-            _userRepository.EncodeId(id, out byte[]? idHash, out byte[]? idSalt, out long timestamp);
-            return Ok(new {idHash, idSalt, timestamp});
-        }
-        return BadRequest();
-    }
-    [HttpPost("decodeId")]
-    public async Task<IActionResult> DecodeId(int expectedId, byte[] hash, byte[] salt, long timestamp)
-    {
+    //[HttpPost("encodeId")]
+    //public async Task<IActionResult> EncodeId(int id)
+    //{
+    //    if(id != null)
+    //    {
+    //        _userRepository.EncodeId(id, out byte[]? idHash, out byte[]? idSalt, out long timestamp);
+    //        return Ok(new {idHash, idSalt, timestamp});
+    //    }
+    //    return BadRequest();
+    //}
+    //[HttpPost("decodeId")]
+    //public async Task<IActionResult> DecodeId(int expectedId, byte[] hash, byte[] salt, long timestamp)
+    //{
         
-        if (!_userRepository.DecodeId(expectedId, hash, salt, timestamp))
-        {
-            return BadRequest("false");
-        }
-        return Ok();
-    }
+    //    if (!_userRepository.DecodeId(expectedId, hash, salt, timestamp))
+    //    {
+    //        return BadRequest("false");
+    //    }
+    //    return Ok();
+    //}
 
-    [HttpPost("decodeLink")]
-    public IActionResult DecodeLink(string link)
-    {
-            string result = mailService.DecodeLink(link);
-            return Ok(result);
-    }
+    //[HttpPost("decodeLink")]
+    //public IActionResult DecodeLink(string link)
+    //{
+    //        string result = mailService.DecodeLink(link);
+    //        return Ok(result);
+    //}
 }
 
 //public class EmailController : ControllerBase

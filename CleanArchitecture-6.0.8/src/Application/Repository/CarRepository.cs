@@ -274,7 +274,10 @@ namespace CleanArchitecture.Application.Repository
                 {
                     cars = cars.Where(c => c.CarStatusId == filter.CarStatusId);
                 }
-
+                if (filter.ParkingLotId.HasValue)
+                {
+                    cars = cars.Where(c => c.ParkingLotId == filter.ParkingLotId);
+                }
                 if (!string.IsNullOrWhiteSpace(filter.CarLicensePlates))
                 {
                     cars = cars.Where(c => c.CarLicensePlates.Contains(filter.CarLicensePlates));

@@ -120,16 +120,15 @@ builder.Services.AddDbContext<ContractContext>(otp => otp.UseSqlServer(builder.C
     var app = builder.Build();
 
 
-
 // Configure the HTTP requestSystem.ArgumentException: 'Cannot instantiate implementation type 'CleanArchitecture.Domain.Interface.ICustomerFileRepository' for service type 'CleanArchitecture.Domain.Interface.ICustomerFileRepository'.' pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-        app.UseCors("AllowAllOrigins");
 
         app.UseRouting();
+        app.UseCors("AllowAllOrigins");
 
         app.UseStaticFiles();
 
