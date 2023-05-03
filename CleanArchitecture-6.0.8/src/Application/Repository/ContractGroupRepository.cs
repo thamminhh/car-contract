@@ -400,7 +400,7 @@ namespace CleanArchitecture.Application.Repository
                 RequireDescriptionInfoPriceForDay = request.RequireDescriptionInfoPriceForDay,
                 RequireDescriptionInfoCarColor = request.RequireDescriptionInfoCarColor,
                 RequireDescriptionInfoGearBox = request.RequireDescriptionInfoGearBox,
-                DeliveryAddress = request.CustomerAddress,
+                DeliveryAddress = request.DeliveryAddress,
                 ContractGroupStatusId = contractGroupIdDefault,
             };
 

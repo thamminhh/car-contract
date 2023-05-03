@@ -417,7 +417,7 @@ namespace CleanArchitecture.Application.Repository
                 _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
 
             }
-            else
+            if(request.OriginalCondition == true && request.ReturnDepostiItem == true)
             {
                 //Update ContractGroupStatus
                 var contractGroupStatusReceiveNotSign = Constant.ContractGroupConstant.ReceiveContractNotSign;
@@ -425,7 +425,7 @@ namespace CleanArchitecture.Application.Repository
                 contractGroupUpdateStatusModel.Id = request.ContractGroupId;
                 contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusReceiveNotSign;
                 _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
-        }
+            }
 
     }
 
@@ -657,14 +657,6 @@ namespace CleanArchitecture.Application.Repository
             receiveContract.OriginalCondition = request.OriginalCondition;
             receiveContract.DepositItemDownPayment = request.DepositItemDownPayment;
             receiveContract.ReturnDepostiItem = request.ReturnDepostiItem;
-            if(request.ReturnDepostiItem == false || request.OriginalCondition == false)
-            {
-                var contractGroupStatusInspecting = Constant.ContractGroupConstant.ContractInspecting;
-                var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
-                contractGroupUpdateStatusModel.Id = request.ContractGroupId;
-                contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusInspecting;
-                _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
-            }
             receiveContract.CustomerSignature = request.CustomerSignature;
             receiveContract.StaffSignature = request.StaffSignature;
             receiveContract.FileWithSignsPath = filePath;
@@ -713,6 +705,38 @@ namespace CleanArchitecture.Application.Repository
 
             _contractContext.ReceiveContracts.Update(receiveContract);
             _contractContext.SaveChanges();
+            if (request.CustomerSignature == null)
+            {
+                if (request.OriginalCondition == true && request.ReturnDepostiItem == false)
+                {
+                    var contractGroupStatusInspecting = Constant.ContractGroupConstant.ContractInspecting;
+                    var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+                    contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+                    contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusInspecting;
+                    _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+
+                }
+
+                if (request.OriginalCondition == false && request.ReturnDepostiItem == false)
+                {
+                    var contractGroupStatusInspecting = Constant.ContractGroupConstant.ContractInspecting;
+                    var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+                    contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+                    contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusInspecting;
+                    _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+
+                }
+
+                if (request.OriginalCondition == true && request.ReturnDepostiItem == true)
+                {
+                    //Update ContractGroupStatus
+                    var contractGroupStatusReceiveNotSign = Constant.ContractGroupConstant.ReceiveContractNotSign;
+                    var contractGroupUpdateStatusModel = new ContractGroupUpdateStatusModel();
+                    contractGroupUpdateStatusModel.Id = request.ContractGroupId;
+                    contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusReceiveNotSign;
+                    _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
+                }
+            }
 
             if (request.CustomerSignature != null && request.StaffSignature != null)
             {
@@ -722,8 +746,6 @@ namespace CleanArchitecture.Application.Repository
                 contractGroupUpdateStatusModel.Id = request.ContractGroupId;
                 contractGroupUpdateStatusModel.ContractGroupStatusId = contractGroupStatusReceiveSigned;
                 _contractGroupRepository.UpdateContractGroupStatus(request.ContractGroupId, contractGroupUpdateStatusModel);
-
-                
 
                 //Update CarStatus 
                 var carAvailableStatus = Constant.CarStatusConstants.Available;
@@ -767,7 +789,6 @@ namespace CleanArchitecture.Application.Repository
                 contractStatisticUpdateModel.ViolationMoney = request.ViolationMoney;
                 contractStatisticUpdateModel.PaymentAmount = contractStatistic.PaymentAmount;
                 _contractStatisticRepository.UpdateContractStatistic(contractStatisticUpdateModel);
-
             }
         }
         private double? calFuelMoney(decimal? tankCapacity, int? fuelPercent, double? currentFuelMoney)

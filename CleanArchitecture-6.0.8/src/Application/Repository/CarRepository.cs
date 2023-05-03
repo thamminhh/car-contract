@@ -318,6 +318,7 @@ namespace CleanArchitecture.Application.Repository
             }
 
             return (from c in cars
+                    join pl in _contractContext.ParkingLots on c.ParkingLotId equals pl.Id
                     join cstatus in _contractContext.CarStatuses on c.CarStatusId equals cstatus.Id
                     join cf in _contractContext.CarFiles on c.Id equals cf.CarId into CarFile
                     from cf in CarFile.DefaultIfEmpty()
@@ -328,6 +329,7 @@ namespace CleanArchitecture.Application.Repository
                     {
                         Id = c.Id,
                         ParkingLotId = c.ParkingLotId,
+                        ParkingLotName = pl.Name,
                         CarStatusId = c.CarStatusId,
                         CarStatus = cstatus.Name,
                         CarLicensePlates = c.CarLicensePlates,
