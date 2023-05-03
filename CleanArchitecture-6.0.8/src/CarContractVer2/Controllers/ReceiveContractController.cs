@@ -21,18 +21,18 @@ namespace CarContractVer2.Controllers
             _receiveContractFileRepository = receiveContractFileRepository;
         }
 
-        //[HttpGet]
-        //[Route(ReceiveContractEndpoints.GetSingle)]
-        //[ProducesResponseType(200, Type = typeof(IEnumerable<ReceiveContract>))]
-        //public IActionResult GetReceiveContractById(int id)
-        //{
-        //    if (!_receiveContractRepository.ReceiveContractExit(id))
-        //        return NotFound();
-        //    var receiveContract = _receiveContractRepository.GetReceiveContractById(id);
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-        //    return Ok(receiveContract);
-        //}
+        [HttpGet]
+        [Route(ReceiveContractEndpoints.GetSingle)]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<ReceiveContract>))]
+        public IActionResult GetReceiveContractById(int id)
+        {
+            if (!_receiveContractRepository.ReceiveContractExit(id))
+                return NotFound();
+            var receiveContract = _receiveContractRepository.GetReceiveContractById(id);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return Ok(receiveContract);
+        }
 
         [HttpGet]
         [Route(ReceiveContractEndpoints.GetByContractGroupId)]

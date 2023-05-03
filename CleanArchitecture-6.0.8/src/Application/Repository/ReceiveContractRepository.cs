@@ -32,65 +32,68 @@ namespace CleanArchitecture.Application.Repository
             _contractStatisticRepository= contractStatisticRepository;
         }
 
-        //public ReceiveContractDataModel GetReceiveContractById(int id)
-        //{
-        //    ReceiveContract receiveContract = _contractContext.ReceiveContracts
-        //        .Include(c => c.Receiver)
-        //        .FirstOrDefault(c => c.Id == id);
-        //    var host = _fileRepository.GetCurrentHost();
-        //    var contractGroup = _contractContext.ContractGroups
-        //        .Include(c => c.CustomerInfo)
-        //        .Include(c => c.TransferContract)
-        //        .FirstOrDefault(c => c.Id == receiveContract.ContractGroupId);
+        public ReceiveContractDataModel GetReceiveContractById(int id)
+        {
+            ReceiveContract receiveContract = _contractContext.ReceiveContracts
+                .Include(c => c.Receiver)
+                .FirstOrDefault(c => c.Id == id);
+            var host = _fileRepository.GetCurrentHost();
+            var contractGroup = _contractContext.ContractGroups
+                .Include(c => c.CustomerInfo)
+                .Include(c => c.TransferContract)
+                .FirstOrDefault(c => c.Id == receiveContract.ContractGroupId);
+            var receiveContractFiles = _receiveContractFileRepository.GetReceiveContractFilesByReceiveContractId(receiveContract.Id);
 
-        //    return new ReceiveContractDataModel
-        //    {
-        //        Id = id,
-        //        ReceiverId = receiveContract.ReceiverId,
-        //        ReceiverName = receiveContract.Receiver.Name,
-        //        ReceiverPhoneNumber = receiveContract.Receiver.PhoneNumber,
-        //        ContractGroupId = receiveContract.ContractGroupId,
-        //        CustomerName = contractGroup.CustomerInfo.CustomerName,
-        //        CustomerPhoneNumber = contractGroup.CustomerInfo.PhoneNumber,
-        //        CustomerAddress = contractGroup.CustomerInfo.CustomerAddress,
-        //        CustomerCitizenIdentificationInfoNumber = contractGroup.CustomerInfo.CitizenIdentificationInfoNumber,
-        //        CustomerCitizenIdentificationInfoAddress = contractGroup.CustomerInfo.CitizenIdentificationInfoAddress,
-        //        CustomerCitizenIdentificationInfoDateReceive = contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive,
-        //        TransferContractId = contractGroup.TransferContract.Id,
 
-        //        DateReceive = receiveContract.DateReceive,
-        //        ReceiveAddress = receiveContract.ReceiveAddress,
-        //        CurrentCarStateSpeedometerNumber = receiveContract.CurrentCarStateSpeedometerNumber,
-        //        CurrentCarStateFuelPercent = receiveContract.CurrentCarStateFuelPercent,
-        //        CurrentCarStateCurrentEtcAmount = receiveContract.CurrentCarStateCurrentEtcAmount,
-        //        CurrentCarStateCarStatusDescription = receiveContract.CurrentCarStateCarStatusDescription,
-        //        CurrentCarStateCarFrontImg = receiveContract.CurrentCarStateCarFrontImg,
-        //        CurrentCarStateCarBackImg = receiveContract.CurrentCarStateCarBackImg,
-        //        CurrentCarStateCarLeftImg = receiveContract.CurrentCarStateCarLeftImg,
-        //        CurrentCarStateCarRightImg = receiveContract.CurrentCarStateCarRightImg,
-        //        CurrentCarStateCarInteriorImg = receiveContract.CurrentCarStateCarInteriorImg,
-        //        CurrentCarStateCarBackSeatImg = receiveContract.CurrentCarStateCarBackSeatImg,
-        //        CurrentCarStateCarPhysicalDamage = receiveContract.CurrentCarStateCarPhysicalDamage,
-        //        DepositItemAsset = receiveContract.DepositItemAsset,
-        //        OriginalCondition = receiveContract.OriginalCondition,
-        //        CurrentCarStateCarDamageDescription = receiveContract.CurrentCarStateCarDamageDescription,
-        //        OrtherViolation = receiveContract.OrtherViolation,
-        //        CarInsuranceMoney = receiveContract.CarInsuranceMoney,
-        //        DetectedViolations = receiveContract.DetectedViolations,
-        //        SpeedingViolationDescription = receiveContract.SpeedingViolationDescription,
-        //        ForbiddenRoadViolationDescription = receiveContract.ForbiddenRoadViolationDescription,
-        //        TrafficLightViolationDescription = receiveContract.TrafficLightViolationDescription,
-        //        ExtraTime = receiveContract.ExtraTime,
-        //        UnpaidTicketMoney = receiveContract.UnpaidTicketMoney,
-        //        CreatedDate = receiveContract.CreatedDate,
-        //        IsExported = receiveContract.IsExported,
-        //        CustomerSignature = receiveContract.CustomerSignature,
-        //        StaffSignature = receiveContract.StaffSignature,
-        //        FilePath = host + receiveContract.FilePath,
-        //        FileWithSignsPath = host + receiveContract.FileWithSignsPath,
-        //        ContractStatusId = receiveContract.ContractStatusId,
-        //    };
-        //}
+            return new ReceiveContractDataModel
+            {
+                Id = receiveContract.Id,
+                ReceiverId = receiveContract.ReceiverId,
+                ReceiverName = receiveContract.Receiver.Name,
+                ReceiverPhoneNumber = receiveContract.Receiver.PhoneNumber,
+                ContractGroupId = receiveContract.ContractGroupId,
+                CustomerName = contractGroup.CustomerInfo.CustomerName,
+                CustomerPhoneNumber = contractGroup.CustomerInfo.PhoneNumber,
+                CustomerAddress = contractGroup.CustomerInfo.CustomerAddress,
+                CustomerCitizenIdentificationInfoNumber = contractGroup.CustomerInfo.CitizenIdentificationInfoNumber,
+                CustomerCitizenIdentificationInfoAddress = contractGroup.CustomerInfo.CitizenIdentificationInfoAddress,
+                CustomerCitizenIdentificationInfoDateReceive = contractGroup.CustomerInfo.CitizenIdentificationInfoDateReceive,
+                TransferContractId = contractGroup.TransferContract.Id,
+
+                DateReceive = receiveContract.DateReceive,
+                ReceiveAddress = receiveContract.ReceiveAddress,
+                CurrentCarStateSpeedometerNumber = receiveContract.CurrentCarStateSpeedometerNumber,
+                CurrentCarStateFuelPercent = receiveContract.CurrentCarStateFuelPercent,
+                CurrentCarStateCurrentEtcAmount = receiveContract.CurrentCarStateCurrentEtcAmount,
+                CurrentCarStateCarStatusDescription = receiveContract.CurrentCarStateCarStatusDescription,
+                OriginalCondition = receiveContract.OriginalCondition,
+
+                DepositItemDownPayment = receiveContract.DepositItemDownPayment,
+                ReturnDepostiItem = receiveContract.ReturnDepostiItem,
+                CreatedDate = receiveContract.CreatedDate,
+                CustomerSignature = receiveContract.CustomerSignature,
+                StaffSignature = receiveContract.StaffSignature,
+                FilePath = host + receiveContract.FilePath,
+                FileWithSignsPath = host + receiveContract.FileWithSignsPath,
+                ContractStatusId = receiveContract.ContractStatusId,
+
+                TotalKilometersTraveled = receiveContract.TotalKilometersTraveled,
+                CurrentCarStateCarDamageDescription = receiveContract.CurrentCarStateCarDamageDescription,
+                InsuranceMoney = receiveContract.InsuranceMoney,
+                ExtraTime = receiveContract.ExtraTime,
+
+                DetectedViolations = receiveContract.DetectedViolations,
+                SpeedingViolationDescription = receiveContract.SpeedingViolationDescription,
+                ForbiddenRoadViolationDescription = receiveContract.ForbiddenRoadViolationDescription,
+                TrafficLightViolationDescription = receiveContract.TrafficLightViolationDescription,
+                OrtherViolation = receiveContract.OrtherViolation,
+                ViolationMoney = receiveContract.ViolationMoney,
+                CurrentFuelMoney = receiveContract.CurrentFuelMoney,
+
+                ReceiveContractFileDataModels = receiveContractFiles,
+
+            };
+        }
 
         public ReceiveContractDataModel GetReceiveContractByContractGroupId(int contractGroupId)
         {
@@ -148,6 +151,8 @@ namespace CleanArchitecture.Application.Repository
                 TrafficLightViolationDescription = receiveContract.TrafficLightViolationDescription,
                 OrtherViolation = receiveContract.OrtherViolation,
                 ViolationMoney = receiveContract.ViolationMoney,
+                CurrentFuelMoney = receiveContract.CurrentFuelMoney,
+                
                 ReceiveContractFileDataModels = receiveContractFiles,
                 
             };
@@ -383,6 +388,7 @@ namespace CleanArchitecture.Application.Repository
                 FilePath = filePath,
                 ViolationMoney = request.ViolationMoney,
                 InsuranceMoney = request.InsuranceMoney,
+                CurrentFuelMoney = request.CurrentFuelMoney,
                 
             };
             _contractContext.ReceiveContracts.Add(receiveContract);
@@ -702,6 +708,7 @@ namespace CleanArchitecture.Application.Repository
             receiveContract.TrafficLightViolationDescription = request.TrafficLightViolationDescription;
             receiveContract.OrtherViolation = request.OrtherViolation;
             receiveContract.ViolationMoney = request.ViolationMoney;
+            receiveContract.CurrentFuelMoney = request.CurrentFuelMoney;
 
             _contractContext.ReceiveContracts.Update(receiveContract);
             _contractContext.SaveChanges();

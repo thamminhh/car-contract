@@ -39,6 +39,7 @@ namespace CleanArchitecture.Domain.Entities
         public string? OrtherViolation { get; set; }
         public double? ViolationMoney { get; set; }
         public double? TotalPayment { get; set; }
+        public double? CurrentFuelMoney { get; set; }
 
         public virtual ContractGroup? ContractGroup { get; set; }
         public virtual ContractStatus? ContractStatus { get; set; }
