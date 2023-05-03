@@ -312,7 +312,7 @@ namespace CleanArchitecture.Application.Repository
                 {
                     htmlContent += "<li>Vé cầu đường phát sinh chưa thanh toán: " + etcMoney + " VNĐ</li>";
                 }
-                htmlContent += "<li>Tiền xăng đã sử dụng: " + fuelMoney + " VNĐ/li>";
+                htmlContent += "<li>Tiền xăng đã sử dụng: " + fuelMoney + " VNĐ</li>";
                 htmlContent += "<li>Thời gian phụ trội so với hợp đồng: " + request.ExtraTime + " giờ, phụ phí phát sinh: " + extraTimeMoney + " VNĐ</li>";
                 if (overKm > 0)
                 {
@@ -323,22 +323,10 @@ namespace CleanArchitecture.Application.Repository
                     overKm = 0;
                     htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
                 }
-                if (request.OriginalCondition == true)
-                {
-                    htmlContent += "<li>Chi phí bảo hiểm: " + request.InsuranceMoney + "  VNĐ</li>";
-                }
-                if (request.OriginalCondition == false)
-                {
-                    htmlContent += "<li>Chi phí bảo hiểm: đang cập nhật </li>";
-                }
-                if (request.DetectedViolations == true)
-                {
-                    htmlContent += "<li>Tổng tiền vi phạm: " + request.ViolationMoney + " VNĐ</li>";
-                }
-                else
-                {
-                    htmlContent += "<li>Tổng tiền vi phạm: đang cập nhật </li>";
-                }
+
+                htmlContent += "<li>Chi phí bảo hiểm: " + request.InsuranceMoney + "  VNĐ</li>";
+                htmlContent += "<li>Tổng tiền vi phạm: " + request.ViolationMoney + " VNĐ</li>";
+
                 if(deposit >= 0)
                 {
                     htmlContent += "<li>Số tiền cọc trả lại cho khách: " + deposit + " VNĐ</li>";
@@ -594,7 +582,7 @@ namespace CleanArchitecture.Application.Repository
                 {
                     htmlContent += "<li>Vé cầu đường phát sinh chưa thanh toán: " + etcMoney + " VNĐ</li>";
                 }
-                htmlContent += "<li>Tiền xăng đã sử dụng: " + fuelMoney + " VNĐ/li>";
+                htmlContent += "<li>Tiền xăng đã sử dụng: " + fuelMoney + " VNĐ</li>";
                 htmlContent += "<li>Thời gian phụ trội so với hợp đồng: " + request.ExtraTime + " giờ, phụ phí phát sinh: " + extraTimeMoney + " VNĐ</li>";
                 if (overKm > 0)
                 {
@@ -605,22 +593,10 @@ namespace CleanArchitecture.Application.Repository
                     overKm = 0;
                     htmlContent += "<li>Số tiền phụ trội km: " + overKm * car.CarGenerallInfo.OverLimitedMileage + " VNĐ</li>";
                 }
-                if (request.OriginalCondition == true)
-                {
                     htmlContent += "<li>Chi phí bảo hiểm: " + request.InsuranceMoney + "  VNĐ</li>";
-                }
-                if (request.OriginalCondition == false)
-                {
-                    htmlContent += "<li>Chi phí bảo hiểm: đang cập nhật </li>";
-                }
-                if (request.DetectedViolations == false)
-                {
+                
                     htmlContent += "<li>Tổng tiền vi phạm: " + request.ViolationMoney + " VNĐ</li>";
-                }
-                else
-                {
-                    htmlContent += "<li>Tổng tiền vi phạm: đang cập nhật </li>";
-                }
+                
                 if (deposit >= 0)
                 {
                     htmlContent += "<li>Số tiền cọc trả lại cho khách: " + deposit + " VNĐ</li>";

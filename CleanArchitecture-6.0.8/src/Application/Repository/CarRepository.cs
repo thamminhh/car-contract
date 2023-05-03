@@ -964,7 +964,6 @@ namespace CleanArchitecture.Application.Repository
                 CarFuel = request.CarFuel,
                 PeriodicMaintenanceLimit = request.PeriodicMaintenanceLimit,
                 TankCapacity = request.TankCapacity,
-
             };
 
             // Save the new car to the database
